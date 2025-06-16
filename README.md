@@ -258,5 +258,6 @@ php artisan view:clear
 ----
 
 ```sh
+
 composer dump-autoload
 ```

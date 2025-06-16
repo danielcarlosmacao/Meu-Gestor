@@ -37,7 +37,7 @@
         <strong>Atualização do Sistema</strong>
     </div>
     <div class="card-body">
-        <button id="deploy-button" class="btn btn-warning">
+        <button id="deploy-button" class="btn btn-warning" disabled>
             Atualizar Sistema
         </button>
 
