@@ -24,7 +24,7 @@ sudo apt install -y git unzip curl php8.2 php8.2-fpm php8.2-mysql php8.2-mbstrin
 ```sh
 
 cd /var/www
-sudo git clone https://github.com/danielcarlosmacao/Gestor.git gestor
+sudo git clone https://github.com/danielcarlosmacao/Meu-Gestor.git gestor
 cd gestor
 ```
 
@@ -57,16 +57,17 @@ Recarregar privilégios? → y
 
 ```sh
 sudo mysql
+```
 
+```sh
 ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'SUA_SENHA_AQUI';
 FLUSH PRIVILEGES;
-EXIT;
 ```
 
 
-```sh
 
-mysql -u root -p
+
+```sh
 CREATE DATABASE Gestor DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 EXIT;
 ```
@@ -232,11 +233,13 @@ php artisan config:clear
 php artisan cache:clear
 php artisan route:clear
 php artisan view:clear
-composer dump-autoload
+
 ```
 
 
+
 #Update 
+
 ```sh
 cd /var/www/gestor
 git config --global --add safe.directory /var/www/gestor
@@ -251,5 +254,9 @@ php artisan config:clear
 php artisan cache:clear
 php artisan route:clear
 php artisan view:clear
+```
+----
+
+```sh
 composer dump-autoload
 ```

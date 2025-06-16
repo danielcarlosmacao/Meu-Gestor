@@ -13,8 +13,10 @@ php artisan migrate --force || exit
 
 echo "🚀 Limpando e atualizando cache do Laravel..."
 php artisan config:clear
-php artisan config:cache
+php artisan cache:clear
 php artisan route:cache
 php artisan view:cache
+
+
 
 echo "✅ Deploy finalizado com sucesso!"
