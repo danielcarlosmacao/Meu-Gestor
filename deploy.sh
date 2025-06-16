@@ -19,4 +19,4 @@ php artisan view:cache
 
 
 
-echo "✅ Deploy finalizado com sucesso!"
+echo "✅ Update finalizado com sucesso!"
