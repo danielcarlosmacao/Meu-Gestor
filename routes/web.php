@@ -24,6 +24,9 @@ use App\Http\Controllers\VacationManager\CollaboratorController;
 use App\Http\Controllers\VacationManager\VacationController;
 use App\Http\Controllers\VacationManager\VacationCalendarController;
 use App\Http\Controllers\DatabaseController;
+use App\Http\Controllers\Service\ClientController;
+use App\Http\Controllers\Service\EquipmentMaintenanceController;
+use App\Http\Controllers\Service\MaintenanceController;
 
 use Illuminate\Support\Facades\Artisan;
 
@@ -50,7 +53,8 @@ require __DIR__ . '/auth.php';
 
 //Route::get('/user', [UserController::class, 'index'])->name('user.index');
 Route::get('/', function () {
-    return view('welcome'); })->middleware(['auth', 'verified'])->name('welcome');
+    return view('welcome');
+})->middleware(['auth', 'verified'])->name('welcome');
 
 
 
@@ -66,15 +70,16 @@ Route::middleware(['auth', 'permission:administrator.user'])->group(function () 
     Route::put('/admin/usuarios/{user}/toggle', [UserController::class, 'toggleActive'])->name('admin.usuarios.toggle');
     Route::delete('/admin/usuarios/{user}', [UserController::class, 'destroy'])->name('admin.usuarios.destroy');
     Route::post('/admin/users/{user}/reset-password', [UserController::class, 'resetPassword'])->name('admin.users.reset-password');
-    Route::get('/admin/sessions',[UserController::class, 'usersOnline'])->name('admin.users.sessions');
+    Route::get('/admin/sessions', [UserController::class, 'usersOnline'])->name('admin.users.sessions');
     Route::delete('/admin/sessions/{user}', [UserController::class, 'destroySession'])->name('admin.sessions.destroy');
     Route::get('/admin/admin.systempanel', function () {
-    return view('admin.systempanel'); })->name('admin.systempanel');
+        return view('admin.systempanel');
+    })->name('admin.systempanel');
 });
 
 
 Route::middleware(['auth', 'permission:vacations.view'])->group(function () {
- // ROTAS PARA COLLABORATORS
+    // ROTAS PARA COLLABORATORS
     Route::get('/vacation_manager/collaborators', [CollaboratorController::class, 'index'])->name('vacation_manager.collaborators.index');
     Route::get('/vacation_manager/collaborators/create', [CollaboratorController::class, 'create'])->name('vacation_manager.collaborators.create');
     Route::post('/vacation_manager/collaborators', [CollaboratorController::class, 'store'])->name('vacation_manager.collaborators.store');
@@ -89,12 +94,12 @@ Route::middleware(['auth', 'permission:vacations.view'])->group(function () {
     Route::get('/vacation_manager/vacations/{id}/edit', [VacationController::class, 'edit'])->name('vacation_manager.vacations.edit');
     Route::put('/vacation_manager/vacations/{id}', [VacationController::class, 'update'])->name('vacation_manager.vacations.update');
     Route::delete('/vacation_manager/vacations/{id}', [VacationController::class, 'destroy'])->name('vacation_manager.vacations.destroy');
-        // CALENDÁRIO
+    // CALENDÁRIO
     Route::get('/vacation_manager/calendar', [VacationCalendarController::class, 'index'])->name('vacation_manager.calendar');
 });
 
 
-    
+
 
 
 //options
@@ -107,12 +112,12 @@ Route::middleware(['auth', 'permission:administrator.options'])->group(function 
     Route::get('/tower/repairsummary', [TowerController::class, 'repairsummary'])->name('tower.repairsummary');
     Route::post('/admin/options/resource', [OptionController::class, 'updateResource'])->name('options.resource.update');
     Route::get('/admin/options/system', [OptionController::class, 'editSystemResource'])->name('options.systemresource.edit');
-    
+
     Route::post('/admin/database/export', [DatabaseController::class, 'export'])->name('database.export');
     Route::post('/admin/database/import', [DatabaseController::class, 'import'])->name('database.import');
     Route::post('/admin/system/update', [DatabaseController::class, 'updateSystem'])->name('system.update');
 
-    
+
 });
 
 
@@ -200,7 +205,30 @@ Route::middleware(['auth', 'permission:fleets.delete'])->group(function () {
     Route::delete('/fleet/vehicle_services/{vehicleService}', [VehicleServiceController::class, 'destroy'])->name('fleet.vehicle_services.destroy');
     Route::delete('/fleet/vehicle_workshop/{id}', [WorkshopController::class, 'destroy'])->name('fleet.vehicle_workshop.destroy');
 });
-
+//service.view
+Route::middleware(['auth','permission:service.view'])->group(function () {
+    Route::get('/service/clients', [ClientController::class, 'index'])->name('service.clients.index');
+    Route::get('/service/equipment_maintenances', [EquipmentMaintenanceController::class, 'index'])->name('service.equipment_maintenances.index');
+    Route::get('/service/maintenances', [MaintenanceController::class, 'index'])->name('service.maintenances.index');
+});
+//service.create
+Route::middleware(['auth','permission:service.create'])->group(function () {
+    Route::post('/service/equipment_maintenances', [EquipmentMaintenanceController::class, 'store'])->name('service.equipment_maintenances.store');
+    Route::post('/service/clients', [ClientController::class, 'store'])->name('service.clients.store');
+    Route::post('/service/maintenances', [MaintenanceController::class, 'store'])->name('service.maintenances.store');
+});
+//service.update
+Route::middleware(['auth','permission:service.edit'])->group(function () {
+    Route::put('/service/maintenances/{maintenance}', [MaintenanceController::class, 'update'])->name('service.maintenances.update');
+    Route::put('/service/clients/{client}', [ClientController::class, 'update'])->name('service.clients.update');
+    Route::put('/service/equipment_maintenances/{equipment_maintenance}', [EquipmentMaintenanceController::class, 'update'])->name('service.equipment_maintenances.update');
+});
+//service.delete
+Route::middleware(['auth','permission:service.delete'])->group(function () {
+    Route::delete('/service/maintenances/{maintenance}', [MaintenanceController::class, 'destroy'])->name('service.maintenances.destroy');
+    Route::delete('/service/equipment_maintenances/{equipment_maintenance}', [EquipmentMaintenanceController::class, 'destroy'])->name('service.equipment_maintenances.destroy');
+    Route::delete('/service/clients/{client}', [ClientController::class, 'destroy'])->name('service.clients.destroy');
+});
 
 Route::get('/deploy/{token}', function ($token) {
     if ($token !== env('DEPLOY_TOKEN')) {

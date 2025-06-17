@@ -60,6 +60,22 @@
                         </div>
                     </div>
           
+
+                    {{-- Grupo: Frota --}}
+                    <div class="col-md-4 mb-3">
+                        <div class="border rounded p-3 shadow-sm h-100">
+                            <h6 class="fw-bold">Gestor de Serviços</h6>
+                            @foreach ($permissions->filter(fn($p) => str_contains($p->name, 'service')) as $permission)
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="permissions[]"
+                                        value="{{ $permission->name }}"
+                                        {{ $user->permissions->contains('name', $permission->name) ? 'checked' : '' }}>
+                                    <label class="form-check-label">{{ __('permissions.' . $permission->name) }}</label>
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
+          
                     {{-- Grupo: Ferias --}}
                     <div class="col-md-4 mb-3">
                         <div class="border rounded p-3 shadow-sm h-100">

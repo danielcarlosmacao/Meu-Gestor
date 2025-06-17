@@ -21,4 +21,8 @@
     'collaborators.edit'=> 'Edita colaboradores',
     'collaborators.delete'=> 'Deleta colaboradores',
     'vacation_manager.calendar'=> 'Visualiza Calendario',
+    'service.view' => 'Visualiza serviço',
+    'service.create'=> 'Cria serviço',
+    'service.edit'=> 'Edita serviço',
+    'service.delete'=> 'Deleta serviço',
 ];

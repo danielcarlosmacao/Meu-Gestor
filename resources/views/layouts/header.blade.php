@@ -62,7 +62,7 @@
                     @endcan
                     @can('fleets.view')
                         <!-- gestao de frota -->
-                        <li class="nav-item dropdown position-static" id="menuFinanceiro">
+                        <li class="nav-item dropdown position-static" id="menuFrota">
                             <a class="nav-link dropdown-toggle" href="#">GESTAO DE FROTA</a>
                             <div class="dropdown-menu mega-menu">
                                 <div class="row">
@@ -76,6 +76,23 @@
                                     </div>
                                     <div class="col-md-6">
                                         <h6>Em producao</h6>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                    @endcan
+                    @can('service.view')
+                        <!-- gestao de serviço -->
+                        <li class="nav-item dropdown position-static" id="menuServico">
+                            <a class="nav-link dropdown-toggle" href="#">GESTAO DE SERVIÇOS</a>
+                            <div class="dropdown-menu mega-menu">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <h6>Gestão</h6>
+                                        <a href="{{ route('service.clients.index') }}">Clientes</a>
+                                        <a href="{{ route('service.equipment_maintenances.index') }}">Manutencao de equipamentos</a>
+                                        <a href="{{ route('service.maintenances.index') }}">Visitas tecnicas</a>
+                                        <!--<a href="#">Abastecimentos</a>-->
                                     </div>
                                 </div>
                             </div>
@@ -175,7 +192,7 @@
 
     <!-- Hover script -->
     <script>
-        const hoverMenus = ['menutower', 'menuFinanceiro', 'menuFerias','menuAdmin','menuUser' ,];
+        const hoverMenus = ['menutower', 'menuFrota','menuServico', 'menuFerias','menuAdmin','menuUser' ,];
 
         hoverMenus.forEach(id => {
             const menu = document.getElementById(id);

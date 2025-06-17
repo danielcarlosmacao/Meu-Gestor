@@ -48,6 +48,12 @@ class PermissionSeeder extends Seeder
 
         // Permissões de calendario
         'vacation_manager.calendar',
+
+        //permição serviços
+        'service.view',
+        'service.create',
+        'service.edit',
+        'service.delete',
     ];
 
     // Criar permissões (se não existirem)
