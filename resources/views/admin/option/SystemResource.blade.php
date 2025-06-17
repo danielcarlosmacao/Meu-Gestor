@@ -43,11 +43,12 @@
     <!-- Atualizar Sistema -->
     <div class="card mt-4">
         <div class="card-body">
- <form method="POST" action="{{ route('system.update') }}">
+ <form action="{{ route('system.update') }}" method="POST" onsubmit="return confirm('Tem certeza que deseja atualizar o sistema agora?')">
     @csrf
-    <button class="btn btn-warning" onclick="return confirm('Deseja realmente atualizar o sistema?')">
+    <button class="btn btn-warning">
         Atualizar Sistema
     </button>
+</form>
 </form>
         </div>
     </div>

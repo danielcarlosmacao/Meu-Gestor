@@ -118,12 +118,33 @@ class DatabaseController extends Controller
 
 public function updateSystem()
 {
-        abort_unless(auth()->user()?->can('administrator.options'), 403);
-
     try {
-        Artisan::call('system:update');
+        $projectRoot = base_path();
+
+        // Define o diretório como seguro
+        exec("git config --global --add safe.directory '$projectRoot'");
+
+        // Salva alterações locais (se houver)
+        exec("cd $projectRoot && git stash");
+
+        // Atualiza com Git Pull
+        $pullOutput = [];
+        $result = 0;
+        exec("cd $projectRoot && git pull origin main 2>&1", $pullOutput, $result);
+        Log::info('Git pull output:', $pullOutput);
+
+        if ($result !== 0) {
+            $errorMessage = implode("\n", $pullOutput);
+            return back()->with('error', "Erro ao atualizar via Git:\n" . $errorMessage);
+        }
+
+        // Roda migrations e limpa caches
+        Artisan::call('migrate', ['--force' => true]);
+        Artisan::call('optimize:clear');
+
         return back()->with('success', 'Sistema atualizado com sucesso!');
     } catch (\Exception $e) {
+        Log::error('Erro ao atualizar sistema', ['erro' => $e->getMessage()]);
         return back()->with('error', 'Erro ao atualizar: ' . $e->getMessage());
     }
 }
