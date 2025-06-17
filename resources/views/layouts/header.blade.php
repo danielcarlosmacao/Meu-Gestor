@@ -123,27 +123,23 @@
                         </li>
                     @endcan
                     <!-- Verifica se o usuário está logado -->
-                    <ul class="navbar-nav ms-auto">
                         @auth
-                            <li class="nav-item dropdown">
-                                <a id="navbarDropdown" class="nav-link dropdown-toggle text-white" href="#"
-                                    role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                    {{ Auth::user()->name }}
-                                </a>
-                                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-                                    <li>
+                        <li class="nav-item dropdown position-static" id="menuUser">
+                            <a class="nav-link dropdown-toggle" href="#" style="color:rgb(0, 0, 0);"> <i class="bi bi-person-fill me-1"></i>{{ Auth::user()->name }}</a>
+                            <div class="dropdown-menu mega-menu">
+                                <div class="row">
+                                    <div class="col-md-6">
                                         <a class="dropdown-item" href="{{ route('profile.edit') }}">Editar Perfil</a>
-                                    </li>
-                                    <li>
+                                 
                                         <form method="POST" action="{{ route('logout') }}">
                                             @csrf
                                             <button type="submit" class="dropdown-item">Sair</button>
                                         </form>
-                                    </li>
-                                </ul>
-                            </li>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
                         @endauth
-                    </ul>
 
 
                 </ul>
@@ -179,7 +175,7 @@
 
     <!-- Hover script -->
     <script>
-        const hoverMenus = ['menutower', 'menuFinanceiro', 'menuFerias','menuAdmin', ];
+        const hoverMenus = ['menutower', 'menuFinanceiro', 'menuFerias','menuAdmin','menuUser' ,];
 
         hoverMenus.forEach(id => {
             const menu = document.getElementById(id);
