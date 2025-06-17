@@ -9,7 +9,7 @@ use App\Models\Battery;
 use App\Models\Equipment;
 use App\Models\Plate;
 use App\Services\SettingService;
-use App\Models\option;
+use App\Models\Option;
 
 class TowerController extends Controller
 {
