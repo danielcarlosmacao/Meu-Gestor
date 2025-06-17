@@ -110,7 +110,8 @@
                                         <h6>Gestão de recursos</h6>
                                         <a href="{{ route('options.colors.edit') }}">Tema </a>
                                         <a href="{{ route('options.resource.edit') }}">Recursos do sistema</a>
-                                        <a href="{{ route('admin.systempanel') }}">Recursos do servidor</a>
+                                        <a href="{{ route('admin.systempanel') }}">Painel do sistema</a>
+                                        <a href="{{ route('options.systemresource.edit') }}">Gestao do sistema</a>
                                     </div>
                                     <div class="col-md-6">
                                         <h6>Acessos</h6>

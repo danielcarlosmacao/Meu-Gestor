@@ -71,6 +71,12 @@ class OptionController extends Controller
         }
         return redirect()->back()->with('success', 'Cores atualizadas com sucesso!');
     }
+    
+    public function editSystemResource()
+    {
+        $options = Option::pluck('value', 'reference')->toArray();
+        return view('admin.option.SystemResource', compact('options'));
+    }
 
 
     public function updateLogo(Request $request)

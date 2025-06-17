@@ -28,9 +28,13 @@ sudo git clone https://github.com/danielcarlosmacao/Meu-Gestor.git gestor
 cd gestor
 ```
 
+```sh
+git update-index --assume-unchanged .env
+git update-index --assume-unchanged -R vendor/
+```
+
 
 ```sh
-
 sudo chown -R www-data:www-data .
 sudo chmod -R 775 storage
 sudo chmod -R 775 bootstrap/cache

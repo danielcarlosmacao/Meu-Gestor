@@ -23,6 +23,7 @@ use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\VacationManager\CollaboratorController;
 use App\Http\Controllers\VacationManager\VacationController;
 use App\Http\Controllers\VacationManager\VacationCalendarController;
+use App\Http\Controllers\DatabaseController;
 
 use Illuminate\Support\Facades\Artisan;
 
@@ -101,9 +102,16 @@ Route::middleware(['auth', 'permission:administrator.options'])->group(function 
     Route::get('/admin/options/colors', [OptionController::class, 'editColors'])->name('options.colors.edit');
     Route::post('/admin/options/colors', [OptionController::class, 'updateColors'])->name('options.colors.update');
     Route::get('/admin/options/resource', [OptionController::class, 'editResource'])->name('options.resource.edit');
-    Route::post('/admin/options/resource', [OptionController::class, 'updateResource'])->name('options.resource.update');
+    Route::post('/admin/options/system', [OptionController::class, 'updateSystemResource'])->name('options.systemresource.update');
     Route::post('/admin/options/logo', [OptionController::class, 'updatelogo'])->name('options.logo.update');
     Route::get('/tower/repairsummary', [TowerController::class, 'repairsummary'])->name('tower.repairsummary');
+    Route::post('/admin/options/resource', [OptionController::class, 'updateResource'])->name('options.resource.update');
+    Route::get('/admin/options/system', [OptionController::class, 'editSystemResource'])->name('options.systemresource.edit');
+    
+    Route::post('/admin/database/export', [DatabaseController::class, 'export'])->name('database.export');
+    Route::post('/admin/database/import', [DatabaseController::class, 'import'])->name('database.import');
+    Route::post('/admin/system/update', [DatabaseController::class, 'updateSystem'])->name('system.update');
+
     
 });
 
