@@ -43,13 +43,14 @@
     <!-- Atualizar Sistema -->
     <div class="card mt-4">
         <div class="card-body">
- <form action="{{ route('system.update') }}" method="POST" onsubmit="return confirm('Tem certeza que deseja atualizar o sistema agora?')">
-    @csrf
-    <button class="btn btn-warning">
-        Atualizar Sistema
-    </button>
-</form>
-</form>
+            <form id="update-form" action="{{ route('system.update') }}" method="POST">
+                @csrf
+                <button type="button" class="btn btn-warning" id="update-btn" onclick="confirmUpdate()">
+                    <span id="btn-text">Atualizar Sistema via Git</span>
+                    <span id="btn-spinner" class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+                </button>
+            </form>
+
         </div>
     </div>
 </div>
