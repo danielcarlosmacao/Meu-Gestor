@@ -122,17 +122,24 @@ public function updateSystem()
         // Diretório raiz do projeto
         $projectRoot = base_path();
 
-        // Comando git pull (ignora conflito se .env ou vendor tiverem sido comitados)
+        // Comando git pull
         $cmd = 'git pull origin main';
 
         // Stash para evitar conflitos locais
+        $stashOutput = [];
         exec("cd $projectRoot && git stash", $stashOutput);
-        exec("cd $projectRoot && $cmd", $pullOutput, $result);
 
+        // Executa o git pull e armazena a saída e o código de retorno
+        $pullOutput = [];
+        $result = 0;
+        exec("cd $projectRoot && $cmd 2>&1", $pullOutput, $result);
+
+        // Registra o log da saída do git
         Log::info('Git pull output:', $pullOutput);
 
         if ($result !== 0) {
-            return back()->with('error', 'Erro ao atualizar via Git.');
+            $errorMessage = implode("\n", $pullOutput);
+            return back()->with('error', "Erro ao atualizar via Git:\n" . $errorMessage);
         }
 
         // Roda as migrations
@@ -147,5 +154,6 @@ public function updateSystem()
         return back()->with('error', 'Falha ao atualizar: ' . $e->getMessage());
     }
 }
+
 
 }
