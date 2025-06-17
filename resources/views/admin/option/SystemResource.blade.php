@@ -18,7 +18,7 @@
             <div class="card-body">
                 <form action="{{ route('database.export') }}" method="POST">
                     @csrf
-                    <button class="btn btn-primary">Exportar Banco de Dados</button>
+                    <button class="btn dcm-btn-primary">Exportar Banco de Dados</button>
                 </form>
             </div>
         </div>
@@ -32,7 +32,7 @@
                         <label for="sql_file" class="form-label">Importar banco (.sql)</label>
                         <input type="file" name="sql_file" id="sql_file" class="form-control" required>
                     </div>
-                    <button type="submit" class="btn btn-primary">Importar Banco</button>
+                    <button type="submit" class="btn dcm-btn-primary">Importar Banco</button>
                 </form>
 
             </div>

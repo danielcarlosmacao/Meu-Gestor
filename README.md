@@ -30,7 +30,8 @@ cd gestor
 
 ```sh
 git update-index --assume-unchanged .env
-git update-index --assume-unchanged -R vendor/
+git update-index --assume-unchanged vendor/composer/autoload_real.php
+git update-index --assume-unchanged vendor/autoload.php
 ```
 
 
