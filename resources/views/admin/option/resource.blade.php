@@ -32,71 +32,12 @@
         <a href="" class="btn btn-warning" role="button" aria-pressed="true" onclick="mostrarPopupConfirmacao(); return false;">Reparar Torres</a>
     </form>
     <br>
-<div class="card mb-4">
-    <div class="card-header">
-        <strong>Atualização do Sistema</strong>
-    </div>
-    <div class="card-body">
-        <button id="deploy-button" class="btn btn-warning" disabled>
-            Atualizar Sistema
-        </button>
 
-        <div id="deploy-result" class="mt-3"></div>
-    </div>
-</div>
 
 
 
 
 </div>
-@push('scripts')
-<script>
-document.getElementById('deploy-button').addEventListener('click', function () {
-    if (!confirm('Deseja realmente atualizar o sistema?')) return;
-
-    const button = this;
-    button.disabled = true;
-    button.innerText = 'Atualizando...';
-    document.getElementById('deploy-result').innerHTML = '';
-
-    fetch('{{ route('deploy.manual', ['token' => env('DEPLOY_TOKEN')]) }}')
-        .then(async response => {
-            const contentType = response.headers.get("content-type");
-
-            if (!response.ok) {
-                const text = await response.text();
-                throw new Error(`Erro ${response.status}: ${text.slice(0, 200)}`);
-            }
-
-            if (contentType && contentType.includes("application/json")) {
-                return response.json();
-            } else {
-                const text = await response.text();
-                throw new Error('Resposta inesperada: ' + text.slice(0, 200));
-            }
-        })
-        .then(data => {
-            document.getElementById('deploy-result').innerHTML = `
-                <div class="alert alert-success">
-                    <strong>Atualização concluída com sucesso!</strong><br>
-                    <pre>${data.output.join('\n')}</pre>
-                </div>
-            `;
-        })
-        .catch(error => {
-            document.getElementById('deploy-result').innerHTML = `
-                <div class="alert alert-danger">
-                    Erro ao atualizar: ${error.message}
-                </div>
-            `;
-        })
-        .finally(() => {
-            button.disabled = false;
-            button.innerText = 'Atualizar Sistema';
-        });
-});
-</script>
-@endpush
 
 
 @endsection
