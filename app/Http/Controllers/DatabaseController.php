@@ -118,7 +118,7 @@ class DatabaseController extends Controller
 
 public function updateSystem()
 {
-        abort_unless(auth()->user()?->can('admin'), 403);
+        abort_unless(auth()->user()?->can('administrator.options'), 403);
 
     try {
         Artisan::call('system:update');
