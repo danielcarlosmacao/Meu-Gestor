@@ -100,8 +100,8 @@ class TowerController extends Controller
         $batteries = Battery::orderBy('name', 'asc')->get();
         $plates = Plate::orderBy('name', 'asc')->get();
         $summary = $tower->summary;
-        $hours_Generation = option::where('reference', 'hours_Generation')->value('value') ?? 5;
-        $hours_autonomy = option::where('reference', 'hours_autonomy')->value('value') ?? 48;
+        $hours_Generation = Option::where('reference', 'hours_Generation')->value('value') ?? 5;
+        $hours_autonomy = Option::where('reference', 'hours_autonomy')->value('value') ?? 48;
 
         $consumptionAhDay = $tower->summary->consumption_ah_day ?? 0;
         $platerrequire = $hours_Generation > 0
