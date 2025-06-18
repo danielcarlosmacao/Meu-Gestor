@@ -55,10 +55,10 @@ require __DIR__ . '/auth.php';
 //Route::get('/user', [UserController::class, 'index'])->name('user.index');
 Route::get('/welcome', function () {
     return view('welcome');
-})->middleware(['auth', 'verified'])->name('welcome');
+})->middleware(['auth', 'verified'])->name('welcome1');
 
 Route::middleware(['auth'])->group(function () {
-    Route::get('/', [PostitController::class, 'index'])->name('postits.index');
+    Route::get('/', [PostitController::class, 'index'])->name('welcome');
     Route::post('/postits', [PostitController::class, 'store'])->name('postits.store');
     Route::put('/postits/{id}', [PostitController::class, 'update'])->name('postits.update');
     Route::delete('/postits/{id}', [PostitController::class, 'destroy'])->name('postits.destroy');

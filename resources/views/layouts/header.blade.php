@@ -28,7 +28,7 @@
 <body class="d-flex flex-column min-vh-100">
     <nav class="navbar navbar-expand-lg navbar-dark bgc-primary">
         <div class="container-fluid">
-            <a class="navbar-brand" href="{{ route('postits.index') }}">
+            <a class="navbar-brand" href="{{ route('welcome') }}">
                 @if (!empty($appOptions['logo']))
                     <img src="{{ asset($appOptions['logo']) }}" alt="Logo do Sistema" style="height: 50px;">
                 @else
