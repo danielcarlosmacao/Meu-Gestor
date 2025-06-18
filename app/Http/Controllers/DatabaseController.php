@@ -126,6 +126,8 @@ public function updateSystem()
 
         // Salva alterações locais (se houver)
         exec("cd $projectRoot && git stash");
+        # Garante que o .env local será ignorado
+        exec("git update-index --skip-worktree .env");
 
         // Atualiza com Git Pull
         $pullOutput = [];

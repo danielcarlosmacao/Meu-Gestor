@@ -228,6 +228,8 @@ php artisan route:cache
 php artisan view:cache
 chmod +x /var/www/gestor/deploy.sh
 sudo chmod +x /var/www/gestor/deploy.sh
+sudo chown -R www-data:www-data /var/www/gestor/.git
+sudo chown -R www-data:www-data /var/www/gestor
 
 
 ```
