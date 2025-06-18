@@ -3,10 +3,10 @@
 
 @section('content')
 <div class="container mt-5">
-    <h2>Clientes
+    <h2  class="text-center" >Clientes
         @can('service.create')
         <button class="btn dcm-btn-primary btn-sm ms-2" data-bs-toggle="modal" data-bs-target="#addClientModal">
-            + Novo Cliente
+            <i class="bi bi-plus-lg"></i>
         </button>
         @endcan
     </h2>

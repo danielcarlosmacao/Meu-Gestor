@@ -3,13 +3,13 @@
 @section('content')
 
     <div class="container mt-5">
-        <h2>Oficinas e Mecanicas
+        <h2 class="text-center" >Oficinas e Mecanicas
             @can('fleets.create')
             <button class="btn dcm-btn-primary btn-sm ms-2" data-bs-toggle="modal" data-bs-target="#createServiceModal">
                 <i class="bi bi-plus-lg"></i>
             </button>
             @endcan
-        </h2>
+        </h2> 
 
         @if (session('success'))
             <div class="alert alert-success mt-3">{{ session('success') }}</div>

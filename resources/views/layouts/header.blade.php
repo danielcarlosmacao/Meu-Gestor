@@ -46,13 +46,14 @@
                                     <div class="col-md-1">
                                     </div>
                                     <div class="col-md-6">
-                                        <h6></h6>
+                                        <h6>Gestão das torres</h6>
                                         <a href="{{ route('tower.index') }}">Torres</a>
                                         <a href="{{ route('battery.index') }}">Baterias</a>
                                         <a href="{{ route('equipment.index') }}">Equipamentos</a>
                                         <a href="{{ route('plate.index') }}">Placas solar</a>
                                     </div>
                                     <div class="col-md-5">
+                                        <h6>Extra</h6>
                                         <a href="{{ route('maintenance.index') }}"><i class="fa fa-cogs"></i> Serviços</a>
                                     </div>
 
@@ -67,15 +68,12 @@
                             <div class="dropdown-menu mega-menu">
                                 <div class="row">
                                     <div class="col-md-6">
-                                        <h6>Gestão</h6>
+                                        <h6>Gestão da frota</h6>
                                         <a href="{{ route('fleet.vehicles.index') }}">Veiculos</a>
                                         <a href="{{ route('fleet.vehicle_maintenances.index') }}">Manutencao</a>
                                         <a href="{{ route('fleet.vehicle_services.index') }}">Servicos</a>
                                         <a href="{{ route('fleet.vehicle_workshop.index') }}">Oficinas</a>
                                         <!--<a href="#">Abastecimentos</a>-->
-                                    </div>
-                                    <div class="col-md-6">
-                                        <h6>Em producao</h6>
                                     </div>
                                 </div>
                             </div>
@@ -88,7 +86,7 @@
                             <div class="dropdown-menu mega-menu">
                                 <div class="row">
                                     <div class="col-md-6">
-                                        <h6>Gestão</h6>
+                                        <h6>Gestão dos seviços</h6>
                                         <a href="{{ route('service.clients.index') }}">Clientes</a>
                                         <a href="{{ route('service.equipment_maintenances.index') }}">Manutencao de equipamentos</a>
                                         <a href="{{ route('service.maintenances.index') }}">Visitas tecnicas</a>
@@ -105,6 +103,7 @@
                             <div class="dropdown-menu mega-menu">
                                 <div class="row">
                                     <div class="col-md-6">
+                                        <h6>Gestão das ferias</h6>
                                         @can('collaborators.view')<a href="{{ route('vacation_manager.collaborators.index') }}">Colaboradores </a>@endcan
                                         @can('vacations.edit')<a href="{{ route('vacation_manager.vacations.index') }}">Ferias</a>@endcan
                                         @can('vacation_manager.calendar')<a href="{{ route('vacation_manager.calendar') }}">Calendario</a>@endcan

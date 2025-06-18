@@ -3,7 +3,7 @@
 @section('content')
 
     <div class="container mt-5">
-        <h2>Serviços de Veículos
+        <h2  class="text-center" >Serviços de Veículos
             @can('fleets.create')
             <button class="btn dcm-btn-primary btn-sm ms-2" data-bs-toggle="modal" data-bs-target="#createServiceModal">
                 <i class="bi bi-plus-lg"></i>
