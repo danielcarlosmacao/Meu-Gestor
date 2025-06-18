@@ -51,6 +51,8 @@
           <div class="info-icon">🖥️</div>
           <h5 class="card-title">Sistema</h5>
           <p class="card-text">{{ php_uname('s') }} {{ php_uname('r') }}</p>
+          <h5 class="card-title">Versao</h5>
+          <p class="card-text">{{ trim(file_get_contents(base_path('VERSION'))) }}</p>
         </div>
       </div>
     </div>

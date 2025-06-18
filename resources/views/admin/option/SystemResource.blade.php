@@ -45,6 +45,7 @@
         <div class="card-body">
             <form id="update-form" action="{{ route('system.update') }}" method="POST">
                 @csrf
+                <label for="upadte" class="form-label">Versão: {{ trim(file_get_contents(base_path('VERSION'))) }}</label><br>
                 <button type="button" class="btn btn-warning" id="update-btn" onclick="confirmUpdate()">
                     <span id="btn-text">Atualizar Sistema via Git</span>
                     <span id="btn-spinner" class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
