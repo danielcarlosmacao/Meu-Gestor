@@ -123,6 +123,8 @@ public function updateSystem()
 
         // Define o diretório como seguro
         exec("git config --global --add safe.directory '$projectRoot'");
+        exec("sudo chown -R $(whoami):$(whoami) .git");
+        exec("chmod -R u+rwX .git");
 
         // Salva alterações locais (se houver)
         exec("cd $projectRoot && git stash");
