@@ -27,6 +27,7 @@ use App\Http\Controllers\DatabaseController;
 use App\Http\Controllers\Service\ClientController;
 use App\Http\Controllers\Service\EquipmentMaintenanceController;
 use App\Http\Controllers\Service\MaintenanceController;
+use App\Http\Controllers\PostitController;
 
 use Illuminate\Support\Facades\Artisan;
 
@@ -52,11 +53,16 @@ require __DIR__ . '/auth.php';
 
 
 //Route::get('/user', [UserController::class, 'index'])->name('user.index');
-Route::get('/', function () {
+Route::get('/welcome', function () {
     return view('welcome');
 })->middleware(['auth', 'verified'])->name('welcome');
 
-
+Route::middleware(['auth'])->group(function () {
+    Route::get('/', [PostitController::class, 'index'])->name('postits.index');
+    Route::post('/postits', [PostitController::class, 'store'])->name('postits.store');
+    Route::put('/postits/{id}', [PostitController::class, 'update'])->name('postits.update');
+    Route::delete('/postits/{id}', [PostitController::class, 'destroy'])->name('postits.destroy');
+});
 
 
 //admin
@@ -229,6 +235,9 @@ Route::middleware(['auth','permission:service.delete'])->group(function () {
     Route::delete('/service/equipment_maintenances/{equipment_maintenance}', [EquipmentMaintenanceController::class, 'destroy'])->name('service.equipment_maintenances.destroy');
     Route::delete('/service/clients/{client}', [ClientController::class, 'destroy'])->name('service.clients.destroy');
 });
+
+
+
 
 Route::get('/deploy/{token}', function ($token) {
     if ($token !== env('DEPLOY_TOKEN')) {
