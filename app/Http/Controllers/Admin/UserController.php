@@ -30,6 +30,27 @@ class UserController extends Controller
     }
     public function updatePermissions(Request $request, User $user)
     {
+
+            $roles = $request->input('roles', []);
+    
+    // Verifica se o usuário está perdendo a role 'admin'
+    $hadAdminRole = $user->hasRole('administrator');
+    $willHaveAdminRole = in_array('administrator', $roles);
+    
+    if ($hadAdminRole && !$willHaveAdminRole) {
+        // Está removendo a role admin deste usuário
+        // Conta quantos usuários admin existem (exceto o atual)
+        $adminCount = Role::findByName('administrator')
+            ->users()
+            ->where('id', '!=', $user->id)
+            ->count();
+        
+        if ($adminCount === 0) {
+            // Não pode remover porque seria o último admin
+            return redirect()->route('admin.usuarios.index')->with('error', 'Não é permitido remover a última conta com permissão de administrador.');
+        }
+    }
+    
         // Atualiza os papéis (roles)
         if ($request->has('roles')) {
             $user->syncRoles($request->input('roles'));
@@ -107,6 +128,10 @@ class UserController extends Controller
     }
     public function toggleActive(User $user)
     {
+        if (auth()->id() === $user->id) {
+             return redirect()->route('admin.usuarios.index')->with('error', 'Você não pode desativar a si mesmo.');
+        }
+
         $user->active = !$user->active;
         $user->save();
 
@@ -115,7 +140,7 @@ class UserController extends Controller
     public function destroy(User $user)
     {
         if (auth()->id() === $user->id) {
-            return redirect()->back()->with('error', 'Você não pode excluir a si mesmo.');
+             return redirect()->route('admin.usuarios.index')->with('error', 'Você não pode excluir a si mesmo.');
         }
 
         $user->delete();

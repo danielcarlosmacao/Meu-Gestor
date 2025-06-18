@@ -6,6 +6,11 @@
         {{ session('success') }}
     </div>
 @endif
+   @if (session('error'))
+    <div class="alert alert-danger mt-2">
+        <pre class="mb-0">{{ session('error') }}</pre>
+    </div>
+@endif
 
 
     <div class="container mt-5">
