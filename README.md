@@ -28,12 +28,6 @@ sudo git clone https://github.com/danielcarlosmacao/Meu-Gestor.git gestor
 cd gestor
 ```
 
-```sh
-git update-index --assume-unchanged .env
-git update-index --assume-unchanged vendor/composer/autoload_real.php
-git update-index --assume-unchanged vendor/autoload.php
-```
-
 
 ```sh
 sudo chown -R www-data:www-data .
@@ -215,11 +209,19 @@ sudo supervisorctl update
 ```
 
 ```sh
-
 crontab -e
 ```
 
+```sh
 * * * * * cd /var/www/nome-do-projeto && php artisan schedule:run >> /dev/null 2>&1
+```
+
+```sh
+ git config --global --add safe.directory /var/www/gestor
+git update-index --assume-unchanged .env
+git update-index --assume-unchanged vendor/composer/autoload_real.php
+git update-index --assume-unchanged vendor/autoload.php
+```
 
 
 ```sh
