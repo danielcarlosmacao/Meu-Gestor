@@ -221,25 +221,14 @@ crontab -e
 
 * * * * * cd /var/www/nome-do-projeto && php artisan schedule:run >> /dev/null 2>&1
 
-```sh
-
-php artisan config:cache
-php artisan route:cache
-php artisan view:cache
-chmod +x /var/www/gestor/deploy.sh
-sudo chmod +x /var/www/gestor/deploy.sh
-sudo chown -R www-data:www-data /var/www/gestor/.git
-sudo chown -R www-data:www-data /var/www/gestor
-
-
-```
-
 
 ```sh
 php artisan config:clear
 php artisan cache:clear
 php artisan route:clear
 php artisan view:clear
+sudo rm -rf /var/www/gestor/public/storage
+php artisan storage:link
 
 ```
 
