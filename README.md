@@ -233,10 +233,19 @@ sudo rm -rf /var/www/gestor/public/storage
 php artisan storage:link
 
 ```
+# aumentar memoria PHP
 
+ ```sh
+nano /etc/php/8.2/fpm/php.ini
+```
+procure memory_limit = 128M e mude para para memory_limit = 1024M
 
+ ```sh
+sudo service php8.2-fpm restart
+sudo service nginx restart
+```
 
-#Update 
+# Update 
 
 ```sh
 cd /var/www/gestor
