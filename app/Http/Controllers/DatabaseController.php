@@ -118,39 +118,61 @@ class DatabaseController extends Controller
 
 public function updateSystem()
 {
-    try {
-        $projectRoot = base_path();
+try {
+    $projectRoot = base_path();
 
-        // Define o diretório como seguro
-        exec("git config --global --add safe.directory '$projectRoot'");
-        exec("sudo chown -R $(whoami):$(whoami) .git");
-        exec("chmod -R u+rwX .git");
+    Log::info('Iniciando update via Git');
 
-        // Salva alterações locais (se houver)
-        exec("cd $projectRoot && git stash");
-        # Garante que o .env local será ignorado
-        exec("git update-index --skip-worktree .env");
+    // Define o diretório como seguro
+    exec("git config --global --add safe.directory '$projectRoot'");
+    exec("sudo chown -R $(whoami):$(whoami) .git");
+    exec("chmod -R u+rwX .git");
+    Log::info('Configurações do diretório .git aplicadas');
 
-        // Atualiza com Git Pull
-        $pullOutput = [];
-        $result = 0;
-        exec("cd $projectRoot && git pull origin main 2>&1", $pullOutput, $result);
-        Log::info('Git pull output:', $pullOutput);
+    // Salva alterações locais (se houver)
+    exec("cd $projectRoot && git stash");
+    Log::info('Alterações locais stashed');
 
-        if ($result !== 0) {
-            $errorMessage = implode("\n", $pullOutput);
-            return back()->with('error', "Erro ao atualizar via Git:\n" . $errorMessage);
-        }
+    // Garante que o .env local será ignorado
+    exec("git update-index --skip-worktree .env");
+    Log::info('.env marcado como skip-worktree');
 
-        // Roda migrations e limpa caches
-        Artisan::call('migrate', ['--force' => true]);
-        Artisan::call('optimize:clear');
+    // Atualiza com Git Pull
+    $pullOutput = [];
+    $result = 0;
+    exec("cd $projectRoot && git pull origin main 2>&1", $pullOutput, $result);
+    Log::info('Git pull output:', $pullOutput);
 
-        return back()->with('success', 'Sistema atualizado com sucesso!');
-    } catch (\Exception $e) {
-        Log::error('Erro ao atualizar sistema', ['erro' => $e->getMessage()]);
-        return back()->with('error', 'Erro ao atualizar: ' . $e->getMessage());
+    if ($result !== 0) {
+        $errorMessage = implode("\n", $pullOutput);
+        Log::error('Erro no git pull', ['output' => $pullOutput]);
+        return back()->with('error', "Erro ao atualizar via Git:\n" . $errorMessage);
     }
+
+    // Checa se o link de storage já existe antes de criar
+    $storageLink = public_path('storage');
+    if (!is_link($storageLink)) {
+        Log::info('Link simbólico storage/storage não encontrado, criando...');
+        Artisan::call('storage:link');
+        Log::info('Link simbólico storage/storage criado com sucesso');
+    } else {
+        Log::info('Link simbólico storage/storage já existe, pulando criação');
+    }
+
+    // Roda migrations e limpa caches
+    Artisan::call('migrate', ['--force' => true]);
+    Log::info('Migrations rodadas com sucesso');
+
+    Artisan::call('optimize:clear');
+    Log::info('Caches limpos');
+
+    return back()->with('success', 'Sistema atualizado com sucesso!');
+
+} catch (\Exception $e) {
+    Log::error('Erro ao atualizar sistema', ['erro' => $e->getMessage()]);
+    return back()->with('error', 'Erro ao atualizar: ' . $e->getMessage());
+}
+
 }
 
 
