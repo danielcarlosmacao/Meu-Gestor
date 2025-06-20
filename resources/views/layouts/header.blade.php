@@ -71,7 +71,7 @@
                                         <h6>Gestão da frota</h6>
                                         <a href="{{ route('fleet.vehicles.index') }}">Veiculos</a>
                                         <a href="{{ route('fleet.vehicle_maintenances.index') }}">Manutencao</a>
-                                        <a href="{{ route('fleet.vehicle_services.index') }}">Servicos</a>
+                                        <a href="{{ route('fleet.vehicle_services.index') }}">Tipos de servicos</a>
                                         <a href="{{ route('fleet.vehicle_workshop.index') }}">Oficinas</a>
                                         <!--<a href="#">Abastecimentos</a>-->
                                     </div>
@@ -88,7 +88,8 @@
                                     <div class="col-md-6">
                                         <h6>Gestão dos seviços</h6>
                                         <a href="{{ route('service.clients.index') }}">Clientes</a>
-                                        <a href="{{ route('service.equipment_maintenances.index') }}">Manutencao de equipamentos</a>
+                                        <a href="{{ route('service.equipment_maintenances.index') }}">Manutencao de
+                                            equipamentos</a>
                                         <a href="{{ route('service.maintenances.index') }}">Visitas tecnicas</a>
                                         <!--<a href="#">Abastecimentos</a>-->
                                     </div>
@@ -104,13 +105,19 @@
                                 <div class="row">
                                     <div class="col-md-6">
                                         <h6>Gestão das ferias</h6>
-                                        @can('collaborators.view')<a href="{{ route('vacation_manager.collaborators.index') }}">Colaboradores </a>@endcan
-                                        @can('vacations.edit')<a href="{{ route('vacation_manager.vacations.index') }}">Ferias</a>@endcan
-                                        @can('vacation_manager.calendar')<a href="{{ route('vacation_manager.calendar') }}">Calendario</a>@endcan
+                                        @can('collaborators.view')
+                                            <a href="{{ route('vacation_manager.collaborators.index') }}">Colaboradores </a>
+                                        @endcan
+                                        @can('vacations.edit')
+                                            <a href="{{ route('vacation_manager.vacations.index') }}">Registro de ferias</a>
+                                        @endcan
+                                        @can('vacation_manager.calendar')
+                                            <a href="{{ route('vacation_manager.calendar') }}">Calendario</a>
+                                        @endcan
                                     </div>
                                     <div class="col-md-6">
                                         <h6></h6>
-                                        
+
                                     </div>
                                 </div>
                             </div>
@@ -124,38 +131,43 @@
                                 <div class="row">
                                     <div class="col-md-6">
                                         <h6>Gestão de recursos</h6>
-                                        <a href="{{ route('options.colors.edit') }}">Tema </a>
+                                        <a href="{{ route('options.colors.edit') }}">Estilos e logo do sistema</a>
                                         <a href="{{ route('options.resource.edit') }}">Recursos do sistema</a>
-                                        <a href="{{ route('admin.systempanel') }}">Painel do sistema</a>
-                                        <a href="{{ route('options.systemresource.edit') }}">Gestao do sistema</a>
+                                        <a href="{{ route('admin.systempanel') }}">Painel de informativo do sistema</a>
+                                        <a href="{{ route('options.systemresource.edit') }}">Recursos do administrador</a>
                                     </div>
                                     <div class="col-md-6">
                                         <h6>Acessos</h6>
                                         <a href="{{ route('admin.usuarios.index') }}">Usuarios</a>
-                                        <a href="{{ route('admin.users.sessions') }}">Sessões</a>
+                                        <a href="{{ route('admin.users.sessions') }}">Sessões ativas</a>
                                     </div>
                                 </div>
                             </div>
                         </li>
                     @endcan
                     <!-- Verifica se o usuário está logado -->
-                        @auth
+                    @auth
                         <li class="nav-item dropdown position-static" id="menuUser">
-                            <a class="nav-link dropdown-toggle" href="#" style="color:rgb(0, 0, 0);"> <i class="bi bi-person-fill me-1"></i>{{ Auth::user()->name }}</a>
+                            <a class="nav-link dropdown-toggle" href="#" style="color:rgb(0, 0, 0);"> <i
+                                    class="bi bi-person-fill me-1"></i>{{ Auth::user()->name }}</a>
                             <div class="dropdown-menu mega-menu">
                                 <div class="row">
                                     <div class="col-md-6">
                                         <a class="dropdown-item" href="{{ route('profile.edit') }}">Editar Perfil</a>
-                                 
-                                        <form method="POST" action="{{ route('logout') }}">
+
+                                        <form id="logout-form" method="POST" action="{{ route('logout') }}"
+                                            style="display: none;">
                                             @csrf
-                                            <button type="submit" class="dropdown-item">Sair</button>
                                         </form>
+                                        <a href="#"
+                                            onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                                            Sair
+                                        </a>
                                     </div>
                                 </div>
                             </div>
                         </li>
-                        @endauth
+                    @endauth
 
 
                 </ul>
@@ -190,7 +202,7 @@
 
     <!-- Hover script -->
     <script>
-        const hoverMenus = ['menutower', 'menuFrota','menuServico', 'menuFerias','menuAdmin','menuUser' ,];
+        const hoverMenus = ['menutower', 'menuFrota', 'menuServico', 'menuFerias', 'menuAdmin', 'menuUser', ];
 
         hoverMenus.forEach(id => {
             const menu = document.getElementById(id);
