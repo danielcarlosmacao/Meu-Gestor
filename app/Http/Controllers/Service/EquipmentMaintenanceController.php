@@ -6,14 +6,16 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\ServiceEquipmentMaintenance;
 use App\Models\ServiceClient;
+use App\Services\SettingService;
 
 class EquipmentMaintenanceController extends Controller
 {
     
 
-    public function index()
+    public function index(SettingService $settingService)
     {
-        $maintenances = ServiceEquipmentMaintenance::with('serviceClient')->paginate(10);
+        $perPage = $settingService->getPerPage();
+        $maintenances = ServiceEquipmentMaintenance::with('serviceClient')->paginate($perPage);
         return view('service.equipment_maintenance', compact('maintenances'));
     }
 

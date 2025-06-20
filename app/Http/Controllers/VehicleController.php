@@ -11,7 +11,7 @@ class VehicleController extends Controller
     public function index(SettingService $settingService)
     {
         $perPage = $settingService->getPerPage();
-        $vehicles = Vehicle::latest()->paginate(10);
+        $vehicles = Vehicle::latest()->paginate($perPage);
         return view('fleet.vehicles.index', compact('vehicles'));
     }
 

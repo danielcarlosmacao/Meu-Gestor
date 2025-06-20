@@ -12,7 +12,7 @@ class VehicleServiceController extends Controller
        public function index(SettingService $settingService)
     {
         $perPage = $settingService->getPerPage();
-        $services = VehicleService::orderBy('name')->paginate(10);
+        $services = VehicleService::orderBy('name')->paginate($perPage);
         return view('fleet.vehicle_services.index', compact('services'));
     }
 

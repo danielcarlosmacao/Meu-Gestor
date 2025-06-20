@@ -2,6 +2,7 @@
     return [
     'active'   => 'ativo',
     'inactive'  => 'inativo',
-    'completed'   => 'completo',
+    'completed'   => 'concluido',
     'pending'  => 'pendente',
+    'archived'  => 'Arquivado',
 ];

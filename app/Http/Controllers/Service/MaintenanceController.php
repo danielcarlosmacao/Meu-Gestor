@@ -6,12 +6,14 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\ServiceMaintenance;
 use App\Models\ServiceClient;
+use App\Services\SettingService;
 
 class MaintenanceController extends Controller
 {
-    public function index()
+    public function index(SettingService $settingService)
     {
-        $maintenances = ServiceMaintenance::with('serviceClient')->latest()->paginate(10);
+        $perPage = $settingService->getPerPage();
+        $maintenances = ServiceMaintenance::with('serviceClient')->latest()->paginate($perPage);
         $clients = ServiceClient::where('status', 'active')->get();
         return view('service.maintenance', compact('maintenances', 'clients'));
     }

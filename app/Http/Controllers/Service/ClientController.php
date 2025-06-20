@@ -5,12 +5,14 @@ namespace App\Http\Controllers\Service;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\ServiceClient;
+use App\Services\SettingService;
 
 class ClientController extends Controller
 {
-   public function index()
+   public function index(SettingService $settingService)
     {
-        $clients = ServiceClient::paginate(10);
+        $perPage = $settingService->getPerPage();
+        $clients = ServiceClient::paginate($perPage);
         return view('service.client', compact('clients'));
     }
 
