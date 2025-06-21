@@ -21,6 +21,8 @@
                 <tr>
                     <th scope="col">Nome</th>
                     <th scope="col">Watts</th>
+                    <th scope="col">Estoque</th>
+                    <th scope="col">Em Produção</th>
                     <th scope="col"></th>
                 </tr>
             </thead>
@@ -29,11 +31,13 @@
                     <tr>
                         <th scope="row">{{ $equipment->name }}</th>
                         <td>{{ $equipment->watts }}</td>
+                        <td>{{ $equipment->stock > 0 ? $equipment->stock : '' }}</td>
+                        <td>{{ $equipment->equipment_productions_count }}</td>
                         <td class="text-center align-middle p-1">
                             @can('towers.edit')
                                 <button type="button" class="btn btn-warning btn-sm edit-equipment-btn"
                                     data-id="{{ $equipment->id }}" data-name="{{ $equipment->name }}"
-                                    data-watts="{{ $equipment->watts }}" data-bs-toggle="modal" data-bs-target="#editModal">
+                                    data-watts="{{ $equipment->watts }}"data-stock="{{ $equipment->stock }}" data-bs-toggle="modal" data-bs-target="#editModal">
                                     <i class="bi bi-pencil"></i> Editar
                                 </button>
                             @endcan
@@ -84,6 +88,11 @@
                             <input type="number" class="form-control" id="watts" name="watts" min="0"
                                 max="1000" step="0.01" required>
                         </div>
+                        <div class="mb-3">
+                            <label for="stock" class="form-label">Estoque:</label>
+                            <input type="number" class="form-control" id="stock" name="stock" min="0"
+                                max="1000" step="1" required>
+                        </div>
 
                         <!-- Botão de envio -->
                         <div class="text-end">
@@ -121,6 +130,11 @@
                             <input type="number" class="form-control" id="edit_watts" name="watts" min="0"
                                 max="1000" step="0.01" required>
                         </div>
+                        <div class="mb-3">
+                            <label for="edit_stock" class="form-label">Estoque</label>
+                            <input type="number" class="form-control" id="edit_stock" name="stock" min="0"
+                                max="1000" step="1" required>
+                        </div>
                     </div>
                     <div class="modal-footer">
                         <button type="submit" class="btn dcm-btn-primary">Salvar</button>
@@ -145,10 +159,12 @@
                 const id = button.dataset.id;
                 const name = button.dataset.name;
                 const watts = button.dataset.watts;
+                const stock = button.dataset.stock;
 
                 document.getElementById('edit_id').value = id;
                 document.getElementById('edit_name').value = name;
                 document.getElementById('edit_watts').value = watts;
+                document.getElementById('edit_stock').value = stock;
 
                 const form = document.getElementById('editForm');
                 form.action = routeUpdate.replace(':id', id);

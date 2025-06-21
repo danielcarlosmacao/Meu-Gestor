@@ -13,7 +13,7 @@ class EquipmentController extends Controller
     {
         $perPage = $settingService->getPerPage();
 
-        $equipments = Equipment::orderBy('name', 'asc')->paginate($perPage);
+        $equipments = Equipment::withCount('equipmentProductions')->orderBy('name', 'asc')->paginate($perPage);
 
         return view('tower.equipment', ['equipments' => $equipments]);
 
@@ -25,6 +25,7 @@ class EquipmentController extends Controller
         $Equipment = new Equipment;
         $Equipment->name = $request->name;
         $Equipment->watts = $request->watts;
+        $Equipment->stock = $request->stock;
 
         $Equipment->save();
         return redirect(route('equipment.index'));
@@ -33,10 +34,12 @@ class EquipmentController extends Controller
 
     public function update(Request $request, $id)
     {
+        
         // Validação básica (opcional, mas recomendada)
         $request->validate([
             'name' => 'required|string|max:255',
             'watts' => 'required|numeric',
+            'stock' => 'nullable|numeric',
         ]);
 
         // Busca o equipamento pelo ID
@@ -45,6 +48,7 @@ class EquipmentController extends Controller
         // Atualiza os campos
         $equipment->name = $request->name;
         $equipment->watts = $request->watts;
+        $equipment->stock = $request->stock;
 
         // Salva no banco
         $equipment->save();

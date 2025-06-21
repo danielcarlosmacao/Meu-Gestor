@@ -8,6 +8,6 @@ class SettingService
 {
     public function getPerPage()
     {
-        return Option::where('reference', 'pagination')->value('value') ?? 5;
+        return Option::where('reference', 'pagination')->value('value') ?? 15;
     }
 }

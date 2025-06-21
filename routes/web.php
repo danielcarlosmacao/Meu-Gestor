@@ -145,14 +145,14 @@ Route::middleware(['auth', 'permission:towers.create'])->group(function () {
     Route::post('/plate', [PlateController::class, 'store'])->name('plate.store');
 });
 // towers.update
-Route::middleware(['auth', 'permission:towers.update'])->group(function () {
+Route::middleware(['auth', 'permission:towers.edit'])->group(function () {
     Route::put('/towers/{id}', [TowerController::class, 'update'])->name('tower.update');
     Route::put('/equipment/{id}', [EquipmentController::class, 'update'])->name('equipment.update');
     Route::put('/battery/{id}', [BatteryController::class, 'update'])->name('battery.update');
     Route::put('/plate/{id}', [PlateController::class, 'update'])->name('plate.update');
 });
 //towers.destroy
-Route::middleware(['auth', 'permission:towers.destroy'])->group(function () {
+Route::middleware(['auth', 'permission:towers.delete'])->group(function () {
     Route::delete('/tower/{id}', [TowerController::class, 'destroy'])->name('tower.destroy');
     Route::delete('/equipment/{id}', [EquipmentController::class, 'destroy'])->name('equipment.destroy');
     Route::delete('/battery/{id}', [BatteryController::class, 'destroy'])->name('battery.destroy');
