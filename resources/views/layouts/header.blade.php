@@ -201,25 +201,27 @@
 
 
     <!-- Hover script -->
-    <script>
-        const hoverMenus = ['menutower', 'menuFrota', 'menuServico', 'menuFerias', 'menuAdmin', 'menuUser', ];
+   <script>
+    const hoverMenus = ['menutower', 'menuFrota', 'menuServico', 'menuFerias', 'menuAdmin', 'menuUser'];
 
-        hoverMenus.forEach(id => {
-            const menu = document.getElementById(id);
-            let timeout;
+    hoverMenus.forEach(id => {
+        const menu = document.getElementById(id);
+        if (!menu) return; // <-- ignora se o menu não existir para o usuário
 
-            menu.addEventListener('mouseenter', () => {
-                clearTimeout(timeout);
-                menu.classList.add('show');
-            });
+        let timeout;
 
-            menu.addEventListener('mouseleave', () => {
-                timeout = setTimeout(() => {
-                    menu.classList.remove('show');
-                }, 200);
-            });
+        menu.addEventListener('mouseenter', () => {
+            clearTimeout(timeout);
+            menu.classList.add('show');
         });
-    </script>
+
+        menu.addEventListener('mouseleave', () => {
+            timeout = setTimeout(() => {
+                menu.classList.remove('show');
+            }, 200);
+        });
+    });
+</script>
 </body>
 
 </html>
