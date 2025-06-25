@@ -77,12 +77,17 @@ class VehicleMaintenanceController extends Controller
         return redirect()->back()->with('success', 'Manutenção excluída com sucesso!');
     }
 
-    public function byVehicle(Request $request, $vehicleId)
+    public function byVehicle(Request $request, $vehicleId, SettingService $settingService)
 {
     $vehicle = Vehicle::findOrFail($vehicleId);
+    $perPage = $settingService->getPerPage();
 
-    $query = $vehicle->maintenances()->with('services')->orderBy('maintenance_date', 'desc');
+    // Cria a query (AINDA não executa)
+    $query = $vehicle->maintenances()
+        ->with('services')
+        ->orderBy('maintenance_date', 'desc');
 
+    // Aplica os filtros
     if ($request->filled('start_date')) {
         $query->whereDate('maintenance_date', '>=', $request->start_date);
     }
@@ -91,7 +96,8 @@ class VehicleMaintenanceController extends Controller
         $query->whereDate('maintenance_date', '<=', $request->end_date);
     }
 
-    $maintenances = $query->get();
+    // Agora sim: executa e pagina
+    $maintenances = $query->paginate($perPage);
 
     return view('fleet.vehicles.by_vehicle', compact('vehicle', 'maintenances'));
 }
