@@ -23,8 +23,8 @@
         @method('PUT')
 
         <div class="mb-3">
-            <label for="name" class="form-label">Nome</label>
-            <input type="text" name="name" class="form-control" value="{{ old('name', auth()->user()->name) }}" required>
+            <label for="name" class="form-label">Usuario</label>
+            <input type="text" name="name" class="form-control" value="{{ old('name', auth()->user()->name) }}" required disabled>
         </div>
 
         <div class="mb-3">
