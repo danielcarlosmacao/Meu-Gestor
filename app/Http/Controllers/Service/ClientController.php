@@ -12,7 +12,7 @@ class ClientController extends Controller
    public function index(SettingService $settingService)
     {
         $perPage = $settingService->getPerPage();
-        $clients = ServiceClient::paginate($perPage);
+        $clients = ServiceClient::orderBy('name' ,'asc')->paginate($perPage);
         return view('service.client', compact('clients'));
     }
 

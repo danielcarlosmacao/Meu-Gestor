@@ -15,7 +15,7 @@ class VacationController extends Controller
     public function index(SettingService $settingService)
     {
         $perPage = $settingService->getPerPage();
-        $vacations = Vacation::with('Collaborator')->paginate($perPage);
+        $vacations = Vacation::with('Collaborator')->orderBy('start_date','desc')->paginate($perPage);
         $collaborators = Collaborator::orderBy('name')->get();
 
         return view('vacation_manager.vacations.index', compact('vacations', 'collaborators'));

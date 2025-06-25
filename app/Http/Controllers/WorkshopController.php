@@ -11,7 +11,7 @@ class WorkshopController extends Controller
      public function index(SettingService $settingService)
     {
         $perPage = $settingService->getPerPage();
-        $services = Workshop::paginate($perPage);
+        $services = Workshop::orderBy('vehicle_type','asc')->orderBy('name', 'asc')->paginate($perPage);
         return view('fleet.vehicle_workshop.index', compact('services'));
     }
 
