@@ -54,7 +54,7 @@
                                     </div>
                                     <div class="col-md-5">
                                         <h6>Extra</h6>
-                                        <a href="{{ route('maintenance.index') }}"><i class="fa fa-cogs"></i> Serviços</a>
+                                        @can('towers.maintenance')<a href="{{ route('maintenance.index') }}"><i class="fa fa-cogs"></i> Serviços</a> @endcan
                                     </div>
 
                                 </div>
