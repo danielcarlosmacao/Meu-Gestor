@@ -6,7 +6,7 @@
     'towers.create'  => 'Adicionar-Modulo-Torres',
     'towers.edit'   => 'Editar-Modulo-Torres',
     'towers.delete'  => 'Deletar-Modulo-Torres',
-    'towers.manage'  => 'Gerenciar-Recurso-torre',
+    'towers.manage'  => 'Gerenciar-Recursos-torre',
     'towers.maintenance'  => 'Gestao Serviços Torres',
     'fleets.view'  => 'Visualiza Gestor de Frota',
     'fleets.create'  => 'Adicionar-Modulo-Frota',
