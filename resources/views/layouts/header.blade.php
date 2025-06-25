@@ -40,7 +40,7 @@
                     @can('towers.view')
                         <!-- gestao de torre -->
                         <li class="nav-item dropdown position-static" id="menutower">
-                            <a class="nav-link dropdown-toggle" href="#">GESTAO DE TORRES</a>
+                            <a class="nav-link dropdown-toggle" href="#">TORRES <i class="bi bi-broadcast ms-2"></i></a>
                             <div class="dropdown-menu mega-menu">
                                 <div class="row">
                                     <div class="col-md-1">
@@ -64,7 +64,7 @@
                     @can('fleets.view')
                         <!-- gestao de frota -->
                         <li class="nav-item dropdown position-static" id="menuFrota">
-                            <a class="nav-link dropdown-toggle" href="#">GESTAO DE FROTA</a>
+                            <a class="nav-link dropdown-toggle" href="#">FROTA <i class="bi bi-truck ms-2"></i></a>
                             <div class="dropdown-menu mega-menu">
                                 <div class="row">
                                     <div class="col-md-6">
@@ -82,7 +82,7 @@
                     @can('service.view')
                         <!-- gestao de serviço -->
                         <li class="nav-item dropdown position-static" id="menuServico">
-                            <a class="nav-link dropdown-toggle" href="#">GESTAO DE SERVIÇOS</a>
+                            <a class="nav-link dropdown-toggle" href="#">SERVIÇOS <i class="bi bi-tools ms-2"></i></a>
                             <div class="dropdown-menu mega-menu">
                                 <div class="row">
                                     <div class="col-md-6">
@@ -100,7 +100,8 @@
                     <!-- Ferias  -->
                     @can('vacations.view')
                         <li class="nav-item dropdown position-static" id="menuFerias">
-                            <a class="nav-link dropdown-toggle" href="#">GESTAO DE FERIAS</a>
+                            <a class="nav-link dropdown-toggle" href="#">FERIAS <i class="bi bi-calendar-week ms-2"></i>
+</a>
                             <div class="dropdown-menu mega-menu">
                                 <div class="row">
                                     <div class="col-md-6">
@@ -126,7 +127,7 @@
                     <!-- administrador -->
                     @can('administrator.user')
                         <li class="nav-item dropdown position-static" id="menuAdmin">
-                            <a class="nav-link dropdown-toggle" href="#">ADMINISTRADOR</a>
+                            <a class="nav-link dropdown-toggle" href="#">ADMINISTRADOR <i class="bi bi-person-gear ms-2"></i></a>
                             <div class="dropdown-menu mega-menu">
                                 <div class="row">
                                     <div class="col-md-6">
