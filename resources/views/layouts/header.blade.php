@@ -67,6 +67,8 @@
                             <a class="nav-link dropdown-toggle" href="#">FROTA <i class="bi bi-truck ms-2"></i></a>
                             <div class="dropdown-menu mega-menu">
                                 <div class="row">
+                                    <div class="col-md-1">
+                                    </div>
                                     <div class="col-md-6">
                                         <h6>Gestão da frota</h6>
                                         <a href="{{ route('fleet.vehicles.index') }}">Veiculos</a>
@@ -85,6 +87,8 @@
                             <a class="nav-link dropdown-toggle" href="#">SERVIÇOS <i class="bi bi-tools ms-2"></i></a>
                             <div class="dropdown-menu mega-menu">
                                 <div class="row">
+                                    <div class="col-md-1">
+                                    </div>
                                     <div class="col-md-6">
                                         <h6>Gestão dos seviços</h6>
                                         <a href="{{ route('service.clients.index') }}">Clientes</a>
@@ -100,10 +104,11 @@
                     <!-- Ferias  -->
                     @can('vacations.view')
                         <li class="nav-item dropdown position-static" id="menuFerias">
-                            <a class="nav-link dropdown-toggle" href="#">FERIAS <i class="bi bi-calendar-week ms-2"></i>
-</a>
+                            <a class="nav-link dropdown-toggle" href="#">FERIAS <i class="bi bi-calendar-week ms-2"></i></a>
                             <div class="dropdown-menu mega-menu">
                                 <div class="row">
+                                    <div class="col-md-1">
+                                    </div>
                                     <div class="col-md-6">
                                         <h6>Gestão das ferias</h6>
                                         @can('collaborators.view')
@@ -130,14 +135,16 @@
                             <a class="nav-link dropdown-toggle" href="#">ADMINISTRADOR <i class="bi bi-person-gear ms-2"></i></a>
                             <div class="dropdown-menu mega-menu">
                                 <div class="row">
-                                    <div class="col-md-6">
+                                    <div class="col-md-1">
+                                    </div>
+                                    <div class="col-md-5">
                                         <h6>Gestão de recursos</h6>
                                         <a href="{{ route('options.colors.edit') }}">Estilos e logo do sistema</a>
                                         <a href="{{ route('options.resource.edit') }}">Recursos do sistema</a>
                                         <a href="{{ route('admin.systempanel') }}">Painel de informativo do sistema</a>
                                         <a href="{{ route('options.systemresource.edit') }}">Recursos do administrador</a>
                                     </div>
-                                    <div class="col-md-6">
+                                    <div class="col-md-5">
                                         <h6>Acessos</h6>
                                         <a href="{{ route('admin.usuarios.index') }}">Usuarios</a>
                                         <a href="{{ route('admin.users.sessions') }}">Sessões ativas</a>
@@ -153,6 +160,8 @@
                                     class="bi bi-person-fill me-1"></i>{{ Auth::user()->name }}</a>
                             <div class="dropdown-menu mega-menu">
                                 <div class="row">
+                                    <div class="col-md-1">
+                                    </div>
                                     <div class="col-md-6">
                                         <a class="dropdown-item" href="{{ route('profile.edit') }}">Editar Perfil</a>
 
