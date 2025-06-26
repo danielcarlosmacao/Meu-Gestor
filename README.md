@@ -213,7 +213,7 @@ crontab -e
 ```
 
 ```sh
-* * * * * cd /var/www/nome-do-projeto && php artisan schedule:run >> /dev/null 2>&1
+* * * * * cd /var/www/gestor && php artisan schedule:run >> /dev/null 2>&1
 ```
 
 ```sh
