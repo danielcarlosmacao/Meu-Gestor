@@ -10,4 +10,4 @@ Artisan::command('inspire', function () {
 
 
 Schedule::command('manutencao:enviar-whatsapp')
-    ->dailyAt('16:47'); // ou everyMinute() para testes
+    ->dailyAt('07:30'); // ou everyMinute() para testes
