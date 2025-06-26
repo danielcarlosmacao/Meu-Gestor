@@ -28,6 +28,7 @@ use App\Http\Controllers\Service\ClientController;
 use App\Http\Controllers\Service\EquipmentMaintenanceController;
 use App\Http\Controllers\Service\MaintenanceController;
 use App\Http\Controllers\PostitController;
+use App\Http\Controllers\Admin\RecipientController;
 
 use Illuminate\Support\Facades\Artisan;
 
@@ -123,6 +124,12 @@ Route::middleware(['auth', 'permission:administrator.options'])->group(function 
     Route::post('/admin/database/import', [DatabaseController::class, 'import'])->name('database.import');
     Route::post('/admin/system/update', [DatabaseController::class, 'updateSystem'])->name('system.update');
 
+
+    Route::get('/admin/recipients', [RecipientController::class, 'index'])->name('admin.recipients.index');
+    Route::post('/admin/recipients', [RecipientController::class, 'store'])->name('admin.recipients.store');
+    Route::put('/admin/recipients/{id}', [RecipientController::class, 'update'])->name('admin.recipients.update');
+    Route::delete('/admin/recipients/{id}', [RecipientController::class, 'destroy'])->name('admin.recipients.destroy');
+    Route::get('/admin/recipients/logs', [RecipientController::class, 'logs'])->name('admin.recipients.logs');
 
 });
 

@@ -28,6 +28,16 @@
             <input type="number" id="pagination" name="pagination" class="form-control" value="{{ $options['pagination'] ?? '20' }}">
             @error('pagination') <div class="text-danger">{{ $message }}</div> @enderror
         </div>
+        <div class="form-group mb-3">
+            <label for="whatsapp_ip">IP da API Whatsapp</label>
+            <input type="text" id="whatsapp_ip" name="whatsapp_ip" class="form-control" value="{{ $options['whatsapp_ip'] ?? '0.0.0.0:0' }}">
+            @error('whatsapp_ip') <div class="text-danger">{{ $message }}</div> @enderror
+        </div>
+        <div class="form-group mb-3">
+            <label for="whatsapp_token">Token da API</label>
+            <input type="text" id="whatsapp_token" name="whatsapp_token" class="form-control" value="{{ $options['whatsapp_token'] ?? '1234567' }}">
+            @error('whatsapp_token') <div class="text-danger">{{ $message }}</div> @enderror
+        </div>
         <button type="submit" class="btn dcm-btn-primary">Salvar</button>
         <a href="" class="btn btn-warning" role="button" aria-pressed="true" onclick="mostrarPopupConfirmacao(); return false;">Reparar Torres</a>
     </form>

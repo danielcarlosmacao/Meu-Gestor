@@ -11,4 +11,9 @@ class Option extends Model
 
     protected $fillable = ['reference', 'value'];
 
+    public static function getValue(string $reference): ?string
+    {
+        return static::where('reference', $reference)->value('value');
+    }
+
 }

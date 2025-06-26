@@ -59,9 +59,11 @@ class OptionController extends Controller
             'hours_Generation' => 'required|integer',
             'hours_autonomy' => 'required|integer',
             'pagination' => 'required|integer',
+            'whatsapp_ip' => 'required|string|max:255',
+            'whatsapp_token' => 'required|string|max:255',
         ]);
 
-        $towers = ['hours_Generation', 'hours_autonomy', 'pagination'];
+        $towers = ['hours_Generation', 'hours_autonomy', 'pagination','whatsapp_ip','whatsapp_token'];
 
         foreach ($towers as $ref) {
             Option::updateOrCreate(

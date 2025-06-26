@@ -148,6 +148,7 @@
                                         <h6>Acessos</h6>
                                         <a href="{{ route('admin.usuarios.index') }}">Usuarios</a>
                                         <a href="{{ route('admin.users.sessions') }}">Sessões ativas</a>
+                                        <a href="{{ route('admin.recipients.index') }}">Notificaçoes</a>
                                     </div>
                                 </div>
                             </div>

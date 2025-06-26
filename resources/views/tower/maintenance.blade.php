@@ -34,11 +34,22 @@
             </thead>
             <tbody>
                 @foreach ($maintenances as $m)
+                    @php
+                        $hoje = \Carbon\Carbon::today();
+                        $diasAntes = $hoje->copy()->addDays(5);
+                        $destacarData = $m->status === 'completed' && $m->next_maintenance_date->lte($diasAntes);
+
+                        $limiteAtraso = $hoje->copy()->addDays(5);
+                        $destacarAtraso = $m->status === 'pending' && $m->maintenance_date->lte($limiteAtraso);
+                    @endphp
+
                     <tr>
                         <td>{{ $m->tower->name ?? 'Torre não encontrada' }}</td>
-                        <td>{{ $m->info }}</td>
-                        <td>{{ $m->maintenance_date->format('d/m/Y') }}</td>
-                        <td>{{ $m->next_maintenance_date->format('d/m/Y') }}</td>
+                        <td>{{ $m->info}}</td>
+                        <td class="{{ $destacarAtraso ? 'text-danger fw-bold' : '' }}">
+                            {{ $m->maintenance_date->format('d/m/Y') }}</td>
+                        <td class="{{ $destacarData ? 'text-danger fw-bold' : '' }}">
+                            {{ $m->next_maintenance_date->format('d/m/Y') }}</td>
                         <td>{{ __('status.' . $m->status) }}</td>
                         <td class="text-center align-middle p-1">
                             @can('towers.maintenance')
