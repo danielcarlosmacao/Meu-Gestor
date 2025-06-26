@@ -30,7 +30,7 @@
                     <td>{{ $log->id }}</td>
                     <td>{{ $log->recipient->name ?? 'N/D' }}</td>
                     <td>{{ $log->recipient->number ?? 'N/D' }}</td>
-                    <td>{{ optional($log->maintenance->tower)->name ?? 'N/D' }}</td>
+                    <td>{{ $log->maintenance?->tower?->name ?? 'N/D' }}</td>
                     <td>
                         @if($log->status === 'sent')
                             <span class="badge bg-success">Enviado</span>
