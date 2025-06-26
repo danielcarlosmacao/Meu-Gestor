@@ -12,7 +12,7 @@ class MaintenancesController extends Controller
     public function index(SettingService $settingService)
     {
         $perPage = $settingService->getPerPage();
-        $maintenances = Maintenance::with('tower')->paginate($perPage);
+        $maintenances = Maintenance::with('tower')->orderBy('maintenance_date','desc')->paginate($perPage);
         $towers = Tower::orderBy('name', 'asc')->get();
         return view('tower.maintenance', compact('maintenances', 'towers'));
     }
