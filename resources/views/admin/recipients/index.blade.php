@@ -17,7 +17,7 @@
             <thead class="bgc-primary">
                 <tr>
                     <th>Nome</th>
-                    <th>Referência</th>
+                    <th>Tipo do envio</th>
                     <th>Número</th>
                     <th>Ações</th>
                 </tr>

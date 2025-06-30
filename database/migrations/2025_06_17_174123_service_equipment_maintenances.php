@@ -19,7 +19,7 @@ return new class extends Migration {
             $table->string('erro')->nullable();
             $table->date('date_send')->nullable();
             $table->date('date_received')->nullable();
-            $table->string('solution')->nullable();
+            $table->text('solution')->nullable();
             $table->decimal('cost_enterprise', 10, 2)->default(0);
             $table->decimal('cost_client', 10, 2)->default(0);
             $table->timestamps();

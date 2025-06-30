@@ -25,7 +25,7 @@
                     <div class="mb-3">
                         <label for="reference" class="form-label">Referência</label>
                         <select name="reference" class="form-select">
-                            <option value="" {{ empty($recipient->reference) ? 'selected' : '' }}>Nenhuma</option>
+                            <option value="{{ empty($recipient->reference) ? 'selected' : 'notSent' }}">Nenhuma</option>
                             <option value="serviceTowe"
                                 {{ isset($recipient) && $recipient->reference === 'serviceTowe' ? 'selected' : '' }}>
                                 Serviço de Torres

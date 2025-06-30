@@ -15,7 +15,7 @@ class EquipmentMaintenanceController extends Controller
     public function index(SettingService $settingService)
     {
         $perPage = $settingService->getPerPage();
-        $maintenances = ServiceEquipmentMaintenance::with('serviceClient')->paginate($perPage);
+        $maintenances = ServiceEquipmentMaintenance::with('serviceClient')->orderBy('date_maintenance','desc')->paginate($perPage);
         return view('service.equipment_maintenance', compact('maintenances'));
     }
 
