@@ -31,7 +31,12 @@ class TowerController extends Controller
             ->orderBy('name', 'asc')
             ->paginate($perPage);
 
-        return view('tower.index', ['towers' => $towers]);
+            
+            $hours_Generation = Option::where('reference', 'hours_Generation')->value('value') ?? 5;
+            
+
+
+        return view('tower.index', compact(['towers', 'hours_Generation' ]));
 
     }
 

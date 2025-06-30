@@ -6,9 +6,9 @@
     <div class="container mb-2 mb-md-5 mt-2 mt-md-5">
         <h2 class="text-center">controle de torres
             @can('towers.create')
-            <button type="button" class="btn dcm-btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#addTower">
-                <i class="bi bi-plus-lg"></i>
-            </button>
+                <button type="button" class="btn dcm-btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#addTower">
+                    <i class="bi bi-plus-lg"></i>
+                </button>
             @endcan
         </h2>
 
@@ -22,30 +22,58 @@
                     <th scope="col">Voltagem</th>
                     <th scope="col">Equipamentos</th>
                     <th scope="col">Bateria</th>
+                    <th scope="col">%</th>
                     <th scope="col">Data Inst. bateria</th>
                     <th scope="col">Tempo em Produção</th>
                     <th scope="col">Placa</th>
+                    <th scope="col">%</th>
                     <th scope="col"></th>
                 </tr>
             </thead>
             <tbody>
                 @foreach ($towers as $tower)
                     <tr>
+                        @php
+                            if (
+                                $tower->activeBattery === null ||
+                                $tower->activeBattery === ''
+                            ) {
+                                $production_percentage = '0';
+                            } else {
+                                $voltageRatio = $tower->voltage / 12;
+                                $totalAmp =
+                                    $voltageRatio > 0
+                                        ? ($tower->activeBattery->amount * $tower->activeBattery->battery->amps) /
+                                            $voltageRatio
+                                        : 0;
+                                $production_percentage =
+                                    $totalAmp > 0 ? ($tower->summary->battery_required / $totalAmp) * 100 : 0;
+                            }
+
+                            $consumptionAhDay = $tower->summary->consumption_ah_day ?? 0;
+                            $platerrequire = $hours_Generation > 0 ? $consumptionAhDay / $hours_Generation : 0;
+                            $plater_percentage = $tower->summary->amps_plate > 0 ? number_format(($platerrequire / $tower->summary->amps_plate) * 100, 2) . '%' : '0%' ;
+
+                        @endphp
                         <th scope="row">
                             <a href="{{ route('tower.show', $tower->id) }}" class="text-decoration-none text-black">
                                 {{ $tower->name }}</a>
                         </th>
                         <td>{{ $tower->voltage }}</td>
                         <td>{{ $tower->active_equipments_count }}</td>
-                        <td>{{ $tower->activeBattery->battery->name ?? 'Sem bateria'  }}</td>
-                        <td>{{ optional(optional($tower->activeBattery)->installation_date)->format('d/m/Y') ?? 'Sem bateria' }}</td>
-                        <td>{{$tower->activeBattery->years_since_installation ?? 'Sem bateria' }}</td>
-                        <td>{{round($tower->summary->watts_plate)}} W - {{round($tower->summary->amps_plate)}} A</td>
-                        <td class="text-center align-middle p-1"> 
+                        <td>{{ $tower->activeBattery->battery->name ?? 'Sem bateria' }}</td>
+                        <td>{{ number_format($production_percentage, 2) . '%' }}</td>
+                        <td>{{ optional(optional($tower->activeBattery)->installation_date)->format('d/m/Y') ?? 'Sem bateria' }}
+                        </td>
+                        <td>{{ $tower->activeBattery->years_since_installation ?? 'Sem bateria' }}</td>
+                        <td>{{ round($tower->summary->watts_plate) }} W - {{ round($tower->summary->amps_plate) }} A</td>
+                        <td>{{$plater_percentage }}</td>
+                        <td class="text-center align-middle p-1">
                             @can('towers.delete')
-                            <button type="button" class="btn btn-danger btn-sm" onclick="deletar({{ $tower->id }})"><i class="bi bi-trash">
-                                </i> Deletar
-                            </button>
+                                <button type="button" class="btn btn-danger btn-sm" onclick="deletar({{ $tower->id }})"><i
+                                        class="bi bi-trash">
+                                    </i> Deletar
+                                </button>
                             @endcan
                         </td>
                     </tr>
