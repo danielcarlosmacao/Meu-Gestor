@@ -53,7 +53,6 @@
         z-index: 10;
     }
 
-    /* Modal styles */
     #postitModal {
         display: none;
         position: fixed;
@@ -62,6 +61,7 @@
         background-color: rgba(0,0,0,0.5);
         justify-content: center; align-items: center;
     }
+
     #postitModal .modal-content {
         background: white;
         padding: 20px;
@@ -69,6 +69,7 @@
         width: 300px;
         text-align: center;
     }
+
     .color-option {
         width: 30px;
         height: 30px;
@@ -79,34 +80,47 @@
         border-radius: 4px;
         vertical-align: middle;
     }
+
     .color-option.selected {
         border: 3px solid #333;
     }
+
     #modal-buttons {
         margin-top: 15px;
         display: flex;
         justify-content: center;
         gap: 20px;
     }
+
     #modal-buttons button {
         padding: 8px 20px;
         border: none;
         border-radius: 5px;
         cursor: pointer;
     }
+
     #btnCancel {
         background: #ccc;
     }
+
     #btnOk {
         background: #28a745;
         color: white;
     }
+
+    #justificationBox {
+        margin-top: 10px;
+        display: none;
+    }
 </style>
-    <div class="container mb-1 mb-md-3 mt-1 mt-md-3">
-        <h2 class="text-center">
-            Meu Mural
-        </h2>
-    </div>
+
+<script>
+    const loggedUserId = {{ Auth::id() }};
+</script>
+
+<div class="container mb-1 mb-md-3 mt-1 mt-md-3">
+    <h2 class="text-center">Meu Mural</h2>
+</div>
 
 <div id="mural-area">
     @foreach($postits as $postit)
@@ -132,6 +146,23 @@
             <div class="color-option" data-color="#77dd77" style="background:#77dd77"></div>
             <div class="color-option" data-color="#aec6cf" style="background:#aec6cf"></div>
         </div>
+
+        <!-- Select de usuários -->
+        <div style="margin-top: 15px;">
+            <label for="user_id">Atribuir para:</label>
+            <select id="user_id" class="form-control" style="width: 100%; margin-top: 5px;">
+                @foreach($users as $user)
+                    <<option value="{{ $user->id }}" {{ $user->id == Auth::id() ? 'selected' : '' }}>{{ $user->name }}</option>
+                @endforeach
+            </select>
+        </div>
+
+        <!-- Justificativa -->
+        <div id="justificationBox">
+            <label for="userComment">Justificativa:</label>
+            <textarea id="userComment" class="form-control" style="width: 100%; margin-top: 5px;" rows="3"></textarea>
+        </div>
+
         <div id="modal-buttons">
             <button id="btnCancel" type="button">Cancelar</button>
             <button id="btnOk" type="button">OK</button>
@@ -145,7 +176,18 @@ $(function(){
     let selectedColor = '#fffa65';
     let clickX = 0, clickY = 0;
 
-    // Abrir modal ao clicar no mural (se não clicou num postit)
+    // Mostrar/esconder justificativa
+    $('#user_id').on('change', function() {
+        const selectedUser = $(this).val();
+        if (selectedUser != loggedUserId) {
+            $('#justificationBox').show();
+        } else {
+            $('#justificationBox').hide();
+            $('#userComment').val('');
+        }
+    });
+
+    // Abrir modal ao clicar no mural
     $('#mural-area').click(function(e){
         if ($(e.target).closest('.postit').length > 0) return;
 
@@ -154,25 +196,24 @@ $(function(){
 
         $('#postitModal').css('display', 'flex');
 
-        // Reseta seleção de cor no modal
         $('#modalColors .color-option').removeClass('selected');
         $('#modalColors .color-option[data-color="'+selectedColor+'"]').addClass('selected');
     });
 
-    // Selecionar cor no modal
     $('#modalColors').on('click', '.color-option', function(){
         $('#modalColors .color-option').removeClass('selected');
         $(this).addClass('selected');
         selectedColor = $(this).data('color');
     });
 
-    // Cancelar criação
     $('#btnCancel').click(function(){
         $('#postitModal').hide();
     });
 
-    // Confirmar criação
     $('#btnOk').click(function(){
+        const userId = $('#user_id').val();
+        const contentText = userId != loggedUserId ? $('#userComment').val() : 'Digite sua ideia...';
+
         $.ajax({
             url: '{{ route('postits.store') }}',
             type: 'POST',
@@ -181,9 +222,10 @@ $(function(){
                 pos_x: clickX,
                 pos_y: clickY,
                 color: selectedColor,
-                content: 'Digite sua ideia...',
+                content: contentText,
                 width: 200,
-                height: 200
+                height: 200,
+                user_id: userId
             },
             success: function(){
                 $('#postitModal').hide();
@@ -196,7 +238,7 @@ $(function(){
         });
     });
 
-    // Excluir postit
+    // Exclusão
     $('#mural-area').on('click', '.close-btn', function(e) {
         e.stopPropagation();
         const postit = $(this).closest('.postit');
@@ -230,7 +272,7 @@ $(function(){
         });
     });
 
-    // Arrastar postit
+    // Drag
     let dragging = null, offsetX = 0, offsetY = 0;
 
     $('#mural-area').on('mousedown', '.drag-icon', function(e) {
@@ -267,7 +309,7 @@ $(function(){
         });
     });
 
-    // Salvar tamanho ao redimensionar (ao soltar mouse)
+    // Resize
     $('#mural-area').on('mouseup', '.postit', function() {
         const postit = $(this);
         const id = postit.data('id');
@@ -284,7 +326,6 @@ $(function(){
             }
         });
     });
-
 });
 </script>
 @endsection

@@ -6,18 +6,23 @@ use Illuminate\Http\Request;
 use App\Models\Postit;
 use Illuminate\Support\Facades\Auth;
 
+use App\Models\User;
+
 class PostitController extends Controller
 {
     public function index()
     {
         $postits = Postit::where('user_id', Auth::id())->get();
-        return view('welcome', compact('postits'));
+        $users = User::where('active','=','1')->orderBy('name', 'asc')->get();
+        
+        return view('welcome', compact('postits','users'));
     }
 
     public function store(Request $request)
     {
+      
         $postit = Postit::create([
-            'user_id' => Auth::id(),
+            'user_id' => $request->input('user_id', Auth::id()),
             'content' => $request->input('content', ''),
             'color' => $request->input('color', '#fffa65'),
             'pos_x' => $request->input('pos_x', 100),
