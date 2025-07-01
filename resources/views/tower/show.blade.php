@@ -61,6 +61,13 @@
                                             } else {
                                                 $production_percentage = $bp->production_percentage;
                                             }
+                                            if($bp->removal_date == '' && $bp->active === 'yes'){
+                                                $tempProdution = date('Y-m-d') - $bp->installation_date ;
+                                            }elseif($bp->removal_date != '' || $bp->removal_date == null){
+                                                 $tempProdution = $bp->removal_date - $bp->installation_date ;
+                                            }else{
+                                                 $tempProdution = '';
+                                            }
                                         @endphp
                                         <tr  class="{{ $bp->active === 'yes' ? 'fw-bold' : '' }}">
                                             <td>{{ $bp->info }}</td>
@@ -71,7 +78,7 @@
                                             <td>{{ optional($bp->removal_date)->format('d/m/Y')}}</td>
                                             <td>{{ number_format($totalAmp, 0) }} A</td>
                                             <td>{{ number_format($production_percentage, 2) }}%</td>
-                                            <td></td>
+                                            <td>{{$tempProdution}}</td>
                                             <td class="text-center align-middle p-1">
                                                 @can('towers.manage')
                                                 <button class="edit-btn btn btn-warning btn-sm"
