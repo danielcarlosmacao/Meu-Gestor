@@ -1,16 +1,19 @@
 @extends('layouts.header')
 @section('title', 'Torres')
 @section('content')
-
+    @php
+        $today = new DateTime();
+    @endphp
     <div class="container-fluid">
         <div class="container mb-2 mb-md-5 mt-2 mt-md-5">
             <h2 class="text-center"> {{ $tower->name }}
                 @can('towers.edit')
-            <button class="btn dcm-btn-primary btn-sm " data-bs-toggle="modal" data-bs-target="#editModal{{ $tower->id }}">
-                <i class="bi bi-pencil-fill"></i>  
-            </button>
-        @endcan
-    </h2>
+                    <button class="btn dcm-btn-primary btn-sm " data-bs-toggle="modal"
+                        data-bs-target="#editModal{{ $tower->id }}">
+                        <i class="bi bi-pencil-fill"></i>
+                    </button>
+                @endcan
+            </h2>
         </div>
         <div class="row g-3">
 
@@ -20,10 +23,10 @@
                     <div class="card-body">
                         <h5 class="card-title text-center">Bateria
                             @can('towers.manage')
-                            <button onclick="document.getElementById('batteryModal').style.display='block'"
-                                class="btn dcm-btn-primary">
-                                <i class="bi bi-plus-lg"></i> Adicionar
-                            </button>
+                                <button onclick="document.getElementById('batteryModal').style.display='block'"
+                                    class="btn dcm-btn-primary">
+                                    <i class="bi bi-plus-lg"></i> Adicionar
+                                </button>
                             @endcan
                         </h5>
                         <div class="table-responsive">
@@ -38,7 +41,7 @@
                                         <th>Data Rem.</th>
                                         <th>Ah total</th>
                                         <th>%</th>
-                                        <th>Anos</th>
+                                        <th>Produção</th>
                                         <th>.</th>
                                     </tr>
                                 </thead>
@@ -61,29 +64,41 @@
                                             } else {
                                                 $production_percentage = $bp->production_percentage;
                                             }
-                                            if($bp->removal_date == '' && $bp->active === 'yes'){
-                                                $tempProdution = date('Y-m-d') - $bp->installation_date ;
-                                            }elseif($bp->removal_date != '' || $bp->removal_date == null){
-                                                 $tempProdution = $bp->removal_date - $bp->installation_date ;
-                                            }else{
-                                                 $tempProdution = '';
+
+                                            
+                                            $installationDate = new DateTime($bp->installation_date);
+                                            $removalDate = new DateTime($bp->removal_date);
+
+                                            if ($bp->removal_date == '' && $bp->active === 'yes') {
+                                                $diff = $today->diff($installationDate); // OK!
+                                                $years = $diff->y;
+                                                $months = $diff->m;
+                                                $tempProdution = $years . " Ano e " . $months . " meses";
+
+                                            } elseif ($bp->removal_date != '' || $bp->removal_date != null) {
+                                                $diff = $installationDate->diff($removalDate); // OK!
+                                                $years = $diff->y;
+                                                $months = $diff->m;
+                                                $tempProdution = $years . " Ano e " . $months . " meses";
+                                            } else {
+                                                $tempProdution = '';
                                             }
                                         @endphp
-                                        <tr  class="{{ $bp->active === 'yes' ? 'fw-bold' : '' }}">
+                                        <tr class="{{ $bp->active === 'yes' ? 'fw-bold' : '' }}">
                                             <td>{{ $bp->info }}</td>
                                             <td>{{ $bp->amount }}</td>
                                             <td>{{ $bp->battery->mark }}</td>
                                             <td>{{ $bp->battery->amps }}</td>
                                             <td>{{ optional($bp->installation_date)->format('d/m/Y') }}</td>
-                                            <td>{{ optional($bp->removal_date)->format('d/m/Y')}}</td>
+                                            <td>{{ optional($bp->removal_date)->format('d/m/Y') }}</td>
                                             <td>{{ number_format($totalAmp, 0) }} A</td>
                                             <td>{{ number_format($production_percentage, 2) }}%</td>
-                                            <td>{{$tempProdution}}</td>
+                                            <td>{{ $tempProdution }}</td>
                                             <td class="text-center align-middle p-1">
                                                 @can('towers.manage')
-                                                <button class="edit-btn btn btn-warning btn-sm"
-                                                    data-id="{{ $bp->id }}">Editar</button>
-                                                    @endcan
+                                                    <button class="edit-btn btn btn-warning btn-sm"
+                                                        data-id="{{ $bp->id }}">Editar</button>
+                                                @endcan
                                             </td>
                                         </tr>
                                     @endforeach
@@ -132,8 +147,8 @@
                                         <td>Watts do painel</td>
                                         <td>{{ $summary->watts_plate }} </td>
                                         <td>Ah da placa</td>
-                                        <td> 
-                                            {{ $summary->amps_plate }} A 
+                                        <td>
+                                            {{ $summary->amps_plate }} A
                                             {{ $summary->amps_plate > 0 ? number_format(($platerrequire / $summary->amps_plate) * 100, 2) . '%' : '0%' }}
 
                                         </td>
@@ -157,10 +172,10 @@
                     <div class="card-body">
                         <h5 class="card-title text-center">Equipamentos
                             @can('towers.manage')
-                            <button onclick="document.getElementById('equipmentModal').style.display='block'"
-                                class="btn dcm-btn-primary">
-                                <i class="bi bi-plus-lg"></i> Adicionar
-                            </button>
+                                <button onclick="document.getElementById('equipmentModal').style.display='block'"
+                                    class="btn dcm-btn-primary">
+                                    <i class="bi bi-plus-lg"></i> Adicionar
+                                </button>
                             @endcan
                         </h5>
                         <div class="table-responsive">
@@ -180,12 +195,12 @@
                                             <td>{{ $ep->identification }}</td>
                                             <td>{{ $ep->equipment->name }}</td>
                                             <td>{{ $ep->equipment->watts }} W</td>
-                                            <td>{{ $ep->active == 'yes' ? 'Ativo' : 'inativo'}}</td>
+                                            <td>{{ $ep->active == 'yes' ? 'Ativo' : 'inativo' }}</td>
                                             <td class="text-center align-middle p-1">
                                                 @can('towers.manage')
-                                                <button type="button" class="edit-equipment-btn btn btn-warning btn-sm"
-                                                    data-id="{{ $ep->id }}">Editar</button>
-                                                    @endcan
+                                                    <button type="button" class="edit-equipment-btn btn btn-warning btn-sm"
+                                                        data-id="{{ $ep->id }}">Editar</button>
+                                                @endcan
                                             </td>
                                         </tr>
                                     @endforeach
@@ -202,11 +217,11 @@
                     <div class="card-body">
                         <h5 class="card-title text-center">Placa Solar
                             @can('towers.manage')
-                            <button onclick="document.getElementById('plateModal').style.display='block'"
-                                class="btn dcm-btn-primary">
-                                
-                                <i class="bi bi-plus-lg"></i> Adicionar
-                            </button>
+                                <button onclick="document.getElementById('plateModal').style.display='block'"
+                                    class="btn dcm-btn-primary">
+
+                                    <i class="bi bi-plus-lg"></i> Adicionar
+                                </button>
                             @endcan
                         </h5>
                         <div class="table-responsive">
@@ -230,10 +245,9 @@
                                             <td>{{ optional($pp->installation_date)->format('d/m/Y') }}</td>
                                             <td class="text-center align-middle p-1">
                                                 @can('towers.manage')
-                                                <button
-                                                    class="delete-plate-btn btn btn-danger"
-                                                    data-id="{{ $pp->id }}">Excluir</button>
-                                                    @endcan
+                                                    <button class="delete-plate-btn btn btn-danger"
+                                                        data-id="{{ $pp->id }}">Excluir</button>
+                                                @endcan
                                             </td>
                                         </tr>
                                     @endforeach
@@ -267,9 +281,6 @@
 
     @push('scripts')
         <script>
-
-
-
             document.addEventListener('DOMContentLoaded', () => {
                 // ---------- ROTAS ----------
                 const routes = {
@@ -330,7 +341,8 @@
                         document.getElementById('edit_battery_id').value = bp.battery_id;
                         document.getElementById('edit_info').value = bp.info;
                         document.getElementById('edit_amount').value = bp.amount ?? '';
-                        document.getElementById('edit_installation_date').value = bp.installation_date ?? '';
+                        document.getElementById('edit_installation_date').value = bp
+                            .installation_date ?? '';
                         document.getElementById('edit_removal_date').value = bp.removal_date ?? '';
                         document.getElementById('edit_active').value = bp.active;
 
