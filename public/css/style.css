@@ -67,7 +67,9 @@
   opacity: 0.65;
 }
 
-
+.dcm-color-secondary{
+  background-color: var(--color-secondary);
+}
 
 /* efeito paginacao*/
 .page-item.active .page-link,

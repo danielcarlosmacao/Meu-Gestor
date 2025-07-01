@@ -10,7 +10,6 @@
                     <i class="bi bi-search"></i>
                 </button>
             </h3>
-
             <div id="filter-form" style="display: none;">
                 <form method="GET" class="row g-3 mt-4 mb-3">
                     <div class="col-md-3">
@@ -35,6 +34,10 @@
                 <div class="alert alert-warning mt-3">Nenhuma manutenção registrada para este veículo.</div>
             @else
         </div>
+        <div class="alert dcm-color-secondary" style="font-family: 'Roboto', sans-serif;">
+            <strong>Total de custos:</strong> R$ {{ number_format($totalCost, 2, ',', '.') }}
+        </div>
+
         <table class="table table-bordered mt-3">
             <thead>
                 <tr>

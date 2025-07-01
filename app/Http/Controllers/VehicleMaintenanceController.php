@@ -95,11 +95,13 @@ class VehicleMaintenanceController extends Controller
     if ($request->filled('end_date')) {
         $query->whereDate('maintenance_date', '<=', $request->end_date);
     }
+       
+    $totalCost = (clone $query)->sum('cost');
 
     // Agora sim: executa e pagina
     $maintenances = $query->paginate($perPage);
 
-    return view('fleet.vehicles.by_vehicle', compact('vehicle', 'maintenances'));
+    return view('fleet.vehicles.by_vehicle', compact('vehicle', 'maintenances', 'totalCost'));
 }
 
 }

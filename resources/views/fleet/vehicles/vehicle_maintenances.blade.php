@@ -28,7 +28,11 @@
             <tbody>
                 @foreach ($maintenances as $maintenance)
                     <tr>
-                        <td>{{ $maintenance->vehicle->model ?? '-' }} {{ $maintenance->vehicle->year ?? '-' }}</td>
+                        <td>
+                            <a href="{{ route('fleet.vehicle.maintenances', $maintenance->vehicle->id) }}" class="btn btn-sm">
+                                {{ $maintenance->vehicle->model ?? '-' }} {{ $maintenance->vehicle->year ?? '-' }}
+                            </a>
+                        </td>
                         <td>{{ \Carbon\Carbon::parse($maintenance->maintenance_date)->format('d/m/Y') }}</td>
                         <td>{{ ucfirst(__('typemaintenances.' . $maintenance->type)) }}</td>
                         <td>{{ number_format($maintenance->mileage, 0, ',', '.') }} km</td>
