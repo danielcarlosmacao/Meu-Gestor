@@ -17,6 +17,7 @@
                     <th>Colaborador</th>
                     <th>Início</th>
                     <th>Fim</th>
+                    <th>Dias de ferias</th>
                     <th>Informações</th>
                     <th>Ações</th>
                 </tr>
@@ -24,9 +25,17 @@
             <tbody>
                 @foreach ($vacations as $vacation)
                     <tr>
+                        @php
+                        $vacationStart_date = new DateTime($vacation->start_date);
+                        $vacationEnd_date = new DateTime($vacation->end_date);
+                        $diff = $vacationStart_date->diff($vacationEnd_date) ;
+                        $vacationInteval= $diff->days + 1;
+
+                        @endphp
                         <td>{{ $vacation->collaborator->name }}</td>
-                        <td>{{ \Carbon\Carbon::parse($vacation->start_date)->format('d/m/Y') }}</td>
-                        <td>{{ \Carbon\Carbon::parse($vacation->end_date)->format('d/m/Y') }}</td>
+                        <td>{{ $vacationStart_date->format('d/m/Y') }}</td>
+                        <td>{{ $vacationEnd_date->format('d/m/Y') }}</td>
+                        <td class="{{ $vacationInteval > 30 ? 'text-danger fw-bold' : '' }};">{{ $vacationInteval}}</td>
                         <td>{{ $vacation->info }}</td>
                         <td>
                             @can('vacations.edit')
