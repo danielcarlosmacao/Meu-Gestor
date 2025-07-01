@@ -67,14 +67,6 @@
   opacity: 0.65;
 }
 
-.dcm-color-secondary{
-  background-color: var(--color-secondary);
-}
-
-.dcm-bgc-secondary {
-  background-color: var(--color-secondary)!important;
-  color: rgb(0, 0, 0) !important;
-}
 
 /* efeito paginacao*/
 .page-item.active .page-link,

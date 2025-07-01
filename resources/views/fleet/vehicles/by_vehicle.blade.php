@@ -34,7 +34,7 @@
                 <div class="alert alert-warning mt-3">Nenhuma manutenção registrada para este veículo.</div>
             @else
         </div>
-        <div class="alert dcm-bgc-secondary" style="font-family: 'Roboto', sans-serif;">
+        <div class="alert alert-info" style="font-family: 'Roboto', sans-serif;">
             <strong>Total de custos:</strong> R$ {{ number_format($totalCost, 2, ',', '.') }}
         </div>
 
