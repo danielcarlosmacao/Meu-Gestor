@@ -29,6 +29,7 @@ use App\Http\Controllers\Service\EquipmentMaintenanceController;
 use App\Http\Controllers\Service\MaintenanceController;
 use App\Http\Controllers\PostitController;
 use App\Http\Controllers\Admin\RecipientController;
+use App\Http\Controllers\Admin\NotificationController;
 
 use Illuminate\Support\Facades\Artisan;
 
@@ -130,6 +131,16 @@ Route::middleware(['auth', 'permission:administrator.options'])->group(function 
     Route::put('/admin/recipients/{id}', [RecipientController::class, 'update'])->name('admin.recipients.update');
     Route::delete('/admin/recipients/{id}', [RecipientController::class, 'destroy'])->name('admin.recipients.destroy');
     Route::get('/admin/recipients/logs', [RecipientController::class, 'logs'])->name('admin.recipients.logs');
+
+});
+
+Route::middleware(['auth', 'permission:administrator.options'])->prefix('admin')->name('admin.')->group(function () {
+    Route::resource('notification', NotificationController::class)->only(['index', 'store', 'destroy']);
+    // Rotas personalizadas para envio
+    Route::post('notification/{notification}/send', [NotificationController::class, 'send'])->name('notification.send');
+    Route::post('notification/{notification}/resend', [NotificationController::class, 'resend'])->name('notification.resend');
+    Route::put('notification/{notification}', [NotificationController::class, 'update'])->name('notification.update');
+    Route::get('notification/logs', [NotificationController::class, 'logs'])->name('notification.logs');
 
 });
 

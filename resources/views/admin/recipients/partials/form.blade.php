@@ -28,7 +28,11 @@
                             <option value="{{ empty($recipient->reference) ? 'selected' : 'notSent' }}">Nenhuma</option>
                             <option value="serviceTowe"
                                 {{ isset($recipient) && $recipient->reference === 'serviceTowe' ? 'selected' : '' }}>
-                                Serviço de Torres
+                                {{__('reference.' . 'serviceTowe')}}
+                            </option>
+                            <option value="notification"
+                                {{ isset($recipient) && $recipient->reference === 'notification' ? 'selected' : '' }}>
+                                {{__('reference.' . 'notification')}}
                             </option>
                         </select>
                     </div>

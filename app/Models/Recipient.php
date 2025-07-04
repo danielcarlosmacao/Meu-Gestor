@@ -10,4 +10,9 @@ class Recipient extends Model
      use SoftDeletes;
 
      protected $fillable = ['name', 'reference', 'number'];
+
+         public function notifications()
+    {
+        return $this->belongsToMany(Notification::class, 'notification_recipient');
+    }
 }
