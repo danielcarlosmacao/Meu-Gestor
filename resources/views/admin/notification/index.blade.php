@@ -53,6 +53,12 @@
                                     <button class="btn btn-success btn-sm">Enviar</button>
                                 </form>
                             @endif
+                            @if ($notification->sent)
+                                <form action="{{ route('admin.notification.cleanSent', $notification->id) }}" method="POST">
+                                    @csrf
+                                    <button class="btn btn-success btn-sm">Limpar envio</button>
+                                </form>
+                            @endif
 
                             <form action="{{ route('admin.notification.resend', $notification->id) }}" method="POST">
                                 @csrf

@@ -139,6 +139,7 @@ Route::middleware(['auth', 'permission:administrator.options'])->prefix('admin')
     // Rotas personalizadas para envio
     Route::post('notification/{notification}/send', [NotificationController::class, 'send'])->name('notification.send');
     Route::post('notification/{notification}/resend', [NotificationController::class, 'resend'])->name('notification.resend');
+    Route::post('notification/{notification}/cleanSent', [NotificationController::class, 'cleanSent'])->name('notification.cleanSent');
     Route::put('notification/{notification}', [NotificationController::class, 'update'])->name('notification.update');
     Route::get('notification/logs', [NotificationController::class, 'logs'])->name('notification.logs');
     Route::delete('notification/logs/{id}', [NotificationController::class, 'logsDelete'])->name('notification.logs.delete');

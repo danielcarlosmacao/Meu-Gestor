@@ -122,6 +122,18 @@ class NotificationController extends Controller
         $notification->update(['sent' => true]);
     }
 
+    public function cleanSent($id)
+    {
+        $notification = Notification::find($id);
+
+        if ($notification) {
+            $notification->sent = 0;
+            $notification->save();
+            return back()->with('success', 'resetado da fila de envio.');
+        }
+        return back()->with('success', 'nao resetado fila de envio.');
+    }
+
     public function logs(SettingService $settingService)
     {
 
@@ -130,7 +142,8 @@ class NotificationController extends Controller
         return view('admin.notification.logs', compact('logs'));
     }
 
-    public function logsDelete($id){
+    public function logsDelete($id)
+    {
         $log = NotificationLog::findOrFail($id);
         $log->delete();
 
