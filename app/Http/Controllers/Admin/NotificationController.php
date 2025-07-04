@@ -129,4 +129,11 @@ class NotificationController extends Controller
         $logs = NotificationLog::with(['recipient', 'notification'])->paginate($perPage);
         return view('admin.notification.logs', compact('logs'));
     }
+
+    public function logsDelete($id){
+        $log = NotificationLog::findOrFail($id);
+        $log->delete();
+
+        return redirect()->route('admin.notification.logs')->with('success', 'Log excluído.');
+    }
 }

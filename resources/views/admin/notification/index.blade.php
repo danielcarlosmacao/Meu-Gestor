@@ -19,6 +19,7 @@
     <table class="table table-striped mt-4">
         <thead class="bgc-primary">
             <tr>
+                <th>ID</th>
                 <th>Mensagem</th>
                 <th>Destinatários</th>
                 <th>Enviada?</th>
@@ -29,6 +30,7 @@
         <tbody>
             @foreach ($notifications as $notification)
                 <tr>
+                    <td>{{ $notification->id }}</td>
                     <td>{{ $notification->msg }}</td>
                     <td>
                         @foreach ($notification->recipients as $r)

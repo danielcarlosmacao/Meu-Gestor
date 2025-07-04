@@ -141,6 +141,7 @@ Route::middleware(['auth', 'permission:administrator.options'])->prefix('admin')
     Route::post('notification/{notification}/resend', [NotificationController::class, 'resend'])->name('notification.resend');
     Route::put('notification/{notification}', [NotificationController::class, 'update'])->name('notification.update');
     Route::get('notification/logs', [NotificationController::class, 'logs'])->name('notification.logs');
+    Route::delete('notification/logs/{id}', [NotificationController::class, 'logsDelete'])->name('notification.logs.delete');
 
 });
 
