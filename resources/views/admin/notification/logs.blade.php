@@ -42,7 +42,7 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="4" class="text-center">Nenhum log encontrado.</td>
+                        <td colspan="6" class="text-center">Nenhum log encontrado.</td>
                     </tr>
                 @endforelse
             </tbody>
