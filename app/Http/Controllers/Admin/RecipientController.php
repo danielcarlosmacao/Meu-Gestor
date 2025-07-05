@@ -16,7 +16,7 @@ class RecipientController extends Controller
         $perPage = $settingService->getPerPage();
 
         $references = Reference::all();
-        $recipients = Recipient::with('references')->paginate($perPage);
+        $recipients = Recipient::with('references')->orderBy('name', 'asc')->paginate($perPage);
 
 
         return view('admin.recipients.index', compact('recipients','references'));
