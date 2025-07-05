@@ -7,12 +7,17 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Recipient extends Model
 {
-     use SoftDeletes;
+    use SoftDeletes;
 
-     protected $fillable = ['name', 'reference', 'number'];
+    protected $fillable = ['name', 'reference', 'number'];
 
-         public function notifications()
+    public function notifications()
     {
         return $this->belongsToMany(Notification::class, 'notification_recipient');
     }
+    public function references()
+    {
+        return $this->belongsToMany(Reference::class, 'recipient_reference');
+    }
+
 }

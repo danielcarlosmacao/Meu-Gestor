@@ -26,7 +26,14 @@
                 @foreach ($recipients as $recipient)
                     <tr>
                         <td>{{ $recipient->name }}</td>
-                        <td>{{ __('reference.' . $recipient->reference) ?? '-'  }}</td>
+                        <td>
+    @if($recipient->references->isNotEmpty())
+        {{ $recipient->references->map(fn($ref) => __('reference.' . $ref->name))->join(', ') }}
+    @else
+        -
+    @endif
+</td>
+
                         <td>{{ $recipient->number }}</td>
                         <td>
                             <button class="btn btn-warning btn-sm" data-bs-toggle="modal"

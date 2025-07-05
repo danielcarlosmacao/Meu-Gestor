@@ -6,16 +6,20 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Recipient;
 use App\Models\WhatsappLog;
+use App\Models\Reference;
 use App\Services\SettingService;
 
 class RecipientController extends Controller
 {
     public function index(SettingService $settingService)
     {
-         $perPage = $settingService->getPerPage();
+        $perPage = $settingService->getPerPage();
 
-        $recipients = Recipient::paginate($perPage);
-        return view('admin.recipients.index', compact('recipients'));
+        $references = Reference::all();
+        $recipients = Recipient::with('references')->paginate($perPage);
+
+
+        return view('admin.recipients.index', compact('recipients','references'));
     }
 
     public function store(Request $request)
@@ -23,10 +27,19 @@ class RecipientController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'number' => 'required|string|max:20',
-            'reference' => 'nullable|string|max:255',
+            'references' => 'nullable|array',
+            'references.*' => 'exists:references,id',
         ]);
 
-        Recipient::create($request->all());
+        $recipient = Recipient::create([
+            'name' => $request->name,
+            'number' => $request->number,
+        ]);
+
+        if ($request->has('references')) {
+            $recipient->references()->attach($request->references);
+        }
+
         return redirect()->back()->with('success', 'Destinatário adicionado com sucesso.');
     }
 
@@ -37,10 +50,17 @@ class RecipientController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'number' => 'required|string|max:20',
-            'reference' => 'nullable|string|max:255',
+            'references' => 'nullable|array',
+            'references.*' => 'exists:references,id',
         ]);
 
-        $recipient->update($request->all());
+        $recipient->update([
+            'name' => $request->name,
+            'number' => $request->number,
+        ]);
+
+        $recipient->references()->sync($request->references ?? []);
+
         return redirect()->back()->with('success', 'Destinatário atualizado com sucesso.');
     }
 
@@ -52,13 +72,13 @@ class RecipientController extends Controller
     }
 
     public function logs(SettingService $settingService)
-{
-    $perPage = $settingService->getPerPage();
+    {
+        $perPage = $settingService->getPerPage();
 
-    $logs = WhatsappLog::with(['recipient', 'maintenance.tower'])
-        ->orderBy('created_at', 'desc')
-        ->paginate($perPage);
+        $logs = WhatsappLog::with(['recipient', 'maintenance.tower'])
+            ->orderBy('created_at', 'desc')
+            ->paginate($perPage);
 
-    return view('admin.recipients.logs', compact('logs'));
-}
+        return view('admin.recipients.logs', compact('logs'));
+    }
 }

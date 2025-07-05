@@ -22,20 +22,20 @@
                         <input type="text" name="name" class="form-control" value="{{ $recipient->name ?? '' }}"
                             required>
                     </div>
-                    <div class="mb-3">
-                        <label for="reference" class="form-label">Referência</label>
-                        <select name="reference" class="form-select">
-                            <option value="{{ empty($recipient->reference) ? 'selected' : 'notSent' }}">Nenhuma</option>
-                            <option value="serviceTowe"
-                                {{ isset($recipient) && $recipient->reference === 'serviceTowe' ? 'selected' : '' }}>
-                                {{__('reference.' . 'serviceTowe')}}
-                            </option>
-                            <option value="notification"
-                                {{ isset($recipient) && $recipient->reference === 'notification' ? 'selected' : '' }}>
-                                {{__('reference.' . 'notification')}}
-                            </option>
-                        </select>
-                    </div>
+<div class="mb-3">
+    <label class="form-label">Referências</label><br>
+    @foreach($references as $reference)
+        <div class="form-check">
+            <input class="form-check-input" type="checkbox" name="references[]"
+                value="{{ $reference->id }}"
+                id="ref{{ $reference->id }}"
+                @if(isset($recipient) && $recipient->references->contains($reference->id)) checked @endif>
+            <label class="form-check-label" for="ref{{ $reference->id }}">
+                {{ __('reference.' . $reference->name) }}
+            </label>
+        </div>
+    @endforeach
+</div>
                     <div class="mb-3">
                         <label for="number" class="form-label">Número</label>
                         <input type="text" name="number" class="form-control" value="{{ $recipient->number ?? '' }}"

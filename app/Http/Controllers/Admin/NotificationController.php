@@ -18,7 +18,10 @@ class NotificationController extends Controller
         $perPage = $settingService->getPerPage();
 
         $notifications = Notification::with('recipients')->latest()->paginate($perPage);
-        $recipients = Recipient::where('reference', '=', 'notification')->get();
+        $recipients = Recipient::whereHas('references', function ($query) {
+            $query->where('name', 'notification');
+        })->get();
+
 
         return view('admin.notification.index', compact('notifications', 'recipients'));
     }

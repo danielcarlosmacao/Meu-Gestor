@@ -36,7 +36,10 @@ class EnviarMensagensDeManutencao extends Command
             return;
         }
 
-        $recipients = Recipient::where('reference', 'serviceTowe')->get();
+        $recipients = Recipient::whereHas('references', function ($query) {
+            $query->where('name', 'serviceTowe');
+        })->get();
+
 
         if ($recipients->isEmpty()) {
             $this->warn('Nenhum destinatário configurado para envio.');
