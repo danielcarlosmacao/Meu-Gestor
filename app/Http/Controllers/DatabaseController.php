@@ -8,6 +8,8 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 
 class DatabaseController extends Controller
 {
@@ -66,8 +68,13 @@ class DatabaseController extends Controller
 
         $request->validate([
             'sql_file' => 'required|file',
+            'password' => 'required|string',
         ]);
 
+        $user = Auth::user();
+        if (!Hash::check($request->input('password'), $user->password)) {
+            return back()->with('error', 'Senha incorreta. Importação cancelada.');
+        }
         $file = $request->file('sql_file');
 
         // Validação da extensão do arquivo

@@ -15,7 +15,7 @@ class VehicleMaintenanceController extends Controller
     {
         $perPage = $settingService->getPerPage();
         $vehicles = Vehicle::where('status', 'active')->get();
-        $vehicleServices = VehicleService::all();
+        $vehicleServices = VehicleService::orderby('name','asc')->get();
         $workshops = Workshop::all();
         $maintenances = VehicleMaintenance::with(['vehicle', 'services'])->orderBy('maintenance_date', 'desc')->paginate($perPage);
 

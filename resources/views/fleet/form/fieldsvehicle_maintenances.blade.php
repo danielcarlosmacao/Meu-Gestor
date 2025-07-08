@@ -70,11 +70,12 @@
 {{-- Serviços Realizados --}}
 <div class="mb-2">
     <label>Serviços Realizados</label>
-    <div id="services-checkboxes">
+    
+    <div id="services-checkboxes" class="d-flex flex-wrap gap-3 mt-2">
         @foreach($vehicleServices as $service)
             <div class="service-checkbox" 
                  data-service-type="{{ strtolower($service->vehicle_type) }}" 
-                 style="display:none; margin-bottom: 5px;">
+                 style="display: none;">
                 <input 
                     type="checkbox" 
                     name="vehicle_services[]" 
@@ -83,12 +84,13 @@
                     @if(isset($maintenance) && $maintenance->services->contains($service->id)) checked @endif
                 >
                 <label for="service{{ $service->id }}">
-                     {{ $service->name }}
+                    {{ $service->name }}
                 </label>
             </div>
         @endforeach
     </div>
 </div>
+
 
 {{-- parts_used --}}
 <div class="mb-2">

@@ -1,4 +1,4 @@
-@extends('layouts.header')
+@extends('layouts.header') 
 @section('title', 'Recursos do sistema')
 
 @section('content')
@@ -9,12 +9,11 @@
         <div class="alert alert-success mt-2">{{ session('success') }}</div>
     @endif
 
-   @if (session('error'))
-    <div class="alert alert-danger mt-2">
-        <pre class="mb-0">{{ session('error') }}</pre>
-    </div>
-@endif
-
+    @if (session('error'))
+        <div class="alert alert-danger mt-2">
+            <pre class="mb-0">{{ session('error') }}</pre>
+        </div>
+    @endif
 
     <!-- Exportar Banco -->
     <div class="card mt-4">
@@ -51,13 +50,11 @@
                     <span id="btn-spinner" class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
                 </button>
             </form>
-
         </div>
     </div>
 </div>
 
-<!-- Modais -->
-<!-- Modal de confirmação genérica -->
+<!-- Modal de confirmação -->
 <div class="modal fade" id="confirmModal" tabindex="-1" aria-labelledby="confirmModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
@@ -65,10 +62,15 @@
         <h5 class="modal-title" id="confirmModalLabel">Confirmação</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
       </div>
-      <div class="modal-body" id="modal-message">
-        Tem certeza que deseja continuar?
+      <div class="modal-body" id="modal-body-content">
+        <p id="modal-message">Tem certeza que deseja continuar?</p>
+        <div id="password-field" class="mt-3 d-none">
+          <label for="confirm-password" class="form-label">Digite sua senha para confirmar:</label>
+          <input type="password" id="confirm-password" class="form-control">
+        </div>
       </div>
       <div class="modal-footer">
+        <div class="text-danger me-auto" id="password-error" style="display:none;"></div>
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
         <button type="button" class="btn btn-primary" id="confirm-action-btn">Confirmar</button>
       </div>
@@ -79,8 +81,10 @@
 @push('scripts')
 <script>
     let currentAction = null;
+    let requirePassword = false;
 
     function confirmExport() {
+        requirePassword = false;
         currentAction = () => document.getElementById('export-form').submit();
         showModal("Tem certeza que deseja exportar o banco de dados?");
     }
@@ -91,11 +95,31 @@
             alert("Por favor, selecione um arquivo .sql");
             return;
         }
-        currentAction = () => document.getElementById('import-form').submit();
+
+        requirePassword = true;
+        currentAction = () => {
+            const password = document.getElementById('confirm-password').value;
+
+            if (!password) {
+                document.getElementById('password-error').innerText = "Senha é obrigatória.";
+                document.getElementById('password-error').style.display = "block";
+                return;
+            }
+
+            const hiddenInput = document.createElement('input');
+            hiddenInput.type = 'hidden';
+            hiddenInput.name = 'password';
+            hiddenInput.value = password;
+            document.getElementById('import-form').appendChild(hiddenInput);
+
+            document.getElementById('import-form').submit();
+        };
+
         showModal("Tem certeza que deseja importar o banco de dados?");
     }
 
     function confirmUpdate() {
+        requirePassword = false;
         currentAction = () => {
             document.getElementById('btn-text').classList.add('d-none');
             document.getElementById('btn-spinner').classList.remove('d-none');
@@ -107,11 +131,26 @@
 
     function showModal(message) {
         document.getElementById('modal-message').innerText = message;
+        document.getElementById('password-error').style.display = "none";
+        document.getElementById('confirm-password').value = "";
+
+        const passwordField = document.getElementById('password-field');
+        if (requirePassword) {
+            passwordField.classList.remove('d-none');
+        } else {
+            passwordField.classList.add('d-none');
+        }
+
         const modal = new bootstrap.Modal(document.getElementById('confirmModal'));
         modal.show();
 
-        // Liga a ação confirmada ao botão
         document.getElementById('confirm-action-btn').onclick = function () {
+            if (requirePassword && !document.getElementById('confirm-password').value) {
+                document.getElementById('password-error').innerText = "Senha é obrigatória.";
+                document.getElementById('password-error').style.display = "block";
+                return;
+            }
+
             modal.hide();
             currentAction();
         };
