@@ -32,7 +32,7 @@
 
 {{-- Quilometragem --}}
 <div class="mb-2">
-    <label>Quilometragem</label>
+    <label for="mileage-label" id="mileage-label">Quilometragem</label>
     <input type="number" name="mileage" class="form-control" value="{{ $maintenance->mileage ?? '' }}">
 </div>
 

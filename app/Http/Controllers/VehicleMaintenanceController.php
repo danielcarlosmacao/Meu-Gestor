@@ -8,18 +8,26 @@ use App\Models\VehicleMaintenance;
 use App\Models\VehicleService;
 use App\Models\Workshop;
 use App\Services\SettingService;
+use Illuminate\Support\Facades\DB;
 
 class VehicleMaintenanceController extends Controller
 {
-   public function index(SettingService $settingService)
+    public function index(SettingService $settingService)
     {
         $perPage = $settingService->getPerPage();
         $vehicles = Vehicle::where('status', 'active')->get();
-        $vehicleServices = VehicleService::orderby('name','asc')->get();
+        $vehicleServices = VehicleService::orderby('name', 'asc')->get();
         $workshops = Workshop::all();
         $maintenances = VehicleMaintenance::with(['vehicle', 'services'])->orderBy('maintenance_date', 'desc')->paginate($perPage);
 
-        return view('fleet.vehicles.vehicle_maintenances', compact('vehicles', 'vehicleServices', 'maintenances','workshops'));
+        // Subquery para obter o maior mileage por vehicle_id
+        $maxMileages = DB::table('vehicle_maintenances')
+            ->select('vehicle_id', DB::raw('MAX(mileage) as max_mileage'))
+            ->whereNull('deleted_at') // importante por causa do softDeletes()
+            ->groupBy('vehicle_id')
+            ->pluck('max_mileage', 'vehicle_id');
+
+        return view('fleet.vehicles.vehicle_maintenances', compact('vehicles', 'vehicleServices', 'maintenances', 'workshops','maxMileages'));
     }
 
     public function store(Request $request)
@@ -78,30 +86,30 @@ class VehicleMaintenanceController extends Controller
     }
 
     public function byVehicle(Request $request, $vehicleId, SettingService $settingService)
-{
-    $vehicle = Vehicle::findOrFail($vehicleId);
-    $perPage = $settingService->getPerPage();
+    {
+        $vehicle = Vehicle::findOrFail($vehicleId);
+        $perPage = $settingService->getPerPage();
 
-    // Cria a query (AINDA não executa)
-    $query = $vehicle->maintenances()
-        ->with('services')
-        ->orderBy('maintenance_date', 'desc');
+        // Cria a query (AINDA não executa)
+        $query = $vehicle->maintenances()
+            ->with('services')
+            ->orderBy('maintenance_date', 'desc');
 
-    // Aplica os filtros
-    if ($request->filled('start_date')) {
-        $query->whereDate('maintenance_date', '>=', $request->start_date);
+        // Aplica os filtros
+        if ($request->filled('start_date')) {
+            $query->whereDate('maintenance_date', '>=', $request->start_date);
+        }
+
+        if ($request->filled('end_date')) {
+            $query->whereDate('maintenance_date', '<=', $request->end_date);
+        }
+
+        $totalCost = (clone $query)->sum('cost');
+
+        // Agora sim: executa e pagina
+        $maintenances = $query->paginate($perPage);
+
+        return view('fleet.vehicles.by_vehicle', compact('vehicle', 'maintenances', 'totalCost'));
     }
-
-    if ($request->filled('end_date')) {
-        $query->whereDate('maintenance_date', '<=', $request->end_date);
-    }
-       
-    $totalCost = (clone $query)->sum('cost');
-
-    // Agora sim: executa e pagina
-    $maintenances = $query->paginate($perPage);
-
-    return view('fleet.vehicles.by_vehicle', compact('vehicle', 'maintenances', 'totalCost'));
-}
 
 }

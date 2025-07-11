@@ -67,5 +67,8 @@
         'vehicleServices' => $vehicleServices,
         'maintenances' => $maintenances,
     ])
+<script>
+    const maxMileages = @json($maxMileages);
+</script>
 
 @endsection
