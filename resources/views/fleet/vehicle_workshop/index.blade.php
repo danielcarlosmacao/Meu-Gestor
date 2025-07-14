@@ -6,7 +6,7 @@
     <h2 class="text-center">
         Oficinas e Mecanicas
         @can('fleets.create')
-            <button class="btn btn-primary btn-sm ms-2" data-bs-toggle="modal" data-bs-target="#createServiceModal">
+            <button class="btn dcm-btn-primary btn-sm ms-2" data-bs-toggle="modal" data-bs-target="#createServiceModal">
                 <i class="bi bi-plus-lg"></i>
             </button>
         @endcan

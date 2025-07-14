@@ -92,7 +92,7 @@
   <div class="modal-dialog modal-dialog-centered modal-md">
     <div class="modal-content shadow rounded-4 border-0">
 
-      <div class="modal-header bg-primary text-white rounded-top-4">
+      <div class="modal-header bgc-primary text-white rounded-top-4">
         <h5 class="modal-title fw-bold" id="addTowerLabel">Novo Registro</h5>
         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fechar"></button>
       </div>
@@ -120,7 +120,7 @@
         </div>
 
         <div class="modal-footer border-0 d-flex justify-content-end gap-2">
-          <button type="submit" class="btn btn-primary rounded-pill">
+          <button type="submit" class="btn dcm-btn-primary rounded-pill">
             <i class="bi bi-save"></i> Salvar
           </button>
           <button type="button" class="btn btn-secondary rounded-pill" data-bs-dismiss="modal">Cancelar</button>
