@@ -88,43 +88,71 @@
 
     </div>
 
+<div class="modal fade" id="addTower" tabindex="-1" aria-labelledby="addTowerLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-md">
+    <div class="modal-content shadow rounded-4 border-0">
 
-    <div class="modal fade" id="addTower" tabindex="-1" aria-labelledby="addTowerLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
+      <div class="modal-header bg-primary text-white rounded-top-4">
+        <h5 class="modal-title fw-bold" id="addTowerLabel">Novo Registro</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fechar"></button>
+      </div>
 
-                <div class="modal-header">
-                    <h5 class="modal-title text-bgc-primary" id="addTowerLabel">Novo Registro</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
-                </div>
-
-                <div class="modal-body">
-                    <form action="{{ route('tower.store') }}" method="POST">
-                        @csrf
-
-                        <div class="mb-3">
-                            <label for="name" class="form-label">Nome</label>
-                            <input type="text" class="form-control" id="name" name="name">
-                        </div>
-
-                        <div class="mb-3">
-                            <label for="voltage" class="form-label">Voltagem</label>
-                            <input type="number" class="form-control" id="voltage" name="voltage" min="12"
-                                max="1000" step="12" step="1" required>
-                        </div>
-
-                        <button type="submit" class="btn dcm-btn-primary">Salvar</button>
-                    </form>
-                </div>
-
+      <form action="{{ route('tower.store') }}" method="POST" novalidate>
+        @csrf
+        <div class="modal-body">
+          <div class="mb-3">
+            <label for="name" class="form-label fw-semibold">Nome <span class="text-danger">*</span></label>
+            <input type="text" class="form-control rounded-pill" id="name" name="name" required
+              placeholder="Digite o nome da torre">
+            <div class="invalid-feedback">
+              Por favor, insira o nome da torre.
             </div>
+          </div>
+
+          <div class="mb-3">
+            <label for="voltage" class="form-label fw-semibold">Voltagem (V) <span class="text-danger">*</span></label>
+            <input type="number" class="form-control rounded-pill" id="voltage" name="voltage" min="12" max="1000" step="12" required
+              placeholder="Ex: 12, 24, 36...">
+            <div class="invalid-feedback">
+              Informe uma voltagem válida entre 12 e 1000.
+            </div>
+          </div>
         </div>
+
+        <div class="modal-footer border-0 d-flex justify-content-end gap-2">
+          <button type="submit" class="btn btn-primary rounded-pill">
+            <i class="bi bi-save"></i> Salvar
+          </button>
+          <button type="button" class="btn btn-secondary rounded-pill" data-bs-dismiss="modal">Cancelar</button>
+        </div>
+      </form>
+
     </div>
+  </div>
+</div>
+
+
 
 
 
     <script>
         const routeDestroy = "{{ route('tower.destroy', ['id' => ':id']) }}";
         const refDestroy = "esta torre";
-    </script>
+        
+  // Exemplo simples de validação Bootstrap 5 nativa
+  (() => {
+    'use strict';
+    const forms = document.querySelectorAll('form');
+    Array.from(forms).forEach(form => {
+      form.addEventListener('submit', event => {
+        if (!form.checkValidity()) {
+          event.preventDefault();
+          event.stopPropagation();
+        }
+        form.classList.add('was-validated');
+      }, false);
+    });
+  })();
+</script>
+
 @endsection

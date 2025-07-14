@@ -65,7 +65,6 @@
                                                 $production_percentage = $bp->production_percentage;
                                             }
 
-                                            
                                             $installationDate = new DateTime($bp->installation_date);
                                             $removalDate = new DateTime($bp->removal_date);
 
@@ -73,13 +72,12 @@
                                                 $diff = $today->diff($installationDate); // OK!
                                                 $years = $diff->y;
                                                 $months = $diff->m;
-                                                $tempProdution = $years . " Ano e " . $months . " meses";
-
+                                                $tempProdution = $years . ' Ano e ' . $months . ' meses';
                                             } elseif ($bp->removal_date != '' || $bp->removal_date != null) {
                                                 $diff = $installationDate->diff($removalDate); // OK!
                                                 $years = $diff->y;
                                                 $months = $diff->m;
-                                                $tempProdution = $years . " Ano e " . $months . " meses";
+                                                $tempProdution = $years . ' Ano e ' . $months . ' meses';
                                             } else {
                                                 $tempProdution = '';
                                             }
@@ -328,6 +326,14 @@
                     });
                 });
                 // ---------- BATERIA ----------
+                // Função para garantir formato YYYY-MM-DD para input date
+                function formatDateForInput(dateString) {
+                    if (!dateString) return '';
+                    return dateString.split('T')[0]; // Pega só o "YYYY-MM-DD"
+
+                }
+
+
                 document.querySelectorAll('.edit-btn').forEach(btn => {
                     btn.addEventListener('click', async () => {
                         const id = btn.dataset.id;
@@ -341,14 +347,16 @@
                         document.getElementById('edit_battery_id').value = bp.battery_id;
                         document.getElementById('edit_info').value = bp.info;
                         document.getElementById('edit_amount').value = bp.amount ?? '';
-                        document.getElementById('edit_installation_date').value = bp
-                            .installation_date ?? '';
-                        document.getElementById('edit_removal_date').value = bp.removal_date ?? '';
+                        document.getElementById('edit_installation_date').value =
+                            formatDateForInput(bp.installation_date);
+                        document.getElementById('edit_removal_date').value = formatDateForInput(bp
+                            .removal_date);
                         document.getElementById('edit_active').value = bp.active;
 
                         document.getElementById('editModal').style.display = 'block';
                     });
                 });
+
 
                 const batteryForm = document.getElementById('editForm');
                 if (batteryForm) {

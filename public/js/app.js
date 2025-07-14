@@ -99,3 +99,4 @@ function setupBrazilianDatepicker(selector) {
 document.addEventListener('DOMContentLoaded', () => {
     setupBrazilianDatepicker('.datepicker');
 });
+
