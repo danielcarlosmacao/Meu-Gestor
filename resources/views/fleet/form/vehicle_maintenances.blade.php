@@ -1,67 +1,82 @@
 <!-- Modal Adicionar Manutenção -->
 <div class="modal fade" id="addMaintenanceModal" tabindex="-1" aria-labelledby="addMaintenanceModalLabel"
     aria-hidden="true">
-    <div class="modal-dialog">
-        <form action="{{ route('fleet.vehicle_maintenances.store') }}" method="POST">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <form action="{{ route('fleet.vehicle_maintenances.store') }}" method="POST" class="w-100">
             @csrf
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="addMaintenanceModalLabel">Nova Manutenção</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+            <div class="modal-content shadow-lg rounded-4 border-0">
+                <div class="modal-header bgc-primary text-white rounded-top-4 border-0">
+                    <h5 class="modal-title fw-bold">Nova Manutenção</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                        aria-label="Fechar"></button>
                 </div>
                 <div class="modal-body">
                     @include('fleet.form.fieldsvehicle_maintenances', [
                         'maintenance' => null,
                         'vehicles' => $vehicles,
                         'vehicleServices' => $vehicleServices,
+                        'workshops' => $workshops,
                     ])
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="submit" class="btn dcm-btn-primary">Salvar</button>
+                <div class="modal-footer border-0">
+                    <button type="button" class="btn btn-outline-secondary rounded-pill"
+                        data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn dcm-btn-primary rounded-pill">
+                        <i class="bi bi-save"></i> Salvar
+                    </button>
                 </div>
             </div>
         </form>
     </div>
 </div>
 
-<!-- Modal Editar Manutenção -->
 @foreach ($maintenances as $maintenance)
     <div class="modal fade" id="editMaintenanceModal{{ $maintenance->id }}" tabindex="-1"
         aria-labelledby="editMaintenanceModalLabel{{ $maintenance->id }}" aria-hidden="true">
-        <div class="modal-dialog">
-            <form action="{{ route('fleet.vehicle_maintenances.update', $maintenance->id) }}" method="POST">
-                @csrf
-                @method('PUT')
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="editMaintenanceModalLabel{{ $maintenance->id }}">Editar Manutenção
-                        </h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
-                    </div>
-                    <div class="modal-body">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content shadow-lg rounded-4 border-0">
+                <div class="modal-header bgc-primary text-white rounded-top-4 border-0">
+                    <h5 class="modal-title fw-bold">Editar Manutenção</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                        aria-label="Fechar"></button>
+                </div>
+
+                <div class="modal-body">
+                    <form action="{{ route('fleet.vehicle_maintenances.update', $maintenance->id) }}" method="POST">
+                        @csrf
+                        @method('PUT')
+
                         @include('fleet.form.fieldsvehicle_maintenances', [
                             'maintenance' => $maintenance,
                             'vehicles' => $vehicles,
                             'vehicleServices' => $vehicleServices,
+                            'workshops' => $workshops,
                         ])
-                    </div>
-                    <div class="modal-footer d-flex justify-content-between">
-                        <button type="submit" class="btn dcm-btn-primary">Atualizar</button>
-            </form>
-            @can('fleets.delete')
-                <form action="{{ route('fleet.vehicle_maintenances.destroy', $maintenance->id) }}" method="POST"
-                    onsubmit="return confirm('Tem certeza que deseja excluir esta manutenção?');">
-                    @csrf
-                    @method('DELETE')
-                    <button type="submit" class="btn btn-danger">Excluir</button>
-                </form>
-            @endcan
+
+                        <div class="modal-footer border-0 px-0 d-flex justify-content-between">
+                            <button type="submit" class="btn dcm-btn-primary rounded-pill">
+                                <i class="bi bi-save"></i> Atualizar
+                            </button>
+
+
+                    </form> @can('fleets.delete')
+                        <!-- Botão de Excluir (fora do form de edição) -->
+                        <form action="{{ route('fleet.vehicle_maintenances.destroy', $maintenance->id) }}" method="POST"
+                            onsubmit="return confirm('Tem certeza que deseja excluir esta manutenção?');" class="m-0">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="btn btn-danger rounded-pill">
+                                <i class="bi bi-trash"></i> Excluir
+                            </button>
+                        </form>
+                    @endcan
+                </div>
+            </div>
         </div>
     </div>
     </div>
-    </div>
 @endforeach
+
 
 
 <script>
@@ -138,7 +153,7 @@
             vehicleSelect.addEventListener('change', () => {
                 filterServices();
                 filterWorkshops();
-    updateMileageHint(); // ← Adicione aqui
+                updateMileageHint(); // ← Adicione aqui
             });
 
             // === Reage ao abrir modal, se estiver dentro de um

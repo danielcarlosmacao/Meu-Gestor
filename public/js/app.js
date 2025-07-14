@@ -77,3 +77,25 @@ function mostrarPopupConfirmacao() {
     }
 }
   
+// Função reutilizável para ativar datepicker com padrão BR
+function setupBrazilianDatepicker(selector) {
+    if (!window.flatpickr) {
+        console.error('Flatpickr não está carregado.');
+        return;
+    }
+
+    flatpickr(selector, {
+        locale: "pt",
+        dateFormat: "Y-m-d",
+        allowInput: true,
+        altInput: true,
+        altFormat: "d/m/Y",
+        wrap: false,
+        //maxDate: "today",
+    });
+}
+
+// Inicializa os datepickers ao carregar a página
+document.addEventListener('DOMContentLoaded', () => {
+    setupBrazilianDatepicker('.datepicker');
+});

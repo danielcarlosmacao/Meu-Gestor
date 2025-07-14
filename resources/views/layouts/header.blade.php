@@ -12,8 +12,19 @@
     <!--bootstrap-->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
-    
+
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+
+ <!-- Flatpickr CSS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" />
+
+<!-- Flatpickr JS -->
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
+<!-- Flatpickr Português BR -->
+<script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/pt.js"></script>
+
+
 
 
     <link rel="stylesheet" href="/css/style.css" type='text/css'>
@@ -43,7 +54,8 @@
                     @can('towers.view')
                         <!-- gestao de torre -->
                         <li class="nav-item dropdown position-static" id="menutower">
-                            <a class="nav-link dropdown-toggle" href="#">TORRES <i class="bi bi-broadcast ms-2"></i></a>
+                            <a class="nav-link dropdown-toggle" href="#">TORRES <i
+                                    class="bi bi-broadcast ms-2"></i></a>
                             <div class="dropdown-menu mega-menu">
                                 <div class="row">
                                     <div class="col-md-1">
@@ -57,7 +69,9 @@
                                     </div>
                                     <div class="col-md-5">
                                         <h6>Extra</h6>
-                                        @can('towers.maintenance')<a href="{{ route('maintenance.index') }}"><i class="fa fa-cogs"></i> Serviços</a> @endcan
+                                        @can('towers.maintenance')
+                                            <a href="{{ route('maintenance.index') }}"><i class="fa fa-cogs"></i> Serviços</a>
+                                        @endcan
                                     </div>
 
                                 </div>
@@ -107,7 +121,8 @@
                     <!-- Ferias  -->
                     @can('vacations.view')
                         <li class="nav-item dropdown position-static" id="menuFerias">
-                            <a class="nav-link dropdown-toggle" href="#">FERIAS <i class="bi bi-calendar-week ms-2"></i></a>
+                            <a class="nav-link dropdown-toggle" href="#">FERIAS <i
+                                    class="bi bi-calendar-week ms-2"></i></a>
                             <div class="dropdown-menu mega-menu">
                                 <div class="row">
                                     <div class="col-md-1">
@@ -135,7 +150,8 @@
                     <!-- administrador -->
                     @can('administrator.user')
                         <li class="nav-item dropdown position-static" id="menuAdmin">
-                            <a class="nav-link dropdown-toggle" href="#">ADMINISTRADOR <i class="bi bi-person-gear ms-2"></i></a>
+                            <a class="nav-link dropdown-toggle" href="#">ADMINISTRADOR <i
+                                    class="bi bi-person-gear ms-2"></i></a>
                             <div class="dropdown-menu mega-menu">
                                 <div class="row">
                                     <div class="col-md-1">
@@ -216,27 +232,27 @@
 
 
     <!-- Hover script -->
-   <script>
-    const hoverMenus = ['menutower', 'menuFrota', 'menuServico', 'menuFerias', 'menuAdmin', 'menuUser'];
+    <script>
+        const hoverMenus = ['menutower', 'menuFrota', 'menuServico', 'menuFerias', 'menuAdmin', 'menuUser'];
 
-    hoverMenus.forEach(id => {
-        const menu = document.getElementById(id);
-        if (!menu) return; // <-- ignora se o menu não existir para o usuário
+        hoverMenus.forEach(id => {
+            const menu = document.getElementById(id);
+            if (!menu) return; // <-- ignora se o menu não existir para o usuário
 
-        let timeout;
+            let timeout;
 
-        menu.addEventListener('mouseenter', () => {
-            clearTimeout(timeout);
-            menu.classList.add('show');
+            menu.addEventListener('mouseenter', () => {
+                clearTimeout(timeout);
+                menu.classList.add('show');
+            });
+
+            menu.addEventListener('mouseleave', () => {
+                timeout = setTimeout(() => {
+                    menu.classList.remove('show');
+                }, 200);
+            });
         });
-
-        menu.addEventListener('mouseleave', () => {
-            timeout = setTimeout(() => {
-                menu.classList.remove('show');
-            }, 200);
-        });
-    });
-</script>
+    </script>
 </body>
 
 </html>
