@@ -209,6 +209,11 @@ Route::middleware(['auth', 'permission:fleets.view'])->group(function () {
     Route::get('/fleet/vehicle_services', [VehicleServiceController::class, 'index'])->name('fleet.vehicle_services.index');
     Route::get('/fleet/vehicle_workshop', [WorkshopController::class, 'index'])->name('fleet.vehicle_workshop.index');
     Route::get('/fleet/veiculos/{vehicle}/manutencoes', [VehicleMaintenanceController::class, 'byVehicle'])->name('fleet.vehicle.maintenances');
+    //report
+    Route::get('/vehicle-maintenance/report/form', function() {return view('fleet.vehicles.vehicle_maintenances_report');})->name('vehicle-maintenance.report.form');
+    
+    Route::get('/vehicle-maintenance/report/pdf', [VehicleMaintenanceController::class, 'handlePdfReport'])->name('vehicle-maintenance.report.pdf');
+
 });
 //fleets.create
 Route::middleware(['auth', 'permission:fleets.create'])->group(function () {

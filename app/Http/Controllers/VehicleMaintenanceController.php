@@ -9,6 +9,7 @@ use App\Models\VehicleService;
 use App\Models\Workshop;
 use App\Services\SettingService;
 use Illuminate\Support\Facades\DB;
+use PDF; // Importar no topo do controller
 
 class VehicleMaintenanceController extends Controller
 {
@@ -111,5 +112,40 @@ class VehicleMaintenanceController extends Controller
 
         return view('fleet.vehicles.by_vehicle', compact('vehicle', 'maintenances', 'totalCost'));
     }
+
+    public function handlePdfReport(Request $request, SettingService $settingService)
+{
+    $year = $request->input('year');
+    $month = $request->input('month');
+    $action = $request->input('action', 'view'); // padrão para visualizar se não informado
+
+    $vehicles = Vehicle::where('status', 'active')->get();
+    $vehicleServices = VehicleService::orderBy('name', 'asc')->get();
+    $workshops = Workshop::all();
+
+    $maintenances = VehicleMaintenance::with(['vehicle', 'services'])
+        ->whereYear('maintenance_date', $year)
+        ->whereMonth('maintenance_date', $month)
+        ->orderBy('maintenance_date', 'desc')
+        ->get();
+
+    $maxMileages = DB::table('vehicle_maintenances')
+        ->select('vehicle_id', DB::raw('MAX(mileage) as max_mileage'))
+        ->whereNull('deleted_at')
+        ->groupBy('vehicle_id')
+        ->pluck('max_mileage', 'vehicle_id');
+
+    $data = compact('vehicles', 'vehicleServices', 'maintenances', 'workshops', 'maxMileages', 'month', 'year');
+
+    $pdf = PDF::loadView('fleet.vehicles.vehicle_maintenances_pdf', $data);
+
+    if ($action === 'download') {
+        return $pdf->download("relatorio_manutenções_{$month}_{$year}.pdf");
+    }
+
+    return $pdf->stream("relatorio_manutenções_{$month}_{$year}.pdf");
+}
+
+
 
 }

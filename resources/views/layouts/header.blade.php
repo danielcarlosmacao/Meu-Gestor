@@ -88,8 +88,6 @@
                             <a class="nav-link dropdown-toggle" href="#">FROTA <i class="bi bi-truck ms-2"></i></a>
                             <div class="dropdown-menu mega-menu">
                                 <div class="row">
-                                    <div class="col-md-1">
-                                    </div>
                                     <div class="col-md-6">
                                         <h6>Gestão da frota</h6>
                                         <a href="{{ route('fleet.vehicles.index') }}">Veiculos</a>
@@ -97,6 +95,10 @@
                                         <a href="{{ route('fleet.vehicle_services.index') }}">Tipos de servicos</a>
                                         <a href="{{ route('fleet.vehicle_workshop.index') }}">Oficinas</a>
                                         <!--<a href="#">Abastecimentos</a>-->
+                                    </div>
+                                    <div class="col-md-6">
+                                        <h6>Outros</h6>
+                                        <a href="{{ route('vehicle-maintenance.report.form') }}">Relatorio de Manutenções</a>
                                     </div>
                                 </div>
                             </div>
