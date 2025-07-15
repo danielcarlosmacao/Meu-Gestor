@@ -176,10 +176,11 @@ class DatabaseController extends Controller
             Log::info('Migrations rodadas com sucesso');
 
             Artisan::call('optimize:clear');
-            Artisan::call('config:clear');
-            Artisan::call('cache:clear');
-            Artisan::call('route:clear');
-            Artisan::call('view:clear');
+            // Recompila as caches importantes
+            Artisan::call('config:cache');  // Recompila config cache
+            Artisan::call('route:cache');   // Recompila rotas cache
+            Artisan::call('view:cache');    // Compila views
+
             Log::info('Caches limpos');
 
             return back()->with('success', 'Sistema atualizado com sucesso!');
