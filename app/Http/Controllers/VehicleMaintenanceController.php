@@ -115,37 +115,40 @@ class VehicleMaintenanceController extends Controller
 
     public function handlePdfReport(Request $request, SettingService $settingService)
 {
-    $year = $request->input('year');
-    $month = $request->input('month');
-    $action = $request->input('action', 'view'); // padrão para visualizar se não informado
+    $startDate = $request->input('start_date');
+    $endDate = $request->input('end_date');
+    $action = $request->input('action', 'view'); // padrão view
+
+    if (!$startDate || !$endDate) {
+        abort(400, 'Período inválido.');
+    }
 
     $vehicles = Vehicle::where('status', 'active')->get();
     $vehicleServices = VehicleService::orderBy('name', 'asc')->get();
     $workshops = Workshop::all();
 
     $maintenances = VehicleMaintenance::with(['vehicle', 'services'])
-        ->whereYear('maintenance_date', $year)
-        ->whereMonth('maintenance_date', $month)
+        ->whereBetween('maintenance_date', [$startDate, $endDate])
         ->orderBy('maintenance_date', 'desc')
         ->get();
 
     $maxMileages = DB::table('vehicle_maintenances')
         ->select('vehicle_id', DB::raw('MAX(mileage) as max_mileage'))
+        ->whereBetween('maintenance_date', [$startDate, $endDate])
         ->whereNull('deleted_at')
         ->groupBy('vehicle_id')
         ->pluck('max_mileage', 'vehicle_id');
 
-    $data = compact('vehicles', 'vehicleServices', 'maintenances', 'workshops', 'maxMileages', 'month', 'year');
+    $data = compact('vehicles', 'vehicleServices', 'maintenances', 'workshops', 'maxMileages', 'startDate', 'endDate');
 
     $pdf = PDF::loadView('fleet.vehicles.vehicle_maintenances_pdf', $data);
 
     if ($action === 'download') {
-        return $pdf->download("relatorio_manutenções_{$month}_{$year}.pdf");
+        return $pdf->download("relatorio_manutencoes_{$startDate}_a_{$endDate}.pdf");
     }
 
-    return $pdf->stream("relatorio_manutenções_{$month}_{$year}.pdf");
+    return $pdf->stream("relatorio_manutencoes_{$startDate}_a_{$endDate}.pdf");
 }
-
 
 
 }

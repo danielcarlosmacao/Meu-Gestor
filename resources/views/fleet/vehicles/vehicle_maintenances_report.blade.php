@@ -1,5 +1,5 @@
 @extends('layouts.header')
-@section('title', 'Relatório de Manutenções')
+@section('title', 'Relatório de Manutenções por Período')
 @section('content')
 
 <div class="container mt-5">
@@ -9,23 +9,17 @@
 
             <form method="GET" action="{{ route('vehicle-maintenance.report.pdf') }}" target="_blank" class="row g-3 justify-content-center">
                 <div class="col-md-3">
-                    <label for="month" class="form-label fw-bold">Mês</label>
-                    <select name="month" id="month" class="form-select shadow-sm" required>
-                        <option value="" disabled selected>Selecione</option>
-                        @for ($m = 1; $m <= 12; $m++)
-                            <option value="{{ $m }}">{{ str_pad($m, 2, '0', STR_PAD_LEFT) }}</option>
-                        @endfor
-                    </select>
+                    <label for="start_date" class="form-label fw-bold">Data Inicial</label>
+                    <input type="date" name="start_date" id="start_date" 
+                           value="{{ date('Y-m-01') }}" 
+                           class="form-control shadow-sm" required>
                 </div>
 
                 <div class="col-md-3">
-                    <label for="year" class="form-label fw-bold">Ano</label>
-                    <select name="year" id="year" class="form-select shadow-sm" required>
-                        <option value="" disabled selected>Selecione</option>
-                        @for ($y = date('Y'); $y >= 2020; $y--)
-                            <option value="{{ $y }}">{{ $y }}</option>
-                        @endfor
-                    </select>
+                    <label for="end_date" class="form-label fw-bold">Data Final</label>
+                    <input type="date" name="end_date" id="end_date" 
+                           value="{{ date('Y-m-d') }}" 
+                           class="form-control shadow-sm" required>
                 </div>
 
                 <div class="col-md-4 d-flex align-items-end justify-content-center gap-2">

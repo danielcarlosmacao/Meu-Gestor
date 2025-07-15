@@ -51,7 +51,12 @@
 </head>
 <body>
 
-    <h2>Resumo de Manutenções - {{ str_pad($month, 2, '0', STR_PAD_LEFT) }}/{{ $year }}</h2>
+    <h2>
+    Resumo de Manutenções - 
+    {{ \Carbon\Carbon::parse($startDate)->format('d/m/Y') }} 
+    até 
+    {{ \Carbon\Carbon::parse($endDate)->format('d/m/Y') }}
+</h2>
 
     <table class="cards-table">
         <tr>
