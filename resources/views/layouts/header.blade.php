@@ -24,6 +24,10 @@
 <!-- Flatpickr Português BR -->
 <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/pt.js"></script>
 
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="{{ asset('js/confirm-action.js') }}"></script>
+
+
 
 
 

@@ -143,3 +143,14 @@
 }
 
 
+    tr.user-inactive td {
+        background-color: #f8f9fa; /* cinza claro */
+        color: #6c757d; /* texto apagado */
+        opacity: 0.7;
+    }
+
+    /* Hover destacado */
+    tbody tr:hover td {
+        background-color: #eef2f7;
+        opacity: 1;
+    }
