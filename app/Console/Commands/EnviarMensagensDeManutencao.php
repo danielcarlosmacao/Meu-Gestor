@@ -62,7 +62,8 @@ class EnviarMensagensDeManutencao extends Command
                 }
 
                 // Monta mensagem
-                $mensagem = "Olá {$recipient->name}! A torre {$towerName} tem uma manutenção "
+                $appName = config('app.name');
+                $mensagem = "*$appName*: Olá {$recipient->name}! A torre {$towerName} tem uma manutenção "
                     . ($manutencao->status === 'pending' ? 'pendente' : 'agendada')
                     . " para hoje ({$hoje->format('d/m/Y')}).";
 

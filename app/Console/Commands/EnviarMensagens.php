@@ -46,7 +46,8 @@ class EnviarMensagens extends Command
                     continue;
                 }
 
-                $mensagem = $notificacao->msg;
+                $appName = config('app.name');
+                $mensagem = "*$appName*: " . $notificacao->msg ;
 
                 $log = NotificationLog::create([
                     'notification_id' => $notificacao->id,
