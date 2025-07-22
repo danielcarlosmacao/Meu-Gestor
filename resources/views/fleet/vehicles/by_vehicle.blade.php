@@ -54,7 +54,7 @@
                 @foreach ($maintenances as $maintenance)
                     <tr>
                         <td>{{ \Carbon\Carbon::parse($maintenance->maintenance_date)->format('d/m/Y') }}</td>
-                        <td>{{ ucfirst($maintenance->type) }}</td>
+                        <td>{{ ucfirst(__('typemaintenances.' . $maintenance->type)) }}</td>
                         <td>{{ number_format($maintenance->mileage, 0, ',', '.') ?? '-' }} km</td>
                         <td>R$ {{ number_format($maintenance->cost, 2, ',', '.') }}</td>
                         <td>{{ $maintenance->status === 'pending' ? 'Pendente' : 'Concluído' }}</td>

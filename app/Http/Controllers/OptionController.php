@@ -59,19 +59,26 @@ class OptionController extends Controller
             'hours_Generation' => 'required|integer',
             'hours_autonomy' => 'required|integer',
             'pagination' => 'required|integer',
-            'whatsapp_ip' => 'required|string|max:255',
-            'whatsapp_token' => 'required|string|max:255',
+            'whatsapp_ip' => 'nullable|string|max:255',
+            'whatsapp_token' => 'nullable|string|max:255',
         ]);
 
         $towers = ['hours_Generation', 'hours_autonomy', 'pagination','whatsapp_ip','whatsapp_token'];
 
         foreach ($towers as $ref) {
-            Option::updateOrCreate(
-                ['reference' => $ref],
-                ['value' => $request->input($ref)]
-            );
+                    $value = $request->input($ref);
+
+        // Se o valor for exatamente a string "null", transforma em vazio
+        if (strtolower(trim($value)) === 'null') {
+            $value = '';
         }
-        return redirect()->back()->with('success', 'Cores atualizadas com sucesso!');
+
+        Option::updateOrCreate(
+            ['reference' => $ref],
+            ['value' => $value ?? '']
+        );
+        }
+        return redirect()->back()->with('success', 'Recursos atualizados com sucesso!');
     }
     
     public function editSystemResource()

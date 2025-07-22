@@ -173,8 +173,10 @@
                                         <h6>usuarios e notificaçoes</h6>
                                         <a href="{{ route('admin.usuarios.index') }}">Usuarios</a>
                                         <a href="{{ route('admin.users.sessions') }}">Sessões ativas</a>
+                                        @if(!empty($options['whatsapp_ip']))
                                         <a href="{{ route('admin.recipients.index') }}">Notificaçoes do sistema</a>
                                         <a href="{{ route('admin.notification.index') }}">Lembretes via whatsapp</a>
+                                        @endif
                                     </div>
                                 </div>
                             </div>
