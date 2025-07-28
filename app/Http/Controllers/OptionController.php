@@ -60,11 +60,12 @@ class OptionController extends Controller
             'hours_autonomy' => 'required|integer',
             'pagination' => 'required|integer',
             'whatsapp_ip' => 'nullable|string|max:255',
+            'whatsapp_method' => 'nullable|string|in:GET,POST',
             'whatsapp_user' => 'nullable|string|max:255',
             'whatsapp_token' => 'nullable|string|max:255',
         ]);
 
-        $towers = ['hours_Generation', 'hours_autonomy', 'pagination','whatsapp_ip','whatsapp_user','whatsapp_token'];
+        $towers = ['hours_Generation', 'hours_autonomy', 'pagination','whatsapp_method','whatsapp_ip','whatsapp_user','whatsapp_token'];
 
         foreach ($towers as $ref) {
                     $value = $request->input($ref);
