@@ -7,17 +7,20 @@ use App\Models\Option;
 class WhatsappService
 {
     protected string $ip;
+    protected string $user;
     protected string $token;
 
     public function __construct()
     {
         $this->ip = Option::getValue('whatsapp_ip');
         $this->token = Option::getValue('whatsapp_token');
+        $this->user = Option::getValue('whatsapp_user');
     }
 
     public function sendMessage(string $phone, string $message): string
     {
         $data = http_build_query([
+            'u'   => $this->user,
             'to' => '55' . $phone,
             'msg' => $message,
             'pass' => $this->token,

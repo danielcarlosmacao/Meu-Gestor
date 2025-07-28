@@ -34,6 +34,11 @@
             @error('whatsapp_ip') <div class="text-danger">{{ $message }}</div> @enderror
         </div>
         <div class="form-group mb-3">
+            <label for="whatsapp_user">Usuario da API</label>
+            <input type="text" id="whatsapp_user" name="whatsapp_user" class="form-control" value="{{ $options['whatsapp_user'] ?? 'admin' }}">
+            @error('whatsapp_user') <div class="text-danger">{{ $message }}</div> @enderror
+        </div>
+        <div class="form-group mb-3">
             <label for="whatsapp_token">Token da API</label>
             <input type="text" id="whatsapp_token" name="whatsapp_token" class="form-control" value="{{ $options['whatsapp_token'] ?? '1234567' }}">
             @error('whatsapp_token') <div class="text-danger">{{ $message }}</div> @enderror
