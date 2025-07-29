@@ -53,7 +53,7 @@
         @can('vacations.delete')
         @if ($isEdit == 'Salvar')
             <form id="deleteVacationForm" method="POST"
-                action="{{ route('vacation_manager.vacations.destroy', ['id' => '__ID__']) }}">
+                action="{{ route('vacation_manager.vacations.destroy', ['id' => $vacation->id]) }}">
                 @csrf
                 @method('DELETE')
                 <button type="submit" class="btn btn-danger"
