@@ -60,13 +60,17 @@
 
     <table class="cards-table">
         <tr>
-            @php $count = 0; @endphp
+            @php 
+                $count = 0; 
+                $allCost = 0;
+            @endphp
             @foreach ($vehicles as $vehicle)
                 @php
                     $vehicleMaintenances = $maintenances->where('vehicle_id', $vehicle->id);
                     $totalMaintenances = $vehicleMaintenances->count();
                     $totalCost = $vehicleMaintenances->sum('cost');
                     $lastMileage = $maxMileages[$vehicle->id] ?? '-';
+                    $allCost = $allCost + $totalCost;
                 @endphp
 
                 @if($totalMaintenances > 0)
@@ -91,6 +95,7 @@
             @endfor
         </tr>
     </table>
+    <h4>Custo total de R$ {{$allCost}}</h4></br>
 
     <h4>Detalhamento das Manutenções</h4>
 
