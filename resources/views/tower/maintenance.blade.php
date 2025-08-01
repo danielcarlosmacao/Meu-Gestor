@@ -17,10 +17,25 @@
                     <i class="bi bi-plus-lg"></i>
                 </button>
             @endcan
+                <button id="toggleFilterBtn" type="button" class="btn dcm-btn-primary">
+        <i class="bi bi-search"></i>
+    </button>
         </h2>
-
+        
     </div>
     <div class="container table-responsive">
+<div id="filterDiv" class="mb-3 px-2" style="display: none;">
+    <form method="GET" action="{{ route('maintenance.index') }}" class="d-flex align-items-center gap-3 w-100 flex-wrap">
+        <label for="status" class="form-label mb-0 fw-semibold me-2">Filtrar por Situação:</label>
+        <select name="status" id="status" class="form-select form-select-sm" onchange="this.form.submit()" style="max-width: 220px; min-width: 150px; border-radius: 0.375rem; box-shadow: 0 0 5px rgba(0,123,255,0.5); transition: box-shadow 0.3s ease;">
+            <option value="" {{ request('status') === null ? 'selected' : '' }}>Todas</option>
+            <option value="pending" {{ request('status') === 'pending' ? 'selected' : '' }}>Pendentes</option>
+            <option value="completed" {{ request('status') === 'completed' ? 'selected' : '' }}>Concluídas</option>
+            <option value="archived" {{ request('status') === 'archived' ? 'selected' : '' }}>Arquivadas</option>
+        </select>
+    </form>
+</div>
+
         <table class="table table-striped">
             <thead class="bgc-primary text-white">
                 <tr>
@@ -234,6 +249,18 @@
                 });
             });
         });
+
+
+            document.getElementById('toggleFilterBtn').addEventListener('click', function() {
+        const filterDiv = document.getElementById('filterDiv');
+        if (filterDiv.style.display === 'none' || filterDiv.style.display === '') {
+            filterDiv.style.display = 'block';
+            this.textContent = 'Ocultar Filtros';
+        } else {
+            filterDiv.style.display = 'none';
+            this.textContent = 'Mostrar Filtros';
+        }
+    });
     </script>
 
 @endsection

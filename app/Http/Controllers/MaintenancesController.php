@@ -9,13 +9,23 @@ use App\Services\SettingService;
 
 class MaintenancesController extends Controller
 {
-    public function index(SettingService $settingService)
-    {
-        $perPage = $settingService->getPerPage();
-        $maintenances = Maintenance::with('tower')->orderBy('maintenance_date','desc')->paginate($perPage);
-        $towers = Tower::orderBy('name', 'asc')->get();
-        return view('tower.maintenance', compact('maintenances', 'towers'));
+public function index(Request $request, SettingService $settingService)
+{
+    $perPage = $settingService->getPerPage();
+    $statusFilter = $request->input('status');
+
+    $query = Maintenance::with('tower')->orderBy('maintenance_date', 'desc');
+
+    if ($statusFilter && in_array($statusFilter, ['pending', 'completed', 'archived'])) {
+        $query->where('status', $statusFilter);
     }
+
+    $maintenances = $query->paginate($perPage)->withQueryString();
+    $towers = Tower::orderBy('name', 'asc')->get();
+
+    return view('tower.maintenance', compact('maintenances', 'towers', 'statusFilter'));
+}
+
 
     public function store(Request $request)
     {
