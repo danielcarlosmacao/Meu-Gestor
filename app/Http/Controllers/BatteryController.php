@@ -17,6 +17,7 @@ class BatteryController extends Controller
 
         return view('tower.battery', ['batterys' => $batterys]);
         
+        
     }
 
     public function store(Request $request){
@@ -27,7 +28,8 @@ class BatteryController extends Controller
         $battery->amps = $request->amps;
 
         $battery->save();
-        return redirect(route('battery.index'));
+        return response()->json(['message' => 'Bateria criada com sucesso.']);
+        //return redirect(route('battery.index'));
 
     }
 
@@ -42,8 +44,9 @@ class BatteryController extends Controller
         ]);
 
         $battery->update($validated);
+         return response()->json(['message' => 'Bateria atualizada com sucesso.']);
 
-        return redirect()->route('battery.index')->with('success', 'Bateria atualizada com sucesso!');
+        //return redirect()->route('battery.index')->with('success', 'Bateria atualizada com sucesso!');
     }
 
     public function destroy($id){

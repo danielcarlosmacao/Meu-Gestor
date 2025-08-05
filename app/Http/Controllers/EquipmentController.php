@@ -22,19 +22,29 @@ class EquipmentController extends Controller
     public function store(Request $request)
     {
 
-        $Equipment = new Equipment;
-        $Equipment->name = $request->name;
-        $Equipment->watts = $request->watts;
-        $Equipment->stock = $request->stock;
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'watts' => 'required|numeric',
+            'stock' => 'nullable|numeric',
+        ]);
 
-        $Equipment->save();
-        return redirect(route('equipment.index'));
+        $equipment = new Equipment;
+        $equipment->name = $request->name;
+        $equipment->watts = $request->watts;
+        $equipment->stock = $request->stock;
+
+        $equipment->save();
+
+        return response()->json([
+            'message' => 'Equipamento criado com sucesso!',
+            'equipment' => $equipment,
+        ]);
 
     }
 
     public function update(Request $request, $id)
     {
-        
+
         // Validação básica (opcional, mas recomendada)
         $request->validate([
             'name' => 'required|string|max:255',
@@ -53,9 +63,10 @@ class EquipmentController extends Controller
         // Salva no banco
         $equipment->save();
 
-        // Redireciona para a lista com mensagem (opcional)
-        return redirect()->route('equipment.index')
-            ->with('success', 'Equipamento atualizado com sucesso!');
+        return response()->json([
+            'message' => 'Equipamento atualizado com sucesso!',
+            'equipment' => $equipment,
+        ]);
     }
 
 

@@ -15,17 +15,17 @@
 
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
 
- <!-- Flatpickr CSS -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" />
+    <!-- Flatpickr CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" />
 
-<!-- Flatpickr JS -->
-<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <!-- Flatpickr JS -->
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 
-<!-- Flatpickr Português BR -->
-<script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/pt.js"></script>
+    <!-- Flatpickr Português BR -->
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/pt.js"></script>
 
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<script src="{{ asset('js/confirm-action.js') }}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="{{ asset('js/confirm-action.js') }}"></script>
 
 
 
@@ -98,7 +98,8 @@
                                     </div>
                                     <div class="col-md-6">
                                         <h6>Outros</h6>
-                                        <a href="{{ route('vehicle-maintenance.report.form') }}">Relatorio de Manutenções</a>
+                                        <a href="{{ route('vehicle-maintenance.report.form') }}">Relatorio de
+                                            Manutenções</a>
                                     </div>
                                 </div>
                             </div>
@@ -183,7 +184,7 @@
                     <!-- Verifica se o usuário está logado -->
                     @auth
                         <li class="nav-item dropdown position-static" id="menuUser">
-                            <a class="nav-link dropdown-toggle" href="#" > <i
+                            <a class="nav-link dropdown-toggle" href="#"> <i
                                     class="bi bi-person-fill me-1"></i>{{ Auth::user()->name }}</a>
                             <div class="dropdown-menu mega-menu">
                                 <div class="row">
@@ -217,6 +218,21 @@
     <main class="flex-grow-1">
         @yield('content')
     </main>
+
+    <!-- Toast Global -->
+    <div class="position-fixed top-0 end-0 p-3" style="z-index: 9999">
+        <div id="toastMessage" class="toast align-items-center text-white bg-success border-0" role="alert"
+            aria-live="assertive" aria-atomic="true">
+            <div class="d-flex">
+                <div class="toast-body" id="toastBody">
+                    <!-- mensagem -->
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"
+                    aria-label="Fechar"></button>
+            </div>
+        </div>
+    </div>
+
 
     @stack('scripts')
     @extends('layouts.footer')
@@ -258,7 +274,24 @@
                 }, 200);
             });
         });
+
+        function showToast(message, isError = false) {
+            const toastEl = document.getElementById('toastMessage');
+            const toastBody = document.getElementById('toastBody');
+
+            if (!toastEl || !toastBody) return;
+
+            toastBody.innerText = message;
+            toastEl.classList.remove('bg-success', 'bg-danger');
+            toastEl.classList.add(isError ? 'bg-danger' : 'bg-success');
+
+            const toast = new bootstrap.Toast(toastEl);
+            toast.show();
+        }
     </script>
+    <!--AJAX CRUD (create, update, delete-->
+    <script src="js/ajax-crud.js"></script>
+
 </body>
 
 </html>
