@@ -15,6 +15,11 @@ class Vacation extends Model
         'end_date',
         'information',
     ];
+    protected $casts = [
+    'start_date' => 'date',
+    'end_date' => 'date',
+];
+
 
     public function collaborator()
     {
