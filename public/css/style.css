@@ -13,6 +13,11 @@
   background-color: var(--color-primary)!important;
   color: white !important;
 }
+nav.navbar.bgc-primary {
+    width: 100vw; /* força ocupar toda a largura visível */
+    margin: 0;
+    padding: 0;
+}
 .text-bgc-primary{
   color:var(--color-text) ;
 }
@@ -21,6 +26,7 @@
   color: #db1414; 
   font-weight: normal; /* garante que não fica negrito */
 }
+
 
 /*Botao primario*/
 

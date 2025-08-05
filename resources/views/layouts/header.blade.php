@@ -44,7 +44,7 @@
 </head>
 
 <body class="d-flex flex-column min-vh-100">
-    <nav class="navbar navbar-expand-lg navbar-dark bgc-primary">
+    <nav class="navbar navbar-expand-lg navbar-dark bgc-primary w-100">
         <div class="container-fluid">
             <a class="navbar-brand" href="{{ route('welcome') }}">
                 @if (!empty($appOptions['logo']))
@@ -183,7 +183,7 @@
                     <!-- Verifica se o usuário está logado -->
                     @auth
                         <li class="nav-item dropdown position-static" id="menuUser">
-                            <a class="nav-link dropdown-toggle" href="#" style="color:rgb(0, 0, 0);"> <i
+                            <a class="nav-link dropdown-toggle" href="#" > <i
                                     class="bi bi-person-fill me-1"></i>{{ Auth::user()->name }}</a>
                             <div class="dropdown-menu mega-menu">
                                 <div class="row">
