@@ -33,6 +33,7 @@ class VehicleMaintenanceController extends Controller
 
     public function store(Request $request)
     {
+        
         $data = $request->validate([
             'vehicle_id' => 'required|exists:vehicles,id',
             'type' => 'required|in:preventive,corrective',
@@ -45,6 +46,7 @@ class VehicleMaintenanceController extends Controller
             'vehicle_services' => 'nullable|array',
             'vehicle_services.*' => 'exists:vehicle_services,id',
         ]);
+       // @dd($data);
         $maintenance = VehicleMaintenance::create($data);
 
         if (!empty($data['vehicle_services'])) {
@@ -53,6 +55,7 @@ class VehicleMaintenanceController extends Controller
 
         return redirect()->back()->with('success', 'Manutenção adicionada com sucesso!');
     }
+
 
     public function update(Request $request, $id)
     {

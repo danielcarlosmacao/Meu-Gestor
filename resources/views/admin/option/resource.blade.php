@@ -5,10 +5,6 @@
     <div class="container py-4">
         <h2>Editar Recursos do sistema</h2>
 
-        @if (session('success'))
-            <div class="alert alert-success mt-2">{{ session('success') }}</div>
-        @endif
-
         <form action="{{ route('options.resource.update') }}" method="POST" class="mt-4">
             @csrf
 

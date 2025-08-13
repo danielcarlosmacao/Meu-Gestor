@@ -28,7 +28,8 @@ class EquipmentController extends Controller
         $Equipment->stock = $request->stock;
 
         $Equipment->save();
-        return redirect(route('equipment.index'));
+        return redirect()->route('equipment.index')
+            ->with('success', 'Equipamento criado com sucesso!');
 
     }
 
@@ -64,6 +65,7 @@ class EquipmentController extends Controller
 
         $equipment = Equipment::findOrFail($id);
         $equipment->delete(); // Soft delete, se usar SoftDeletes
-        return response()->json(['message' => 'Equipamento deletada com sucesso.']);
+        return redirect()->route('equipment.index')
+            ->with('success', 'Equipamento deletada com sucesso!');
     }
 }

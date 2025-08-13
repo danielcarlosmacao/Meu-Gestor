@@ -2,7 +2,6 @@
 @section('title', 'Equipamentos')
 @section('content')
 
-
     <div class="container mb-2 mb-md-5 mt-2 mt-md-5">
         <h2 class="text-center">Equipamentos
             <!-- Botão que abre o modal -->
@@ -34,18 +33,37 @@
                         <td>{{ $equipment->stock > 0 ? $equipment->stock : '' }}</td>
                         <td>{{ $equipment->equipment_productions_count }}</td>
                         <td class="text-center align-middle p-1">
-                            @can('towers.edit')
-                                <button type="button" class="btn btn-warning btn-sm edit-equipment-btn"
-                                    data-id="{{ $equipment->id }}" data-name="{{ $equipment->name }}"
-                                    data-watts="{{ $equipment->watts }}"data-stock="{{ $equipment->stock }}" data-bs-toggle="modal" data-bs-target="#editModal">
-                                    <i class="bi bi-pencil"></i> Editar
+                            <div class="btn-group">
+                                <button type="button" class="btn btn-sm dcm-btn-primary dropdown-toggle"
+                                    data-bs-toggle="dropdown">
+                                    <i class="bi bi-gear"></i> Ações
                                 </button>
-                            @endcan
-                            @can('towers.delete')
-                                <button type="button" class="btn btn-danger btn-sm" onclick="deletar({{ $equipment->id }})"><i
-                                        class="bi bi-trash"></i> Deletar</button>
-                            @endcan
-
+                                <ul class="dropdown-menu dropdown-menu-end">
+                                    <li>
+                                        @can('towers.edit')
+                                            <button type="button" class="dropdown-item edit-equipment-btn"
+                                                data-id="{{ $equipment->id }}" data-name="{{ $equipment->name }}"
+                                                data-watts="{{ $equipment->watts }}"data-stock="{{ $equipment->stock }}"
+                                                data-bs-toggle="modal" data-bs-target="#editModal">
+                                                <i class="bi bi-pencil-square"></i> Editar
+                                            </button>
+                                        @endcan
+                                    </li>
+                                    <li>
+                                        @can('towers.delete')
+                                            <form action="{{ route('equipment.destroy', $equipment->id) }}" method="POST"
+                                                style="display:inline;">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="dropdown-item"
+                                                    onclick="return confirm('Tem certeza que deseja deletar este equipamento ?')">
+                                                    <i class="bi bi-trash"></i> Deletar
+                                                </button>
+                                            </form>
+                                        @endcan
+                                    </li>
+                                </ul>
+                            </div>
                         </td>
                     </tr>
                 @endforeach
@@ -55,12 +73,7 @@
             {{ $equipments->links() }}
         </div>
         <br>
-
-
     </div>
-
-
-
 
     <!-- Modal -->
     <div class="modal fade" id="modalForm" tabindex="-1" aria-labelledby="modalFormLabel" aria-hidden="true">
@@ -105,7 +118,6 @@
         </div>
     </div>
 
-
     <!-- Modal de edição (fora do loop) -->
     <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
         <div class="modal-dialog">
@@ -145,13 +157,7 @@
         </div>
     </div>
 
-
-
     <script>
-        const routeDestroy = "{{ route('equipment.destroy', ['id' => ':id']) }}";
-        const refDestroy = "este equipamento";
-
-
         const routeUpdate = "{{ route('equipment.update', ['id' => ':id']) }}";
 
         document.querySelectorAll('.edit-equipment-btn').forEach(button => {

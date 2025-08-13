@@ -2,13 +2,6 @@
 @section('title', 'Manutenções de Torres')
 @section('content')
 
-    @if (session('success'))
-        <script>
-            window.onload = () => {
-                alert("{{ session('success') }}");
-            };
-        </script>
-    @endif
 
     <div class="container mb-2 mb-md-5 mt-2 mt-md-5">
         <h2 class="text-center">Manutenções de Torres
@@ -17,24 +10,26 @@
                     <i class="bi bi-plus-lg"></i>
                 </button>
             @endcan
-                <button id="toggleFilterBtn" type="button" class="btn dcm-btn-primary">
-        <i class="bi bi-search"></i>
-    </button>
+            <button id="toggleFilterBtn" type="button" class="btn dcm-btn-primary">
+                <i class="bi bi-search"></i>
+            </button>
         </h2>
-        
+
     </div>
     <div class="container table-responsive">
-<div id="filterDiv" class="mb-3 px-2" style="display: none;">
-    <form method="GET" action="{{ route('maintenance.index') }}" class="d-flex align-items-center gap-3 w-100 flex-wrap">
-        <label for="status" class="form-label mb-0 fw-semibold me-2">Filtrar por Situação:</label>
-        <select name="status" id="status" class="form-select form-select-sm" onchange="this.form.submit()" style="max-width: 220px; min-width: 150px; border-radius: 0.375rem; box-shadow: 0 0 5px rgba(0,123,255,0.5); transition: box-shadow 0.3s ease;">
-            <option value="" {{ request('status') === null ? 'selected' : '' }}>Todas</option>
-            <option value="pending" {{ request('status') === 'pending' ? 'selected' : '' }}>Pendentes</option>
-            <option value="completed" {{ request('status') === 'completed' ? 'selected' : '' }}>Concluídas</option>
-            <option value="archived" {{ request('status') === 'archived' ? 'selected' : '' }}>Arquivadas</option>
-        </select>
-    </form>
-</div>
+        <div id="filterDiv" class="mb-3 px-2" style="display: none;">
+            <form method="GET" action="{{ route('maintenance.index') }}"
+                class="d-flex align-items-center gap-3 w-100 flex-wrap">
+                <label for="status" class="form-label mb-0 fw-semibold me-2">Filtrar por Situação:</label>
+                <select name="status" id="status" class="form-select form-select-sm" onchange="this.form.submit()"
+                    style="max-width: 220px; min-width: 150px; border-radius: 0.375rem; box-shadow: 0 0 5px rgba(0,123,255,0.5); transition: box-shadow 0.3s ease;">
+                    <option value="" {{ request('status') === null ? 'selected' : '' }}>Todas</option>
+                    <option value="pending" {{ request('status') === 'pending' ? 'selected' : '' }}>Pendentes</option>
+                    <option value="completed" {{ request('status') === 'completed' ? 'selected' : '' }}>Concluídas</option>
+                    <option value="archived" {{ request('status') === 'archived' ? 'selected' : '' }}>Arquivadas</option>
+                </select>
+            </form>
+        </div>
 
         <table class="table table-striped">
             <thead class="bgc-primary text-white">
@@ -60,7 +55,7 @@
 
                     <tr>
                         <td>{{ $m->tower->name ?? 'Torre não encontrada' }}</td>
-                        <td>{{ $m->info}}</td>
+                        <td>{{ $m->info }}</td>
                         <td class="{{ $destacarAtraso ? 'text-danger fw-bold' : '' }}">
                             {{ $m->maintenance_date->format('d/m/Y') }}</td>
                         <td class="{{ $destacarData ? 'text-danger fw-bold' : '' }}">
@@ -68,15 +63,39 @@
                         <td>{{ __('status.' . $m->status) }}</td>
                         <td class="text-center align-middle p-1">
                             @can('towers.maintenance')
-                                <button type="button" class="btn btn-warning btn-sm edit-maintenance-btn"
-                                    data-id="{{ $m->id }}" data-tower_id="{{ $m->tower_id }}"
-                                    data-info="{{ $m->info }}"
-                                    data-maintenance_date="{{ $m->maintenance_date->format('Y-m-d') }}"
-                                    data-next_maintenance_date="{{ $m->next_maintenance_date->format('Y-m-d') }}"
-                                    data-status="{{ $m->status }}" data-bs-toggle="modal"
-                                    data-bs-target="#editMaintenanceModal">
-                                    <i class="bi bi-pencil"></i> Editar
-                                </button>
+                                <div class="btn-group">
+                                    <button type="button" class="btn btn-sm dcm-btn-primary dropdown-toggle"
+                                        data-bs-toggle="dropdown">
+                                        <i class="bi bi-gear"></i> Ações
+                                    </button>
+                                    <ul class="dropdown-menu dropdown-menu-end">
+                                        <li>
+
+                                            <button type="button" class="dropdown-item  edit-maintenance-btn"
+                                                data-id="{{ $m->id }}" data-tower_id="{{ $m->tower_id }}"
+                                                data-info="{{ $m->info }}"
+                                                data-maintenance_date="{{ $m->maintenance_date->format('Y-m-d') }}"
+                                                data-next_maintenance_date="{{ $m->next_maintenance_date->format('Y-m-d') }}"
+                                                data-status="{{ $m->status }}" data-bs-toggle="modal"
+                                                data-bs-target="#editMaintenanceModal">
+                                                <i class="bi bi-pencil-square"></i> Editar
+                                            </button>
+
+                                        </li>
+                                        <li>
+                                            <form action="{{ route('maintenance.destroy', $m->id) }}" method="POST"
+                                                style="display:inline;">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="dropdown-item "
+                                                    onclick="return confirm('Tem certeza que deseja deletar esta bateria?')">
+                                                    <i class="bi bi-trash"></i> Deletar
+                                                </button>
+                                            </form>
+
+                                        </li>
+                                    </ul>
+                                </div>
                             @endcan
                         </td>
                     </tr>
@@ -188,7 +207,6 @@
                         </div>
                         <div class="modal-footer">
                             <button type="submit" class="btn dcm-btn-primary">Salvar</button>
-                            <button type="button" class="btn btn-danger" id="deleteInModalBtn">Excluir</button>
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
                         </div>
                     </div>
@@ -251,16 +269,16 @@
         });
 
 
-            document.getElementById('toggleFilterBtn').addEventListener('click', function() {
-        const filterDiv = document.getElementById('filterDiv');
-        if (filterDiv.style.display === 'none' || filterDiv.style.display === '') {
-            filterDiv.style.display = 'block';
-            this.textContent = 'Ocultar Filtros';
-        } else {
-            filterDiv.style.display = 'none';
-            this.textContent = 'Mostrar Filtros';
-        }
-    });
+        document.getElementById('toggleFilterBtn').addEventListener('click', function() {
+            const filterDiv = document.getElementById('filterDiv');
+            if (filterDiv.style.display === 'none' || filterDiv.style.display === '') {
+                filterDiv.style.display = 'block';
+                this.textContent = 'Ocultar Filtros';
+            } else {
+                filterDiv.style.display = 'none';
+                this.textContent = 'Mostrar Filtros';
+            }
+        });
     </script>
 
 @endsection

@@ -89,7 +89,7 @@ class TowerController extends Controller
 
         $tower = Tower::findOrFail($id);
         $tower->delete(); // Soft delete, se usar SoftDeletes
-        return response()->json(['message' => 'Torre deletada com sucesso.']);
+        return redirect()->back()->with('success', 'Torre deletada com sucesso!');
 
     }
 

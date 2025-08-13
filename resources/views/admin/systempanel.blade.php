@@ -205,8 +205,84 @@
         </div>
       </div>
     </div>
+    {{-- CPU --}}
+@php
+    $cpuModel = 'Desconhecido';
+    $cpuCores = 0;
+    $cpuLoad = [];
+
+    if (PHP_OS_FAMILY === 'Linux') {
+        $cpuInfo = @file_get_contents('/proc/cpuinfo');
+        if ($cpuInfo) {
+            preg_match('/model name\s+:\s+(.+)/', $cpuInfo, $match);
+            if (!empty($match[1])) {
+                $cpuModel = trim($match[1]);
+            }
+            preg_match_all('/^processor/m', $cpuInfo, $cores);
+            $cpuCores = count($cores[0]);
+        }
+        $cpuLoad = sys_getloadavg();
+    }
+@endphp
+<div class="col-md-6 col-lg-3">
+    <div class="card info-card p-3" style="background-color: #e8eaf6;">
+        <div class="card-body">
+            <div class="info-icon">🖲️</div>
+            <h5 class="card-title">CPU</h5>
+            <p class="card-text">{{ $cpuModel }}</p>
+            <p class="card-text">Cores: {{ $cpuCores ?: 'N/A' }}</p>
+            @if(!empty($cpuLoad))
+                <p class="card-text">Load: {{ implode(', ', array_map(fn($l) => round($l, 2), $cpuLoad)) }}</p>
+            @endif
+        </div>
+    </div>
+</div>
+
+{{-- Banco de Dados --}}
+@php
+    try {
+        $dbVersion = DB::selectOne('select version() as v')->v ?? 'Desconhecida';
+        $dbStatus = 'Conectado';
+    } catch (Exception $e) {
+        $dbVersion = 'Erro';
+        $dbStatus = 'Falha na conexão';
+    }
+@endphp
+<div class="col-md-6 col-lg-3">
+    <div class="card info-card p-3" style="background-color: #fff8e1;">
+        <div class="card-body">
+            <div class="info-icon">🗄️</div>
+            <h5 class="card-title">Banco de Dados</h5>
+            <p class="card-text">Status: {{ $dbStatus }}</p>
+            <p class="card-text">Versão: {{ $dbVersion }}</p>
+        </div>
+    </div>
+</div>
+
+{{-- Tempo do Servidor --}}
+<div class="col-md-6 col-lg-3">
+    <div class="card info-card p-3" style="background-color: #f1f8e9;">
+        <div class="card-body">
+            <div class="info-icon">⏰</div>
+            <h5 class="card-title">Servidor</h5>
+            <p class="card-text">Data/Hora: {{ now()->format('d/m/Y H:i:s') }}</p>
+            @if(PHP_OS_FAMILY === 'Linux' && is_readable('/proc/uptime'))
+                @php
+                    $uptimeData = explode(' ', file_get_contents('/proc/uptime'));
+                    $uptimeSeconds = (int) $uptimeData[0];
+                    $uptimeDays = floor($uptimeSeconds / 86400);
+                    $uptimeHours = floor(($uptimeSeconds % 86400) / 3600);
+                    $uptimeMinutes = floor(($uptimeSeconds % 3600) / 60);
+                @endphp
+                <p class="card-text">Uptime: {{ $uptimeDays }}d {{ $uptimeHours }}h {{ $uptimeMinutes }}m</p>
+            @endif
+        </div>
+    </div>
+</div>
+
 
   </div>
 </div>
+
 
 @endsection

@@ -2,14 +2,6 @@
 @section('title', 'Baterias')
 @section('content')
 
-    @if (session('success'))
-        <script>
-            window.onload = () => {
-                alert("{{ session('success') }}");
-            };
-        </script>
-    @endif
-
 
     <div class="container mb-2 mb-md-5 mt-2 mt-md-5">
         <h2 class="text-center">Baterias
@@ -44,14 +36,37 @@
                         <td>{{ $battery->mark }}</td>
                         <td>{{ $battery->amps }}</td>
                         <td class="text-center align-middle p-1">
-                            @can('towers.edit')
-                                <button type="button" class="btn btn-warning btn-sm edit-battery-btn"
-                                    data-id="{{ $battery->id }}" data-name="{{ $battery->name }}"
-                                    data-mark="{{ $battery->mark }}" data-amps="{{ $battery->amps }}" data-bs-toggle="modal"
-                                    data-bs-target="#editBatteryModal">
-                                    <i class="bi bi-pencil"></i> Editar
+                            <div class="btn-group">
+                                <button type="button" class="btn btn-sm dcm-btn-primary dropdown-toggle"
+                                    data-bs-toggle="dropdown">
+                                    <i class="bi bi-gear"></i> Ações
                                 </button>
-                            @endcan
+                                <ul class="dropdown-menu dropdown-menu-end">
+                                    <li>
+                                        @can('towers.edit')
+                                            <button type="button" class="dropdown-item edit-battery-btn"
+                                                data-id="{{ $battery->id }}" data-name="{{ $battery->name }}"
+                                                data-mark="{{ $battery->mark }}" data-amps="{{ $battery->amps }}"
+                                                data-bs-toggle="modal" data-bs-target="#editBatteryModal">
+                                                <i class="bi bi-pencil-square"></i> Editar
+                                            </button>
+                                        @endcan
+                                    </li>
+                                    <li>
+                                        @can('towers.delete')
+                                            <form action="{{ route('battery.destroy', $battery->id) }}" method="POST"
+                                                style="display:inline;">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="dropdown-item"
+                                                    onclick="return confirm('Tem certeza que deseja deletar esta bateria?')">
+                                                    <i class="bi bi-trash"></i> Deletar
+                                                </button>
+                                            </form>
+                                        @endcan
+                                    </li>
+                                </ul>
+                            </div>
                         </td>
                     </tr>
                 @endforeach
@@ -131,9 +146,6 @@
                     </div>
                     <div class="modal-footer">
                         <button type="submit" class="btn dcm-btn-primary">Salvar</button>
-                        @can('towers.delete')
-                            <button type="button" class="btn btn-danger" id="deleteInModalBtn">Excluir</button>
-                        @endcan
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
                     </div>
                 </div>
@@ -142,8 +154,6 @@
     </div>
 
     <script>
-        const routeDestroy = "{{ route('battery.destroy', ['id' => ':id']) }}";
-        const refDestroy = "esta bateria";
         const routeUpdate = "{{ route('battery.update', ['id' => ':id']) }}";
 
         // Preenche o modal de edição com os dados do botão clicado

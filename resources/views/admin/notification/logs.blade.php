@@ -4,9 +4,7 @@
 
     <div class="container mt-5">
         <h2 class="text-center">Logs de Notificações</h2>
-        @if (session('success'))
-            <div class="alert alert-success mt-3">{{ session('success') }}</div>
-        @endif
+
         <table class="table table-striped mt-4">
             <thead class="bgc-primary">
                 <tr>

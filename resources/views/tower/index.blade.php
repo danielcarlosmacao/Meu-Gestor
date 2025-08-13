@@ -34,10 +34,7 @@
                 @foreach ($towers as $tower)
                     <tr>
                         @php
-                            if (
-                                $tower->activeBattery === null ||
-                                $tower->activeBattery === ''
-                            ) {
+                            if ($tower->activeBattery === null || $tower->activeBattery === '') {
                                 $production_percentage = '0';
                             } else {
                                 $voltageRatio = $tower->voltage / 12;
@@ -52,7 +49,10 @@
 
                             $consumptionAhDay = $tower->summary->consumption_ah_day ?? 0;
                             $platerrequire = $hours_Generation > 0 ? $consumptionAhDay / $hours_Generation : 0;
-                            $plater_percentage = $tower->summary->amps_plate > 0 ? number_format(($platerrequire / $tower->summary->amps_plate) * 100, 2) . '%' : '0%' ;
+                            $plater_percentage =
+                                $tower->summary->amps_plate > 0
+                                    ? number_format(($platerrequire / $tower->summary->amps_plate) * 100, 2) . '%'
+                                    : '0%';
 
                         @endphp
                         <th scope="row">
@@ -67,13 +67,18 @@
                         </td>
                         <td>{{ $tower->activeBattery->years_since_installation ?? 'Sem bateria' }}</td>
                         <td>{{ round($tower->summary->watts_plate) }} W - {{ round($tower->summary->amps_plate) }} A</td>
-                        <td>{{$plater_percentage }}</td>
+                        <td>{{ $plater_percentage }}</td>
                         <td class="text-center align-middle p-1">
                             @can('towers.delete')
-                                <button type="button" class="btn btn-danger btn-sm" onclick="deletar({{ $tower->id }})"><i
-                                        class="bi bi-trash">
-                                    </i> Deletar
-                                </button>
+                                <form action="{{ route('tower.destroy', $tower->id) }}" method="POST"
+                                    style="display:inline;">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="btn btn-danger btn-sm"
+                                        onclick="return confirm('Tem certeza que deseja deletar esta torre?')">
+                                        <i class="bi bi-trash"></i> Deletar
+                                    </button>
+                                </form>
                             @endcan
                         </td>
                     </tr>
@@ -88,48 +93,52 @@
 
     </div>
 
-<div class="modal fade" id="addTower" tabindex="-1" aria-labelledby="addTowerLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered modal-md">
-    <div class="modal-content shadow rounded-4 border-0">
+    <div class="modal fade" id="addTower" tabindex="-1" aria-labelledby="addTowerLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-md">
+            <div class="modal-content shadow rounded-4 border-0">
 
-      <div class="modal-header bgc-primary text-white rounded-top-4">
-        <h5 class="modal-title fw-bold" id="addTowerLabel">Novo Registro</h5>
-        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fechar"></button>
-      </div>
+                <div class="modal-header bgc-primary text-white rounded-top-4">
+                    <h5 class="modal-title fw-bold" id="addTowerLabel">Novo Registro</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                        aria-label="Fechar"></button>
+                </div>
 
-      <form action="{{ route('tower.store') }}" method="POST" novalidate>
-        @csrf
-        <div class="modal-body">
-          <div class="mb-3">
-            <label for="name" class="form-label fw-semibold">Nome <span class="text-danger">*</span></label>
-            <input type="text" class="form-control rounded-pill" id="name" name="name" required
-              placeholder="Digite o nome da torre">
-            <div class="invalid-feedback">
-              Por favor, insira o nome da torre.
+                <form action="{{ route('tower.store') }}" method="POST" novalidate>
+                    @csrf
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="name" class="form-label fw-semibold">Nome <span
+                                    class="text-danger">*</span></label>
+                            <input type="text" class="form-control rounded-pill" id="name" name="name" required
+                                placeholder="Digite o nome da torre">
+                            <div class="invalid-feedback">
+                                Por favor, insira o nome da torre.
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="voltage" class="form-label fw-semibold">Voltagem (V) <span
+                                    class="text-danger">*</span></label>
+                            <input type="number" class="form-control rounded-pill" id="voltage" name="voltage"
+                                min="12" max="1000" step="12" required placeholder="Ex: 12, 24, 36...">
+                            <div class="invalid-feedback">
+                                Informe uma voltagem válida entre 12 e 1000.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer border-0 d-flex justify-content-end gap-2">
+                        <button type="submit" class="btn dcm-btn-primary rounded-pill">
+                            <i class="bi bi-save"></i> Salvar
+                        </button>
+                        <button type="button" class="btn btn-secondary rounded-pill"
+                            data-bs-dismiss="modal">Cancelar</button>
+                    </div>
+                </form>
+
             </div>
-          </div>
-
-          <div class="mb-3">
-            <label for="voltage" class="form-label fw-semibold">Voltagem (V) <span class="text-danger">*</span></label>
-            <input type="number" class="form-control rounded-pill" id="voltage" name="voltage" min="12" max="1000" step="12" required
-              placeholder="Ex: 12, 24, 36...">
-            <div class="invalid-feedback">
-              Informe uma voltagem válida entre 12 e 1000.
-            </div>
-          </div>
         </div>
-
-        <div class="modal-footer border-0 d-flex justify-content-end gap-2">
-          <button type="submit" class="btn dcm-btn-primary rounded-pill">
-            <i class="bi bi-save"></i> Salvar
-          </button>
-          <button type="button" class="btn btn-secondary rounded-pill" data-bs-dismiss="modal">Cancelar</button>
-        </div>
-      </form>
-
     </div>
-  </div>
-</div>
 
 
 
@@ -138,21 +147,21 @@
     <script>
         const routeDestroy = "{{ route('tower.destroy', ['id' => ':id']) }}";
         const refDestroy = "esta torre";
-        
-  // Exemplo simples de validação Bootstrap 5 nativa
-  (() => {
-    'use strict';
-    const forms = document.querySelectorAll('form');
-    Array.from(forms).forEach(form => {
-      form.addEventListener('submit', event => {
-        if (!form.checkValidity()) {
-          event.preventDefault();
-          event.stopPropagation();
-        }
-        form.classList.add('was-validated');
-      }, false);
-    });
-  })();
-</script>
+
+        // Exemplo simples de validação Bootstrap 5 nativa
+        (() => {
+            'use strict';
+            const forms = document.querySelectorAll('form');
+            Array.from(forms).forEach(form => {
+                form.addEventListener('submit', event => {
+                    if (!form.checkValidity()) {
+                        event.preventDefault();
+                        event.stopPropagation();
+                    }
+                    form.classList.add('was-validated');
+                }, false);
+            });
+        })();
+    </script>
 
 @endsection

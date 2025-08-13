@@ -27,7 +27,7 @@ class PlateController extends Controller
         $plate->watts = $request->watts;
 
         $plate->save();
-        return redirect(route('plate.index'));
+        return redirect()->route('plate.index')->with('success', 'Placa criada com sucesso!');
 
     }
 
@@ -53,6 +53,6 @@ class PlateController extends Controller
 
         $plate = plate::findOrFail($id);
         $plate->delete(); // Soft delete, se usar SoftDeletes
-        return response()->json(['message' => 'Placa deletada com sucesso.']);
+        return redirect()->route('plate.index')->with('success', 'Placa deletada com sucesso!');
     }
 }

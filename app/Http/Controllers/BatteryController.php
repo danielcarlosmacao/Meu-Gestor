@@ -27,7 +27,7 @@ class BatteryController extends Controller
         $battery->amps = $request->amps;
 
         $battery->save();
-        return redirect(route('battery.index'));
+        return redirect()->route('battery.index')->with('success', 'Bateria criada com sucesso!');
 
     }
 
@@ -49,7 +49,8 @@ class BatteryController extends Controller
     public function destroy($id){
 
         $battery = battery::findOrFail($id);
-        $battery->delete(); // Soft delete, se usar SoftDeletes
-        return response()->json(['message' => 'Bateria deletada com sucesso.']);
+        $battery->delete(); 
+        return redirect()->route('battery.index')->with('success', 'Bateria deletada com sucesso!');
+
     }
 }

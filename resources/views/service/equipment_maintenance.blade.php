@@ -11,12 +11,8 @@
             @endcan
         </h2>
 
-        @if (session('success'))
-            <div class="alert alert-success mt-3">{{ session('success') }}</div>
-        @endif
-
         <table class="table table-striped mt-3">
-            <thead>
+            <thead class="bgc-primary">
                 <tr>
                     <th>Cliente</th>
                     <th>Assistência Tecnica</th>

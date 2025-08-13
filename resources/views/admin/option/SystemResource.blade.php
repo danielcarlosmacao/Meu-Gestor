@@ -5,15 +5,6 @@
 <div class="container py-4">
     <h2>Gestão do sistema</h2>
 
-    @if (session('success'))
-        <div class="alert alert-success mt-2">{{ session('success') }}</div>
-    @endif
-
-    @if (session('error'))
-        <div class="alert alert-danger mt-2">
-            <pre class="mb-0">{{ session('error') }}</pre>
-        </div>
-    @endif
 
     <!-- Exportar Banco -->
     <div class="card mt-4">

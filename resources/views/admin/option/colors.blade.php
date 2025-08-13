@@ -5,9 +5,6 @@
 <div class="container py-4">
     <h2>Editar Cores do Sistema</h2>
 
-    @if(session('success'))
-        <div class="alert alert-success mt-2">{{ session('success') }}</div>
-    @endif
 
     <form action="{{ route('options.colors.update') }}" method="POST" class="mt-4">
         @csrf

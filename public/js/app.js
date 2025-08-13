@@ -38,33 +38,32 @@ $(function () {
    
 // Função de delete.
 
-   function deletar(id) {
-      if (!confirm('Tem certeza que deseja deletar ' + refDestroy + ' ?')) return;
-  
-      const token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-      // Gera a URL da rota e substitui o {id} pelo valor real
-      const url = routeDestroy.replace(':id', id);
-  
-      fetch(url, {
-          method: 'DELETE',
-          headers: {
-              'X-CSRF-TOKEN': token,
-              'Content-Type': 'application/json',
-          }
-      })
-      .then(res => {
-          if (!res.ok) throw new Error('Erro ao deletar ' + refDestroy );
-          return res.json();
-      })
-      .then(data => {
-          alert(data.message);
-          window.location.reload(); // Atualiza a página após deletar
-      })
-      .catch(err => {
-          console.error('Erro:', err);
-          alert('Erro ao deletar ' + refDestroy );
-      });
-  }
+  function deletar(id) {
+    if (!confirm('Tem certeza que deseja deletar ' + refDestroy + ' ?')) return;
+
+    const token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+    const url = routeDestroy.replace(':id', id);
+
+    fetch(url, {
+        method: 'DELETE',
+        headers: {
+            'X-CSRF-TOKEN': token,
+            'Content-Type': 'application/json',
+        }
+    })
+    .then(res => {
+        if (!res.ok) throw new Error('Erro ao deletar ' + refDestroy);
+        return res.json();
+    })
+    .then(data => {
+        toastr.success(data.message); // Mostra toast
+        setTimeout(() => window.location.reload(), 1500); // Dá tempo de ver o toast antes de recarregar
+    })
+    .catch(err => {
+        console.error('Erro:', err);
+        toastr.error('Erro ao deletar ' + refDestroy);
+    });
+}
 
 function mostrarPopupConfirmacao() {
     var confirmacao = confirm("Tem certeza que quer reparar todas as torres?");

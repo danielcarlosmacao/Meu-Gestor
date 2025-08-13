@@ -259,6 +259,10 @@
             });
         });
     </script>
+    
+    <!-- alert tipo toast no sistema --> 
+    @include('layouts.toast')
+
 </body>
 
 </html>
