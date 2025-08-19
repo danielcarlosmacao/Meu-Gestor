@@ -171,6 +171,18 @@ class DatabaseController extends Controller
                 Log::info('Link simbólico storage/storage já existe, pulando criação');
             }
 
+            // 🔹 Atualiza dependências via Composer
+            $output = null;
+            $returnVar = null;
+            exec('composer install --no-dev --optimize-autoloader 2>&1', $output, $returnVar);
+
+            if ($returnVar !== 0) {
+                Log::error('Erro ao rodar composer install: ' . implode("\n", $output));
+                return back()->with('error', 'Erro ao atualizar dependências do sistema.');
+            }
+
+            Log::info('Composer install executado com sucesso');
+
             // Roda migrations e limpa caches
             Artisan::call('migrate', ['--force' => true]);
             Log::info('Migrations rodadas com sucesso');
