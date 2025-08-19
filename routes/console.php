@@ -15,4 +15,4 @@ Schedule::command('manutencao:enviar-whatsapp')
 Schedule::command('mensagens:enviar')->everyMinute();
 
 // Executa todos os dias às 3h da manhã
-    $schedule->command('logs:clear 90')->dailyAt('03:00');
+Schedule::command('logs:clear 90')->dailyAt('03:00');
