@@ -11,7 +11,7 @@ class VehicleController extends Controller
     public function index(SettingService $settingService)
     {
         $perPage = $settingService->getPerPage();
-        $vehicles = Vehicle::orderBy('type','asc')->orderBy('model', 'asc')->paginate($perPage);
+        $vehicles = Vehicle::orderBy('type', 'asc')->orderBy('model', 'asc')->paginate($perPage);
         return view('fleet.vehicles.index', compact('vehicles'));
     }
 
@@ -26,10 +26,23 @@ class VehicleController extends Controller
             'fuel_type' => 'required|string|max:30',
             'status' => 'required|string|max:20',
         ]);
-        
 
-        Vehicle::create($data);
-        return redirect()->route('fleet.vehicles.index')->with('success', 'Veículo adicionado com sucesso.');
+        // Cria o veículo
+        $vehicle = Vehicle::create($data);
+
+        // Log de auditoria
+        activity()
+            ->causedBy(auth()->user())
+            ->performedOn($vehicle)
+            ->withProperties([
+                'new' => $vehicle->toArray()
+            ])
+            ->log('Veículo Criado');
+
+        return redirect()
+            ->route('fleet.vehicles.index')
+            ->with('success', 'Veículo adicionado com sucesso.');
+
     }
 
     public function update(Request $request, Vehicle $vehicle)
@@ -44,13 +57,41 @@ class VehicleController extends Controller
             'status' => 'required|string|max:20',
         ]);
 
+        // Pega os dados antigos antes da atualização
+        $oldData = $vehicle->toArray();
+
+        // Atualiza com os novos dados
         $vehicle->update($data);
-        return redirect()->route('fleet.vehicles.index')->with('success', 'Veículo atualizado com sucesso.');
+
+        // Log de auditoria
+        activity()
+            ->causedBy(auth()->user())
+            ->performedOn($vehicle)
+            ->withProperties([
+                'old' => $oldData,
+                'new' => $vehicle->toArray(),
+            ])
+            ->log('Veículo Atualizado');
+
+        return redirect()
+            ->route('fleet.vehicles.index')
+            ->with('success', 'Veículo atualizado com sucesso.');
     }
 
     public function destroy(Vehicle $vehicle)
     {
+        
+        $oldData = $vehicle->toArray();
         $vehicle->delete();
+
+                //Logs
+        activity()
+            ->causedBy(auth()->user())
+            ->performedOn($vehicle)
+            ->withProperties([
+                'old' => $oldData
+            ])
+            ->log('Veiculo Deletado');
         return redirect()->route('fleet.vehicles.index')->with('success', 'Veículo excluído com sucesso.');
     }
 }

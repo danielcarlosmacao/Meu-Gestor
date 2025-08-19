@@ -17,32 +17,72 @@ class VehicleServiceController extends Controller
     }
 
     public function store(Request $request)
-    {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'vehicle_type' => 'required|in:car,motorcycle,truck,others,all',
-        ]);
+{
+    $data = $request->validate([
+        'name'         => 'required|string|max:255',
+        'vehicle_type' => 'required|in:car,motorcycle,truck,others,all',
+    ]);
 
-        VehicleService::create($request->only('name', 'vehicle_type'));
+    $service = VehicleService::create($data);
 
-        return redirect()->route('fleet.vehicle_services.index')->with('success', 'Serviço criado com sucesso!');
-    }
+    // 🔹 Log de criação
+    activity()
+        ->causedBy(auth()->user())
+        ->performedOn($service)
+        ->withProperties([
+            'new' => $service->toArray()
+        ])
+        ->log('Serviço de Veículo Criado');
 
-    public function update(Request $request, VehicleService $vehicleService)
-    {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'vehicle_type' => 'required|in:car,motorcycle,truck,others,all',
-        ]);
+    return redirect()
+        ->route('fleet.vehicle_services.index')
+        ->with('success', 'Serviço criado com sucesso!');
+}
 
-        $vehicleService->update($request->only('name', 'vehicle_type'));
+public function update(Request $request, VehicleService $vehicleService)
+{
+    $data = $request->validate([
+        'name'         => 'required|string|max:255',
+        'vehicle_type' => 'required|in:car,motorcycle,truck,others,all',
+    ]);
 
-        return redirect()->route('fleet.vehicle_services.index')->with('success', 'Serviço atualizado com sucesso!');
-    }
+    $oldData = $vehicleService->toArray();
 
-    public function destroy(VehicleService $vehicleService)
-    {
-        $vehicleService->delete();
-        return redirect()->route('fleet.vehicle_services.index')->with('success', 'Serviço excluído com sucesso!');
-    }
+    $vehicleService->update($data);
+
+    // 🔹 Log de atualização
+    activity()
+        ->causedBy(auth()->user())
+        ->performedOn($vehicleService)
+        ->withProperties([
+            'old' => $oldData,
+            'new' => $vehicleService->toArray()
+        ])
+        ->log('Serviço de Veículo Atualizado');
+
+    return redirect()
+        ->route('fleet.vehicle_services.index')
+        ->with('success', 'Serviço atualizado com sucesso!');
+}
+
+public function destroy(VehicleService $vehicleService)
+{
+    $oldData = $vehicleService->toArray();
+
+    $vehicleService->delete();
+
+    // 🔹 Log de exclusão
+    activity()
+        ->causedBy(auth()->user())
+        ->performedOn($vehicleService)
+        ->withProperties([
+            'old' => $oldData
+        ])
+        ->log('Serviço de Veículo Deletado');
+
+    return redirect()
+        ->route('fleet.vehicle_services.index')
+        ->with('success', 'Serviço excluído com sucesso!');
+}
+
 }

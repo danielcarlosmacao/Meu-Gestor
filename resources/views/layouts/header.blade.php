@@ -168,6 +168,7 @@
                                         <a href="{{ route('options.resource.edit') }}">Recursos do sistema</a>
                                         <a href="{{ route('admin.systempanel') }}">Painel de informativo do sistema</a>
                                         <a href="{{ route('options.systemresource.edit') }}">Recursos do administrador</a>
+                                        <a href="{{ route('activitylogs.index') }}">Logs</a>
                                     </div>
                                     <div class="col-md-5">
                                         <h6>usuarios e notificaçoes</h6>

@@ -64,6 +64,14 @@ class TowerController extends Controller
             'amps_plate' => '0',
         ]);
 
+          activity()
+            ->causedBy(auth()->user())
+            ->performedOn($tower)
+            ->withProperties([
+                'new' => $tower->toArray()
+            ])
+            ->log('Torre Criada');
+
         return redirect(route('tower.index'));
 
     }
@@ -76,10 +84,22 @@ class TowerController extends Controller
         ]);
 
         $tower = Tower::findOrFail($id);
+        
+        $oldData = $tower->toArray();
+
         $tower->update([
             'name' => $request->name,
             'voltage' => $request->voltage,
         ]);
+
+        activity()
+            ->causedBy(auth()->user())
+            ->performedOn($tower) 
+            ->withProperties([
+                'old' => $oldData,
+                'new' => $tower->toArray() 
+            ])
+            ->log('Torre Atualizada');
 
         return redirect()->back()->with('success', 'Torre atualizada com sucesso!');
     }
@@ -88,7 +108,18 @@ class TowerController extends Controller
     {
 
         $tower = Tower::findOrFail($id);
+        $oldData = $tower->toArray();
         $tower->delete(); // Soft delete, se usar SoftDeletes
+
+        
+          activity()
+            ->causedBy(auth()->user())
+            ->performedOn($tower)
+            ->withProperties([
+                'old' => $oldData
+            ])
+            ->log('Torre Deletada');
+
         return redirect()->back()->with('success', 'Torre deletada com sucesso!');
 
     }

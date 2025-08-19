@@ -31,63 +31,93 @@ class VehicleMaintenanceController extends Controller
         return view('fleet.vehicles.vehicle_maintenances', compact('vehicles', 'vehicleServices', 'maintenances', 'workshops','maxMileages'));
     }
 
-    public function store(Request $request)
-    {
-        
-        $data = $request->validate([
-            'vehicle_id' => 'required|exists:vehicles,id',
-            'type' => 'required|in:preventive,corrective',
-            'maintenance_date' => 'required|date',
-            'cost' => 'nullable|numeric',
-            'status' => 'required|in:pending,completed',
-            'mileage' => 'nullable|integer',
-            'parts_used' => 'nullable|string|max:255',
-            'workshop' => 'nullable|string|max:255',
-            'vehicle_services' => 'nullable|array',
-            'vehicle_services.*' => 'exists:vehicle_services,id',
-        ]);
-       // @dd($data);
-        $maintenance = VehicleMaintenance::create($data);
+   public function store(Request $request)
+{
+    $data = $request->validate([
+        'vehicle_id'        => 'required|exists:vehicles,id',
+        'type'              => 'required|in:preventive,corrective',
+        'maintenance_date'  => 'required|date',
+        'cost'              => 'nullable|numeric',
+        'status'            => 'required|in:pending,completed',
+        'mileage'           => 'nullable|integer',
+        'parts_used'        => 'nullable|string|max:255',
+        'workshop'          => 'nullable|string|max:255',
+        'vehicle_services'  => 'nullable|array',
+        'vehicle_services.*'=> 'exists:vehicle_services,id',
+    ]);
 
-        if (!empty($data['vehicle_services'])) {
-            $maintenance->services()->attach($data['vehicle_services']);
-        }
+    $maintenance = VehicleMaintenance::create($data);
 
-        return redirect()->back()->with('success', 'Manutenção adicionada com sucesso!');
+    if (!empty($data['vehicle_services'])) {
+        $maintenance->services()->attach($data['vehicle_services']);
     }
 
+    // 🔹 Log de criação
+    activity()
+        ->causedBy(auth()->user())
+        ->performedOn($maintenance)
+        ->withProperties([
+            'new' => $maintenance->load('services')->toArray()
+        ])
+        ->log('Manutenção de Veículo Criada');
 
-    public function update(Request $request, $id)
-    {
-        $maintenance = VehicleMaintenance::findOrFail($id);
+    return redirect()->back()->with('success', 'Manutenção adicionada com sucesso!');
+}
 
-        $data = $request->validate([
-            'vehicle_id' => 'required|exists:vehicles,id',
-            'type' => 'required|in:preventive,corrective',
-            'maintenance_date' => 'required|date',
-            'cost' => 'nullable|numeric',
-            'status' => 'required|in:pending,completed',
-            'mileage' => 'nullable|integer',
-            'parts_used' => 'nullable|string|max:255',
-            'workshop' => 'nullable|string|max:255',
-            'vehicle_services' => 'nullable|array',
-            'vehicle_services.*' => 'exists:vehicle_services,id',
-        ]);
+public function update(Request $request, $id)
+{
+    $maintenance = VehicleMaintenance::findOrFail($id);
 
-        $maintenance->update($data);
+    $data = $request->validate([
+        'vehicle_id'        => 'required|exists:vehicles,id',
+        'type'              => 'required|in:preventive,corrective',
+        'maintenance_date'  => 'required|date',
+        'cost'              => 'nullable|numeric',
+        'status'            => 'required|in:pending,completed',
+        'mileage'           => 'nullable|integer',
+        'parts_used'        => 'nullable|string|max:255',
+        'workshop'          => 'nullable|string|max:255',
+        'vehicle_services'  => 'nullable|array',
+        'vehicle_services.*'=> 'exists:vehicle_services,id',
+    ]);
 
-        $maintenance->services()->sync($data['vehicle_services'] ?? []);
+    $oldData = $maintenance->load('services')->toArray();
 
-        return redirect()->back()->with('success', 'Manutenção atualizada com sucesso!');
-    }
+    $maintenance->update($data);
+    $maintenance->services()->sync($data['vehicle_services'] ?? []);
 
-    public function destroy($id)
-    {
-        $maintenance = VehicleMaintenance::findOrFail($id);
-        $maintenance->delete();
+    // 🔹 Log de atualização
+    activity()
+        ->causedBy(auth()->user())
+        ->performedOn($maintenance)
+        ->withProperties([
+            'old' => $oldData,
+            'new' => $maintenance->load('services')->toArray()
+        ])
+        ->log('Manutenção de Veículo Atualizada');
 
-        return redirect()->back()->with('success', 'Manutenção excluída com sucesso!');
-    }
+    return redirect()->back()->with('success', 'Manutenção atualizada com sucesso!');
+}
+
+public function destroy($id)
+{
+    $maintenance = VehicleMaintenance::findOrFail($id);
+
+    $oldData = $maintenance->load('services')->toArray();
+
+    $maintenance->delete();
+
+    // 🔹 Log de exclusão
+    activity()
+        ->causedBy(auth()->user())
+        ->performedOn($maintenance)
+        ->withProperties([
+            'old' => $oldData
+        ])
+        ->log('Manutenção de veículo Deletado');
+
+    return redirect()->back()->with('success', 'Manutenção excluída com sucesso!');
+}
 
     public function byVehicle(Request $request, $vehicleId, SettingService $settingService)
     {

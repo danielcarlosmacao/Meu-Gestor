@@ -30,6 +30,7 @@ use App\Http\Controllers\Service\MaintenanceController;
 use App\Http\Controllers\PostitController;
 use App\Http\Controllers\Admin\RecipientController;
 use App\Http\Controllers\Admin\NotificationController;
+use App\Http\Controllers\Admin\ActivityLogController;
 
 use Illuminate\Support\Facades\Artisan;
 
@@ -80,9 +81,9 @@ Route::middleware(['auth', 'permission:administrator.user'])->group(function () 
     Route::post('/admin/users/{user}/reset-password', [UserController::class, 'resetPassword'])->name('admin.users.reset-password');
     Route::get('/admin/sessions', [UserController::class, 'usersOnline'])->name('admin.users.sessions');
     Route::delete('/admin/sessions/{user}', [UserController::class, 'destroySession'])->name('admin.sessions.destroy');
-    Route::get('/admin/admin.systempanel', function () {
-        return view('admin.systempanel');
-    })->name('admin.systempanel');
+    Route::get('/admin/admin.systempanel', function () {return view('admin.systempanel');})->name('admin.systempanel');
+    Route::get('admin/activity-logs', [ActivityLogController::class, 'index'])->name('activitylogs.index');
+
 });
 
 

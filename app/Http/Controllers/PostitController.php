@@ -35,24 +35,36 @@ class PostitController extends Controller
     }
 
     public function update(Request $request, $id)
-    {
-        $postit = Postit::where('id', $id)->where('user_id', Auth::id())->firstOrFail();
+{
+    // Validação opcional
+    $validated = $request->validate([
+        'content' => 'sometimes|string|max:500',
+        'pos_x' => 'sometimes|integer',
+        'pos_y' => 'sometimes|integer',
+        'width' => 'sometimes|integer|min:0',
+        'height' => 'sometimes|integer|min:0',
+    ]);
 
-        if ($request->has('content')) {
-            $postit->content = $request->content;
-        }
-        if ($request->has('pos_x') && $request->has('pos_y')) {
-            $postit->pos_x = $request->pos_x;
-            $postit->pos_y = $request->pos_y;
-        }
-        if ($request->has('width') && $request->has('height')) {
-            $postit->width = $request->width;
-            $postit->height = $request->height;
-        }
-        $postit->save();
+    // Busca o postit do usuário autenticado
+    $postit = Postit::where('id', $id)
+                     ->where('user_id', Auth::id())
+                     ->firstOrFail();
 
-        return response()->json(['status' => 'updated']);
-    }
+    // Atualiza apenas os campos presentes no request
+    $updateData = array_filter($validated, fn($v) => !is_null($v));
+    $postit->update($updateData);
+
+    // 🔹 Log de alteração (opcional)
+    activity()
+        ->causedBy(Auth::user())
+        ->performedOn($postit)
+        ->withProperties([
+            'updated_fields' => $updateData
+        ])
+        ->log('Postit atualizado');
+
+    return response()->json(['status' => 'updated']);
+}
 
     public function destroy($id)
     {

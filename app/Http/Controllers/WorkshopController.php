@@ -16,37 +16,78 @@ class WorkshopController extends Controller
     }
 
     public function store(Request $request)
-    {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'info' => 'required|string|max:255',
-            'vehicle_type' => 'required|in:car,motorcycle,truck,others,all',
-        ]);
+{
+    $data = $request->validate([
+        'name'         => 'required|string|max:255',
+        'info'         => 'required|string|max:255',
+        'vehicle_type' => 'required|in:car,motorcycle,truck,others,all',
+    ]);
 
-        Workshop::create($request->only('name', 'info', 'vehicle_type'));
+    $workshop = Workshop::create($data);
 
-        return redirect()->route('fleet.vehicle_workshop.index')->with('success', 'Serviço criado com sucesso!');
-    }
+    // 🔹 Log de criação
+    activity()
+        ->causedBy(auth()->user())
+        ->performedOn($workshop)
+        ->withProperties([
+            'new' => $workshop->toArray()
+        ])
+        ->log('Oficina Criada');
 
-    public function update(Request $request, $id)
-    {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'info' => 'required|string|max:255',
-            'vehicle_type' => 'required|in:car,motorcycle,truck,others,all',
-        ]);
+    return redirect()
+        ->route('fleet.vehicle_workshop.index')
+        ->with('success', 'Oficina criada com sucesso!');
+}
 
-        $service = Workshop::findOrFail($id);
-        $service->update($request->only('name', 'info', 'vehicle_type'));
+public function update(Request $request, $id)
+{
+    $data = $request->validate([
+        'name'         => 'required|string|max:255',
+        'info'         => 'required|string|max:255',
+        'vehicle_type' => 'required|in:car,motorcycle,truck,others,all',
+    ]);
 
-        return redirect()->route('fleet.vehicle_workshop.index')->with('success', 'Serviço atualizado com sucesso!');
-    }
+    $workshop = Workshop::findOrFail($id);
 
-    public function destroy($id)
-    {
-        $service = Workshop::findOrFail($id);
-        $service->delete();
+    $oldData = $workshop->toArray();
 
-        return redirect()->route('fleet.vehicle_workshop.index')->with('success', 'Serviço excluído com sucesso!');
-    }
+    $workshop->update($data);
+
+    // 🔹 Log de atualização
+    activity()
+        ->causedBy(auth()->user())
+        ->performedOn($workshop)
+        ->withProperties([
+            'old' => $oldData,
+            'new' => $workshop->toArray()
+        ])
+        ->log('Oficina Atualizada');
+
+    return redirect()
+        ->route('fleet.vehicle_workshop.index')
+        ->with('success', 'Oficina atualizada com sucesso!');
+}
+
+public function destroy($id)
+{
+    $workshop = Workshop::findOrFail($id);
+
+    $oldData = $workshop->toArray();
+
+    $workshop->delete();
+
+    // 🔹 Log de exclusão
+    activity()
+        ->causedBy(auth()->user())
+        ->performedOn($workshop)
+        ->withProperties([
+            'old' => $oldData
+        ])
+        ->log('Oficina Deletado');
+
+    return redirect()
+        ->route('fleet.vehicle_workshop.index')
+        ->with('success', 'Oficina excluída com sucesso!');
+}
+
 }

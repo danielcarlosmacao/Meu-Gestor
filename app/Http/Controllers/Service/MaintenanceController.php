@@ -19,36 +19,70 @@ class MaintenanceController extends Controller
     }
 
     public function store(Request $request)
-    {
-        $request->validate([
-            'date_maintenance' => 'required|date',
-            'service_client_id' => 'required|exists:service_clients,id',
-            'maintenance' => 'required|string|max:255',
-            'cost_enterprise' => 'nullable|numeric',
-            'cost_client' => 'nullable|numeric',
-        ]);
+{
+    $data = $request->validate([
+        'date_maintenance'  => 'required|date',
+        'service_client_id' => 'required|exists:service_clients,id',
+        'maintenance'       => 'required|string|max:255',
+        'cost_enterprise'   => 'nullable|numeric',
+        'cost_client'       => 'nullable|numeric',
+    ]);
 
-        ServiceMaintenance::create($request->all());
-        return back()->with('success', 'Manutenção adicionada com sucesso.');
-    }
+    $maintenance = ServiceMaintenance::create($data);
 
-    public function update(Request $request, ServiceMaintenance $maintenance)
-    {
-        $request->validate([
-            'date_maintenance' => 'required|date',
-            'service_client_id' => 'required|exists:service_clients,id',
-            'maintenance' => 'required|string|max:255',
-            'cost_enterprise' => 'nullable|numeric',
-            'cost_client' => 'nullable|numeric',
-        ]);
+    // 🔹 Log de criação
+    activity()
+        ->causedBy(auth()->user())
+        ->performedOn($maintenance)
+        ->withProperties([
+            'new' => $maintenance->toArray()
+        ])
+        ->log('Manutenção Criada');
 
-        $maintenance->update($request->all());
-        return back()->with('success', 'Manutenção atualizada com sucesso.');
-    }
+    return back()->with('success', 'Manutenção adicionada com sucesso.');
+}
 
-    public function destroy(ServiceMaintenance $maintenance)
-    {
-        $maintenance->delete();
-        return back()->with('success', 'Manutenção excluída com sucesso.');
-    }
+public function update(Request $request, ServiceMaintenance $maintenance)
+{
+    $data = $request->validate([
+        'date_maintenance'  => 'required|date',
+        'service_client_id' => 'required|exists:service_clients,id',
+        'maintenance'       => 'required|string|max:255',
+        'cost_enterprise'   => 'nullable|numeric',
+        'cost_client'       => 'nullable|numeric',
+    ]);
+
+    $oldData = $maintenance->toArray();
+    $maintenance->update($data);
+
+    // 🔹 Log de atualização
+    activity()
+        ->causedBy(auth()->user())
+        ->performedOn($maintenance)
+        ->withProperties([
+            'old' => $oldData,
+            'new' => $maintenance->toArray()
+        ])
+        ->log('Manutenção Atualizada');
+
+    return back()->with('success', 'Manutenção atualizada com sucesso.');
+}
+
+public function destroy(ServiceMaintenance $maintenance)
+{
+    $oldData = $maintenance->toArray();
+    $maintenance->delete();
+
+    // 🔹 Log de exclusão
+    activity()
+        ->causedBy(auth()->user())
+        ->performedOn($maintenance)
+        ->withProperties([
+            'old' => $oldData
+        ])
+        ->log('Manutenção Deletada');
+
+    return back()->with('success', 'Manutenção excluída com sucesso.');
+}
+
 }

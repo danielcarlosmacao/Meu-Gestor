@@ -17,35 +17,74 @@ class ClientController extends Controller
     }
 
     public function store(Request $request)
-    {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'status' => 'required|in:active,inactive',
-        ]);
+{
+    $data = $request->validate([
+        'name'   => 'required|string|max:255',
+        'status' => 'required|in:active,inactive',
+    ]);
 
-        ServiceClient::create($request->only('name', 'status'));
+    $serviceClient = ServiceClient::create($data);
 
-        return redirect()->route('service.clients.index')->with('success', 'Cliente criado com sucesso.');
-    }
+    // 🔹 Log de criação
+    activity()
+        ->causedBy(auth()->user())
+        ->performedOn($serviceClient)
+        ->withProperties([
+            'new' => $serviceClient->toArray()
+        ])
+        ->log('Cliente Criado');
+
+    return redirect()
+        ->route('service.clients.index')
+        ->with('success', 'Cliente criado com sucesso.');
+}
 
 public function update(Request $request, $id)
 {
     $data = $request->validate([
-        'name' => 'required|string|max:255',
+        'name'   => 'required|string|max:255',
         'status' => 'required|in:active,inactive',
     ]);
 
-    $service_client = ServiceClient::find($id);
+    $serviceClient = ServiceClient::findOrFail($id);
+    $oldData = $serviceClient->toArray();
 
-    $service_client->update($data);
-        return redirect()->route('service.clients.index')->with('success', 'Cliente atualizado com sucesso.');
-    }
+    $serviceClient->update($data);
 
-    public function destroy(ServiceClient $service_client, $id)
-    {
-        $service_client = ServiceClient::find($id);
-        $service_client->delete();
+    // 🔹 Log de atualização
+    activity()
+        ->causedBy(auth()->user())
+        ->performedOn($serviceClient)
+        ->withProperties([
+            'old' => $oldData,
+            'new' => $serviceClient->toArray()
+        ])
+        ->log('Cliente Atualizado');
 
-        return redirect()->route('service.clients.index')->with('success', 'Cliente excluído com sucesso.');
-    }
+    return redirect()
+        ->route('service.clients.index')
+        ->with('success', 'Cliente atualizado com sucesso.');
+}
+
+public function destroy($id)
+{
+    $serviceClient = ServiceClient::findOrFail($id);
+    $oldData = $serviceClient->toArray();
+
+    $serviceClient->delete();
+
+    // 🔹 Log de exclusão
+    activity()
+        ->causedBy(auth()->user())
+        ->performedOn($serviceClient)
+        ->withProperties([
+            'old' => $oldData
+        ])
+        ->log('Cliente Deletado');
+
+    return redirect()
+        ->route('service.clients.index')
+        ->with('success', 'Cliente excluído com sucesso.');
+}
+
 }

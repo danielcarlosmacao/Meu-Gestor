@@ -21,40 +21,79 @@ class VacationController extends Controller
         return view('vacation_manager.vacations.index', compact('vacations', 'collaborators'));
     }
 
-    public function store(Request $request)
-    {
-        $request->validate([
-            'collaborator_id' => 'required|exists:collaborators,id',
-            'start_date' => 'required|date',
-            'end_date' => 'required|date|after_or_equal:start_date',
-            'information' => 'nullable|string',
-        ]);
+public function store(Request $request)
+{
+    $data = $request->validate([
+        'collaborator_id' => 'required|exists:collaborators,id',
+        'start_date'      => 'required|date',
+        'end_date'        => 'required|date|after_or_equal:start_date',
+        'information'     => 'nullable|string',
+    ]);
 
-        Vacation::create($request->only(['collaborator_id', 'start_date', 'end_date', 'information']));
+    $vacation = Vacation::create($data);
 
-        return redirect()->route('vacation_manager.vacations.index')->with('success', 'Férias cadastradas com sucesso.');
-    }
+    // 🔹 Log de criação
+    activity()
+        ->causedBy(auth()->user())
+        ->performedOn($vacation)
+        ->withProperties([
+            'new' => $vacation->toArray()
+        ])
+        ->log('Férias Criada');
 
-    public function update(Request $request, $id)
-    {
-        $request->validate([
-            'collaborator_id' => 'required|exists:collaborators,id',
-            'start_date' => 'required|date',
-            'end_date' => 'required|date|after_or_equal:start_date',
-            'information' => 'nullable|string',
-        ]);
+    return redirect()
+        ->route('vacation_manager.vacations.index')
+        ->with('success', 'Férias cadastradas com sucesso.');
+}
 
-        $vacation = Vacation::findOrFail($id);
-        $vacation->update($request->only(['collaborator_id', 'start_date', 'end_date', 'information']));
+public function update(Request $request, $id)
+{
+    $data = $request->validate([
+        'collaborator_id' => 'required|exists:collaborators,id',
+        'start_date'      => 'required|date',
+        'end_date'        => 'required|date|after_or_equal:start_date',
+        'information'     => 'nullable|string',
+    ]);
 
-        return redirect()->route('vacation_manager.vacations.index')->with('success', 'Férias atualizadas com sucesso.');
-    }
+    $vacation = Vacation::findOrFail($id);
+    $oldData = $vacation->toArray();
 
-    public function destroy($id)
-    {
-        $vacation = Vacation::findOrFail($id);
-        $vacation->delete();
+    $vacation->update($data);
 
-        return redirect()->route('vacation_manager.vacations.index')->with('success', 'Férias excluídas com sucesso.');
-    }
+    // 🔹 Log de atualização
+    activity()
+        ->causedBy(auth()->user())
+        ->performedOn($vacation)
+        ->withProperties([
+            'old' => $oldData,
+            'new' => $vacation->toArray()
+        ])
+        ->log('Férias Atualizada');
+
+    return redirect()
+        ->route('vacation_manager.vacations.index')
+        ->with('success', 'Férias atualizadas com sucesso.');
+}
+
+public function destroy($id)
+{
+    $vacation = Vacation::findOrFail($id);
+    $oldData = $vacation->toArray();
+
+    $vacation->delete();
+
+    // 🔹 Log de exclusão
+    activity()
+        ->causedBy(auth()->user())
+        ->performedOn($vacation)
+        ->withProperties([
+            'old' => $oldData
+        ])
+        ->log('Férias Deletada');
+
+    return redirect()
+        ->route('vacation_manager.vacations.index')
+        ->with('success', 'Férias excluídas com sucesso.');
+}
+
 }

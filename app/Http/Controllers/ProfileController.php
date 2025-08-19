@@ -27,23 +27,33 @@ class ProfileController extends Controller
      */
     public function update(ProfileUpdateRequest $request): RedirectResponse
     {
-            $user = auth()->user();
+        $user = auth()->user();
+        $oldData = $user->toArray();
 
-    $data = $request->validate([
-        'name' => 'required|string|max:255',
-        'email' => 'required|email|unique:users,email,' . $user->id,
-        'password' => 'nullable|string|min:6|confirmed',
-    ]);
+        $data = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email,' . $user->id,
+            'password' => 'nullable|string|min:6|confirmed',
+        ]);
 
-    if ($data['password']) {
-        $data['password'] = Hash::make($data['password']);
-    } else {
-        unset($data['password']);
-    }
+        if ($data['password']) {
+            $data['password'] = Hash::make($data['password']);
+        } else {
+            unset($data['password']);
+        }
 
-    $user->update($data);
+        $user->update($data);
 
-    return back()->with('success', 'Perfil atualizado com sucesso.');
+         activity()
+        ->causedBy(auth()->user())         
+        ->performedOn($user)          
+        ->withProperties([
+            'old' => $oldData,             
+            'new' => $user->toArray()  
+        ])
+        ->log('Usuario Atualizado');  
+
+        return back()->with('success', 'Perfil atualizado com sucesso.');
     }
 
     /**
@@ -56,10 +66,20 @@ class ProfileController extends Controller
         ]);
 
         $user = $request->user();
+        $oldData = $user->toArray();
 
         Auth::logout();
 
         $user->delete();
+
+        //Logs
+        activity()
+            ->causedBy(auth()->user())
+            ->performedOn($user)
+            ->withProperties([
+                'old' => $oldData
+            ])
+            ->log('Usuario Deletado');
 
         $request->session()->invalidate();
         $request->session()->regenerateToken();

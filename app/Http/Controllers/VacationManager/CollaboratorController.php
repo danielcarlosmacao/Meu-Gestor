@@ -17,40 +17,79 @@ class CollaboratorController extends Controller
         return view('vacation_manager.collaborators.index', compact('collaborators'));
     }
 
-    public function store(Request $request)
-    {
-        $request->validate([
-            'name' => 'required|string',
-            'admission_date' => 'required|date',
-            'color' => 'required|string',
-            'status' => 'required|in:active,inactive',
-        ]);
+   public function store(Request $request)
+{
+    $data = $request->validate([
+        'name'           => 'required|string',
+        'admission_date' => 'required|date',
+        'color'          => 'required|string',
+        'status'         => 'required|in:active,inactive',
+    ]);
 
-        Collaborator::create($request->all());
+    $collaborator = Collaborator::create($data);
 
-        return redirect()->route('vacation_manager.collaborators.index')->with('success', 'Colaborador criado com sucesso.');
-    }
+    // 🔹 Log de criação
+    activity()
+        ->causedBy(auth()->user())
+        ->performedOn($collaborator)
+        ->withProperties([
+            'new' => $collaborator->toArray()
+        ])
+        ->log('Colaborador Criado');
 
-    public function update(Request $request, $id)
-    {
-        $request->validate([
-            'name' => 'required|string',
-            'admission_date' => 'required|date',
-            'color' => 'required|string',
-            'status' => 'required|in:active,inactive',
-        ]);
+    return redirect()
+        ->route('vacation_manager.collaborators.index')
+        ->with('success', 'Colaborador criado com sucesso.');
+}
 
-        $collaborator = Collaborator::findOrFail($id);
-        $collaborator->update($request->all());
+public function update(Request $request, $id)
+{
+    $data = $request->validate([
+        'name'           => 'required|string',
+        'admission_date' => 'required|date',
+        'color'          => 'required|string',
+        'status'         => 'required|in:active,inactive',
+    ]);
 
-        return redirect()->route('vacation_manager.collaborators.index')->with('success', 'Colaborador atualizado com sucesso.');
-    }
+    $collaborator = Collaborator::findOrFail($id);
+    $oldData = $collaborator->toArray();
 
-    public function destroy($id)
-    {
-        $collaborator = Collaborator::findOrFail($id);
-        $collaborator->delete();
+    $collaborator->update($data);
 
-        return redirect()->route('vacation_manager.collaborators.index')->with('success', 'Colaborador excluído com sucesso.');
-    }
+    // 🔹 Log de atualização
+    activity()
+        ->causedBy(auth()->user())
+        ->performedOn($collaborator)
+        ->withProperties([
+            'old' => $oldData,
+            'new' => $collaborator->toArray()
+        ])
+        ->log('Colaborador Atualizado');
+
+    return redirect()
+        ->route('vacation_manager.collaborators.index')
+        ->with('success', 'Colaborador atualizado com sucesso.');
+}
+
+public function destroy($id)
+{
+    $collaborator = Collaborator::findOrFail($id);
+    $oldData = $collaborator->toArray();
+
+    $collaborator->delete();
+
+    // 🔹 Log de exclusão
+    activity()
+        ->causedBy(auth()->user())
+        ->performedOn($collaborator)
+        ->withProperties([
+            'old' => $oldData
+        ])
+        ->log('Colaborador Deletado');
+
+    return redirect()
+        ->route('vacation_manager.collaborators.index')
+        ->with('success', 'Colaborador excluído com sucesso.');
+}
+
 }

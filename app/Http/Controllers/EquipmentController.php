@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\Equipment;
 use App\Services\SettingService;
 
+
 class EquipmentController extends Controller
 {
     public function index(SettingService $settingService)
@@ -26,16 +27,23 @@ class EquipmentController extends Controller
         $Equipment->name = $request->name;
         $Equipment->watts = $request->watts;
         $Equipment->stock = $request->stock;
-
         $Equipment->save();
+
+        activity()
+            ->causedBy(auth()->user())
+            ->performedOn($Equipment)
+            ->withProperties([
+                'new' => $Equipment->toArray()
+            ])
+            ->log('Equipmento Criado');
+
         return redirect()->route('equipment.index')
             ->with('success', 'Equipamento criado com sucesso!');
-
     }
 
     public function update(Request $request, $id)
     {
-        
+
         // Validação básica (opcional, mas recomendada)
         $request->validate([
             'name' => 'required|string|max:255',
@@ -46,15 +54,25 @@ class EquipmentController extends Controller
         // Busca o equipamento pelo ID
         $equipment = Equipment::findOrFail($id);
 
+        $oldData = $equipment->toArray();
+
         // Atualiza os campos
         $equipment->name = $request->name;
         $equipment->watts = $request->watts;
         $equipment->stock = $request->stock;
-
-        // Salva no banco
         $equipment->save();
 
-        // Redireciona para a lista com mensagem (opcional)
+        //Logs
+
+        activity()
+            ->causedBy(auth()->user())
+            ->performedOn($equipment)
+            ->withProperties([
+                'old' => $oldData,
+                'new' => $equipment->toArray()
+            ])
+            ->log('Equipamento Atualizado');
+
         return redirect()->route('equipment.index')
             ->with('success', 'Equipamento atualizado com sucesso!');
     }
@@ -64,7 +82,18 @@ class EquipmentController extends Controller
     {
 
         $equipment = Equipment::findOrFail($id);
-        $equipment->delete(); // Soft delete, se usar SoftDeletes
+        $oldData = $equipment->toArray();
+        $equipment->delete();
+        
+        //Logs
+        activity()
+            ->causedBy(auth()->user())
+            ->performedOn($equipment)
+            ->withProperties([
+                'old' => $oldData
+            ])
+            ->log('Equipmento Deletado');
+
         return redirect()->route('equipment.index')
             ->with('success', 'Equipamento deletada com sucesso!');
     }
