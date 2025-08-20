@@ -75,26 +75,44 @@
                                                     $props = $log->properties;
                                                 @endphp
 
-                                                {{-- Se houver old/new, destacamos as mudanças --}}
+                                                {{-- Se houver old/new, destacamos apenas os campos que mudaram --}}
                                                 @if (isset($props['old']) && isset($props['new']))
                                                     @php
                                                         $old = $props['old'];
                                                         $new = $props['new'];
                                                     @endphp
+
                                                     @foreach ($new as $key => $newValue)
                                                         @php
                                                             $oldValue = $old[$key] ?? null;
                                                             $changed = $oldValue != $newValue;
+
+                                                            // Converte arrays/objetos para string JSON
+                                                            $oldValueDisplay =
+                                                                is_array($oldValue) || is_object($oldValue)
+                                                                    ? json_encode(
+                                                                        $oldValue,
+                                                                        JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE,
+                                                                    )
+                                                                    : $oldValue;
+                                                            $newValueDisplay =
+                                                                is_array($newValue) || is_object($newValue)
+                                                                    ? json_encode(
+                                                                        $newValue,
+                                                                        JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE,
+                                                                    )
+                                                                    : $newValue;
                                                         @endphp
-                                                        <div>
+
+                                                        <div class="mb-1">
                                                             <strong>{{ $key }}:</strong>
                                                             @if ($changed)
-                                                                <span class="text-danger">Anterior:
-                                                                    {{ $oldValue }}</span>
-                                                                <span class="text-success ms-2">Novo:
-                                                                    {{ $newValue }}</span>
+                                                                <span class="text-danger">Old:
+                                                                    {{ $oldValueDisplay }}</span>
+                                                                <span class="text-success ms-2">New:
+                                                                    {{ $newValueDisplay }}</span>
                                                             @else
-                                                                <span>{{ $newValue }}</span>
+                                                                <span>{{ $newValueDisplay }}</span>
                                                             @endif
                                                         </div>
                                                     @endforeach
