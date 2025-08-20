@@ -61,7 +61,7 @@ class PostitController extends Controller
         ->withProperties([
             'updated_fields' => $updateData
         ])
-        ->log('Postit atualizado');
+        ->log('Postit Atualizado');
 
     return response()->json(['status' => 'updated']);
 }
