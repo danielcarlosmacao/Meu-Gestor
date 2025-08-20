@@ -82,7 +82,6 @@ Route::middleware(['auth', 'permission:administrator.user'])->group(function () 
     Route::get('/admin/sessions', [UserController::class, 'usersOnline'])->name('admin.users.sessions');
     Route::delete('/admin/sessions/{user}', [UserController::class, 'destroySession'])->name('admin.sessions.destroy');
     Route::get('/admin/admin.systempanel', function () {return view('admin.systempanel');})->name('admin.systempanel');
-    Route::get('admin/activity-logs', [ActivityLogController::class, 'index'])->name('activitylogs.index');
 
 });
 
@@ -125,6 +124,10 @@ Route::middleware(['auth', 'permission:administrator.options'])->group(function 
     Route::post('/admin/database/export', [DatabaseController::class, 'export'])->name('database.export');
     Route::post('/admin/database/import', [DatabaseController::class, 'import'])->name('database.import');
     Route::post('/admin/system/update', [DatabaseController::class, 'updateSystem'])->name('system.update');
+
+    
+    Route::get('admin/activity-logs', [ActivityLogController::class, 'index'])->name('activitylogs.index');
+    Route::get('admin/system-logs', [ActivityLogController::class, 'laravelLog'])->name('systemlogs.index');
 
 
     Route::get('/admin/recipients', [RecipientController::class, 'index'])->name('admin.recipients.index');

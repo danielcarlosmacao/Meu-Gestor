@@ -3,7 +3,7 @@
 
 @section('content')
     <div class="container mt-4">
-        <h3 class="mb-3">📜 Logs de Atividade</h3>
+        <h3 class="mb-3">Logs de Atividade</h3>
         <div class="card shadow rounded-2xl">
             <div class="card-body">
 
