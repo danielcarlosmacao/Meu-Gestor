@@ -16,7 +16,7 @@
         font-size: 0.7rem;
     }
     .month-name {
-        background: #007bff;
+        background: var(--color-primary);
         color: #fff;
         text-align: center;
         padding: 4px;
@@ -73,7 +73,7 @@
     <form method="GET" class="text-center mb-4">
         <label for="year">Ano:</label>
         <input type="number" name="year" id="year" value="{{ $year }}" class="form-control d-inline w-auto" min="2000" max="2100">
-        <button class="btn btn-primary btn-sm">Atualizar</button>
+        <button class="btn dcm-btn-primary btn-sm">Atualizar</button>
     </form>
 
     <div class="calendar">
