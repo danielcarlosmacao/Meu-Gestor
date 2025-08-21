@@ -81,7 +81,7 @@ class Tower extends Model
             ->sum('plates.watts');
     
         // Soma os amps das placas associadas a esta torre específica
-        $totalamps= \DB::table('plate_productions')
+        $totalAmps= \DB::table('plate_productions')
             ->join('plates', 'plate_productions.plate_id', '=', 'plates.id')
             ->where('plate_productions.tower_id', $this->id)
             ->whereNull('plates.deleted_at')                 // ignora placas deletadas
@@ -90,8 +90,13 @@ class Tower extends Model
         // Atualiza o campo watts_plate no resumo técnico da torre
         if ($this->summary) {
             $this->summary->update(['watts_plate' => $totalWatts]);
-            $this->summary->update(['amps_plate' => $totalamps]);
+            $this->summary->update(['amps_plate' => $totalAmps]);
         }
+            // Retorna os valores atualizados para log
+    return [
+        'totalWatts' => $totalWatts,
+        'totalAmps'  => $totalAmps,
+    ];
     
 }
     

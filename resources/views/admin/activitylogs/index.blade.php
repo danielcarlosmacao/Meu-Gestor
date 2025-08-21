@@ -17,7 +17,7 @@
                         <tr>
                             <th>Usuário</th>
                             <th>Ação</th>
-                            @if ($full)
+                            @if ($debug)
                                 <th>Modelo</th>
                                 <th>ID</th>
                             @endif
@@ -33,15 +33,15 @@
                                 $badgeClass = 'secondary';
                                 $icon = 'bi-circle';
 
-                                if (\Illuminate\Support\Str::contains($action, ['Criado', 'Criada'])) {
+                                if (\Illuminate\Support\Str::contains($action, ['Criado', 'Criada','adicionado','Adicionou'])) {
                                     $rowClass = 'table-success';
                                     $badgeClass = 'success';
                                     $icon = 'bi-plus-circle';
-                                } elseif (\Illuminate\Support\Str::contains($action, ['Atualizado', 'Atualizada'])) {
+                                } elseif (\Illuminate\Support\Str::contains($action, ['Atualizado', 'Atualizada','Atualizou'])) {
                                     $rowClass = 'table-warning';
                                     $badgeClass = 'warning';
                                     $icon = 'bi-pencil-square';
-                                } elseif (\Illuminate\Support\Str::contains($action, ['Deletado', 'Deletada'])) {
+                                } elseif (\Illuminate\Support\Str::contains($action, ['Deletado', 'Deletada','Removeu'])) {
                                     $rowClass = 'table-danger';
                                     $badgeClass = 'danger';
                                     $icon = 'bi-trash';
@@ -56,13 +56,13 @@
                                 <td>
                                     <span class="badge bg-{{ $badgeClass }}">
                                         <i class="bi {{ $icon }}"></i>
-                                        {{ $log->description }} @if ($full)
+                                        {{ $log->description }} @if ($debug)
                                             {{ $log->properties['ip'] ?? '' }}
                                         @endif
                                     </span>
 
                                 </td>
-                                @if ($full)
+                                @if ($debug)
                                     <td>{{ class_basename($log->subject_type) ?? '-' }}</td>
                                     <td>{{ $log->subject_id ?? '-' }}</td>
                                 @endif

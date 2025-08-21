@@ -11,16 +11,25 @@ use Illuminate\Pagination\LengthAwarePaginator;
 
 class ActivityLogController extends Controller
 {
-    public function index(SettingService $settingService,Request $request)
-    {
-        $perPage = $settingService->getPerPage();
+   public function index(SettingService $settingService, Request $request)
+{
+    $perPage = $settingService->getPerPage();
 
-        $full = $request->query('all') == "s";
-        
-        $logs = Activity::with('causer')->latest()->paginate($perPage);
+    $debug = $request->query('debug') === "s";
+    $full  = $request->query('full') === "s";
 
-        return view('admin.activitylogs.index', compact('logs', 'full'));
+    $logsQuery = Activity::with('causer')->latest();
+
+    // Se não for "full=s", exclui os logs de User
+    if (!$full) {
+        $logsQuery->where('subject_type', '!=', \App\Models\User::class);
     }
+
+    $logs = $logsQuery->paginate($perPage);
+
+    return view('admin.activitylogs.index', compact('logs', 'debug', 'full'));
+}
+
 
      public function laravelLog(SettingService $settingService,Request $request)
     {
