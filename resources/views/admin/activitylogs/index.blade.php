@@ -13,7 +13,7 @@
                 </div>
 
                 <table class="table table-bordered table-hover align-middle">
-                    <thead class="table-dark">
+                    <thead class="bgc-primary">
                         <tr>
                             <th>Usuário</th>
                             <th>Ação</th>
