@@ -32,6 +32,8 @@ use App\Http\Controllers\Admin\RecipientController;
 use App\Http\Controllers\Admin\NotificationController;
 use App\Http\Controllers\Admin\ActivityLogController;
 
+use App\Http\Controllers\MkAuthController;
+
 use Illuminate\Support\Facades\Artisan;
 
 Route::aliasMiddleware('permission', PermissionMiddleware::class);
@@ -283,3 +285,4 @@ Route::get('/deploy/{token}', function ($token) {
 
 
 
+Route::get('/api/mk/nfe/{emissao}', [MkAuthController::class, 'buscarNotas']);
