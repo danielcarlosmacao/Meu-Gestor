@@ -71,7 +71,7 @@ public function buscarNotas($emissao)
             })
             ->sortKeys(); // ordena IBGE asc
 
-        return view('api.nfe', [
+        return view('api.mk.nfe', [
             'notas' => $notas,
             'agrupado' => $agrupado,
             'mensagem' => $dados['mensagem'] ?? null,
