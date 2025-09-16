@@ -30,7 +30,7 @@ public function buscarNotas(Request $request)
     $emissao = "{$ano}-{$mes}";
 
     try {
-        $dados = $this->mkAuth->get("gestor/show_nfe/{$emissao}");
+        $dados = $this->mkAuth->get("gestorwf/show_nfe/{$emissao}");
 
         // ✅ Só aplica array_walk_recursive se $dados for um array
         if (is_array($dados)) {
