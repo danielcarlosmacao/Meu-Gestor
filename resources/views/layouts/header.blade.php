@@ -157,7 +157,7 @@
                     @can('administrator.user')
                         <li class="nav-item dropdown position-static" id="menuExtra">
                             <a class="nav-link dropdown-toggle" href="#">
-                                Extras 
+                                EXTRAS 
                                 <i class="bi bi-puzzle"></i>
                             </a>
                             <div class="dropdown-menu mega-menu">
