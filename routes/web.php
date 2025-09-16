@@ -285,4 +285,4 @@ Route::get('/deploy/{token}', function ($token) {
 
 
 
-Route::get('/api/mk/nfe/{emissao}', [MkAuthController::class, 'buscarNotas']);
+Route::get('/api/mk/nfe', [MkAuthController::class, 'buscarNotas'])->name('api.mk.nfe');

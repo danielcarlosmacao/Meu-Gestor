@@ -14,26 +14,43 @@ class MkAuthController extends Controller
         $this->mkAuth = $mkAuth;
     }
 
-public function buscarNotas($emissao)
+public function buscarNotas(Request $request)
 {
-    if (!preg_match('/^\d{4}-\d{2}$/', $emissao)) {
-        return response()->json([
-            'status' => 'erro',
-            'mensagem' => 'Formato inválido, use YYYY-MM'
-        ], 422);
+    $ano = $request->query('year');
+    $mes = $request->query('month');
+
+    if (!$ano || !$mes || !preg_match('/^\d{4}$/', $ano) || !preg_match('/^\d{2}$/', $mes)) {
+                    return view('api.mk.nfe', [
+                'notas' => [],
+                'agrupado' => collect(),
+                'mensagem' => 'Faça uma nova pesquisa clicando em Buscar.',
+            ]);
     }
+
+    $emissao = "{$ano}-{$mes}";
 
     try {
         $dados = $this->mkAuth->get("gestor/show_nfe/{$emissao}");
 
-        // Força UTF-8
-        array_walk_recursive($dados, function (&$item) {
-            if (is_string($item)) {
-                $item = mb_convert_encoding($item, 'UTF-8', 'auto');
-            }
-        });
+        // ✅ Só aplica array_walk_recursive se $dados for um array
+        if (is_array($dados)) {
+            array_walk_recursive($dados, function (&$item) {
+                if (is_string($item)) {
+                    $item = mb_convert_encoding($item, 'UTF-8', 'auto');
+                }
+            });
+        }
 
         $notas = $dados['notas'] ?? [];
+
+        // Se não houver notas, apenas renderiza view vazia
+        if (empty($notas)) {
+            return view('api.mk.nfe', [
+                'notas' => [],
+                'agrupado' => collect(),
+                'mensagem' => 'Nenhuma nota encontrada para o período informado.',
+            ]);
+        }
 
         // ✅ Agrupamento IBGE > CFOP > VELDOWN > TIPO
         $agrupado = collect($notas)
@@ -43,11 +60,8 @@ public function buscarNotas($emissao)
                     ->groupBy('cfop')
                     ->map(function ($grupoCfop) {
                         return $grupoCfop
-                            ->groupBy(function ($item) {
-                                return $item['veldown']; // agrupa por velocidade bruta
-                            })
+                            ->groupBy(fn($item) => $item['veldown'])
                             ->map(function ($grupoVel) {
-                                // Dentro de cada velocidade, agrupa por tipo
                                 return collect($grupoVel)
                                     ->groupBy('tipo')
                                     ->map(function ($grupoTipo) {
@@ -63,24 +77,26 @@ public function buscarNotas($emissao)
                                             'tipo' => $primeiro['tipo'] ?? 'Padrão',
                                         ];
                                     })
-                                    ->sortKeys(); // ordena tipo em ordem alfabética
+                                    ->sortKeys();
                             })
-                            ->sortKeysDesc(); // ordena velocidade desc
+                            ->sortKeysDesc();
                     })
-                    ->sortKeys(); // ordena CFOP asc
+                    ->sortKeys();
             })
-            ->sortKeys(); // ordena IBGE asc
+            ->sortKeys();
 
         return view('api.mk.nfe', [
             'notas' => $notas,
             'agrupado' => $agrupado,
-            'mensagem' => $dados['mensagem'] ?? null,
+            'mensagem' => null,
         ]);
+
     } catch (\Exception $e) {
-        return response()->json([
-            'status' => 'erro',
-            'mensagem' => $e->getMessage()
-        ], 500);
+          return view('api.mk.nfe', [
+            'notas' => [],
+            'agrupado' => collect(),
+            'mensagem' => 'Erro de conexão com o servidor MKAuth erro:  ' . $e->getMessage(),
+        ]);
     }
 }
 

@@ -5,14 +5,49 @@
 <div class="container py-4">
     <h1 class="mb-4 fw-bold text-primary">Notas Fiscais</h1>
 
+        {{-- FORM DE BUSCA POR MÊS/ANO --}}
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <form method="GET" action="{{ url('/api/mk/nfe') }}" class="row g-3 align-items-end">
+                <div class="col-md-3">
+                    <label for="month" class="form-label fw-semibold">Mês</label>
+                    <select name="month" id="month" class="form-select">
+                        @for ($i = 1; $i <= 12; $i++)
+                            <option value="{{ str_pad($i, 2, '0', STR_PAD_LEFT) }}"
+                                {{ (request('month') == str_pad($i, 2, '0', STR_PAD_LEFT)) ? 'selected' : '' }}>
+                                {{ str_pad($i, 2, '0', STR_PAD_LEFT) }}
+                            </option>
+                        @endfor
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label for="year" class="form-label fw-semibold">Ano</label>
+                    <select name="year" id="year" class="form-select">
+                        @for ($year = now()->year; $year >= now()->year - 5; $year--)
+                            <option value="{{ $year }}" {{ (request('year') == $year) ? 'selected' : '' }}>
+                                {{ $year }}
+                            </option>
+                        @endfor
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="bi bi-search me-1"></i> Buscar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+
     @if($mensagem)
         <div class="alert alert-danger shadow-sm rounded-3">
             {{ $mensagem }}
         </div>
     @endif
 
-    {{-- TABELA DE RESUMO --}}
 
+    {{-- TABELA DE RESUMO --}}
     
     <div class="card shadow-sm mb-4">
     <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">

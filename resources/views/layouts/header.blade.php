@@ -153,11 +153,35 @@
                             </div>
                         </li>
                     @endcan
+                    <!-- extra -->
+                    @can('administrator.user')
+                        <li class="nav-item dropdown position-static" id="menuAdmin">
+                            <a class="nav-link dropdown-toggle" href="#">
+                                Extras 
+                                <i class="bi bi-puzzle"></i>
+                            </a>
+                            <div class="dropdown-menu mega-menu">
+                                <div class="row">
+                                    <div class="col-md-1">
+                                    </div>
+                                    <div class="col-md-5">
+                                        <h6>notificaçoes</h6>
+                                        <a href="{{ route('admin.recipients.index') }}">Notificaçoes do sistema</a>
+                                        <a href="{{ route('admin.notification.index') }}">Lembretes via whatsapp</a>
+                                    </div>
+                                    <div class="col-md-5">
+                                        <h6>API</h6>
+                                        <a href="{{ route('api.mk.nfe') }}">NFE Mk-Auth</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                    @endcan
                     <!-- administrador -->
                     @can('administrator.user')
                         <li class="nav-item dropdown position-static" id="menuAdmin">
-                            <a class="nav-link dropdown-toggle" href="#">ADMINISTRADOR <i
-                                    class="bi bi-person-gear ms-2"></i></a>
+                            <a class="nav-link dropdown-toggle" href="#">ADMINISTRADOR 
+                                <i class="bi bi-person-gear ms-2"></i></a>
                             <div class="dropdown-menu mega-menu">
                                 <div class="row">
                                     <div class="col-md-1">
@@ -171,11 +195,9 @@
                                         <a href="{{ route('activitylogs.index') }}">Logs</a>
                                     </div>
                                     <div class="col-md-5">
-                                        <h6>usuarios e notificaçoes</h6>
+                                        <h6>usuarios</h6>
                                         <a href="{{ route('admin.usuarios.index') }}">Usuarios</a>
                                         <a href="{{ route('admin.users.sessions') }}">Sessões ativas</a>
-                                        <a href="{{ route('admin.recipients.index') }}">Notificaçoes do sistema</a>
-                                        <a href="{{ route('admin.notification.index') }}">Lembretes via whatsapp</a>
                                     </div>
                                 </div>
                             </div>
