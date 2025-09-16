@@ -155,7 +155,7 @@
                     @endcan
                     <!-- extra -->
                     @can('administrator.user')
-                        <li class="nav-item dropdown position-static" id="menuAdmin">
+                        <li class="nav-item dropdown position-static" id="menuExtra">
                             <a class="nav-link dropdown-toggle" href="#">
                                 Extras 
                                 <i class="bi bi-puzzle"></i>
@@ -262,7 +262,7 @@
 
     <!-- Hover script -->
     <script>
-        const hoverMenus = ['menutower', 'menuFrota', 'menuServico', 'menuFerias', 'menuAdmin', 'menuUser'];
+        const hoverMenus = ['menutower', 'menuFrota', 'menuServico', 'menuFerias','menuExtra', 'menuAdmin', 'menuUser'];
 
         hoverMenus.forEach(id => {
             const menu = document.getElementById(id);
