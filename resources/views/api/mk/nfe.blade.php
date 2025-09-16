@@ -3,7 +3,7 @@
 
 @section('content')
 <div class="container py-4">
-    <h1 class="mb-4 fw-bold text-primary">Notas Fiscais</h1>
+    <h1 class="mb-4 fw-bold text-bgc-primary">Notas Fiscais</h1>
 
         {{-- FORM DE BUSCA POR MÊS/ANO --}}
     <div class="card shadow-sm mb-4">
@@ -31,7 +31,7 @@
                     </select>
                 </div>
                 <div class="col-md-3">
-                    <button type="submit" class="btn btn-primary w-100">
+                    <button type="submit" class="btn dcm-btn-primary w-100">
                         <i class="bi bi-search me-1"></i> Buscar
                     </button>
                 </div>
@@ -50,7 +50,7 @@
     {{-- TABELA DE RESUMO --}}
     
     <div class="card shadow-sm mb-4">
-    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+    <div class="card-header bgc-primary text-white d-flex justify-content-between align-items-center">
         <h5 class="mb-0">
             Resumo Mensal por Cidade / CFOP / Velocidade / Tipo
         </h5>
