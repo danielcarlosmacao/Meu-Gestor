@@ -1,6 +1,5 @@
 <?php
 
-
 namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
@@ -20,54 +19,57 @@ class EnviarMensagensDeManutencao extends Command
     {
         $hoje = Carbon::today();
 
-        // Busca manutenções para hoje (duas condições)
-        $manutencoes = Maintenance::where(function ($query) use ($hoje) {
-            $query->where(function ($q) use ($hoje) {
-                $q->whereDate('next_maintenance_date', $hoje)
-                    ->where('status', 'completed');
-            })->orWhere(function ($q) use ($hoje) {
-                $q->whereDate('maintenance_date', $hoje)
-                    ->where('status', 'pending');
-            });
-        })->with('tower')->get();
+        // Busca apenas colunas necessárias
+        $manutencoes = Maintenance::select('id', 'status', 'next_maintenance_date', 'maintenance_date', 'tower_id')
+            ->where(function ($query) use ($hoje) {
+                $query->where(function ($q) use ($hoje) {
+                    $q->whereDate('next_maintenance_date', $hoje)
+                      ->where('status', 'completed');
+                })->orWhere(function ($q) use ($hoje) {
+                    $q->whereDate('maintenance_date', $hoje)
+                      ->where('status', 'pending');
+                });
+            })
+            ->with('tower:id,name')
+            ->get();
 
         if ($manutencoes->isEmpty()) {
             $this->info('Nenhuma manutenção encontrada para hoje.');
             return;
         }
 
-        $recipients = Recipient::whereHas('references', function ($query) {
-            $query->where('name', 'serviceTowe');
-        })->get();
-
+        $recipients = Recipient::select('id', 'name', 'number')
+            ->whereHas('references', fn($q) => $q->where('name', 'serviceTowe'))
+            ->get();
 
         if ($recipients->isEmpty()) {
             $this->warn('Nenhum destinatário configurado para envio.');
             return;
         }
 
+        // Carrega logs já enviados para evitar consultas repetidas
+        $logsEnviados = WhatsappLog::whereIn('maintenance_id', $manutencoes->pluck('id'))
+            ->whereIn('recipient_id', $recipients->pluck('id'))
+            ->where('status', 'sent')
+            ->get()
+            ->keyBy(fn($log) => $log->maintenance_id.'-'.$log->recipient_id);
+
+        $appName = config('app.name');
+
         foreach ($manutencoes as $manutencao) {
-            $towerName = optional($manutencao->tower)->name ?? 'Sem torre associada';
+            $towerName = $manutencao->tower->name ?? 'Sem torre associada';
 
             foreach ($recipients as $recipient) {
-                // Evita reenvio se já enviado com sucesso
-                $jaEnviado = WhatsappLog::where('recipient_id', $recipient->id)
-                    ->where('maintenance_id', $manutencao->id)
-                    ->where('status', 'sent')
-                    ->exists();
-
-                if ($jaEnviado) {
+                $key = $manutencao->id.'-'.$recipient->id;
+                if (isset($logsEnviados[$key])) {
                     $this->info("Mensagem já enviada para {$recipient->number} ({$recipient->name}) — pulando.");
                     continue;
                 }
 
-                // Monta mensagem
-                $appName = config('app.name');
                 $mensagem = "*$appName*: Olá {$recipient->name}! A torre {$towerName} tem uma manutenção "
                     . ($manutencao->status === 'pending' ? 'pendente' : 'agendada')
                     . " para hoje ({$hoje->format('d/m/Y')}).";
 
-                // Cria log com status 'pending'
                 $log = WhatsappLog::create([
                     'recipient_id' => $recipient->id,
                     'maintenance_id' => $manutencao->id,
@@ -78,7 +80,6 @@ class EnviarMensagensDeManutencao extends Command
                 try {
                     $resposta = $whatsapp->sendMessage($recipient->number, $mensagem);
 
-                    // Atualiza log com sucesso
                     $log->update([
                         'status' => 'sent',
                         'response' => $resposta,
@@ -86,8 +87,7 @@ class EnviarMensagensDeManutencao extends Command
                     ]);
 
                     $this->info("Mensagem enviada para {$recipient->number} ({$recipient->name}): $resposta");
-                } catch (\Exception $e) {
-                    // Atualiza log com erro
+                } catch (\Throwable $e) {
                     $log->update([
                         'status' => 'failed',
                         'response' => $e->getMessage(),
