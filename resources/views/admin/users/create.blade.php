@@ -110,7 +110,7 @@
         <div class="col-md-4 mb-3">
             <div class="border rounded p-3 shadow-sm h-100">
                 <h6 class="fw-bold">Administrador</h6>
-                @foreach ($permissions->filter(fn($p) => str_contains($p->name, 'user') || str_contains($p->name, 'admin')) as $permission)
+                @foreach ($permissions->filter(fn($p) => str_contains($p->name, 'user') || str_contains($p->name, 'admin') || str_contains($p->name, 'api')) as $permission)
                     <div class="form-check">
                         <input class="form-check-input" type="checkbox" name="permissions[]"
                                value="{{ $permission->name }}"

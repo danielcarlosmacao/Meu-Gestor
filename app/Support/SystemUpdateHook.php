@@ -18,7 +18,6 @@ class SystemUpdateHook
 
             $newPermissions = [
                 // 'reports.export',
-                 'api.nfe',
             ];
 
             if (!empty($newPermissions)) {

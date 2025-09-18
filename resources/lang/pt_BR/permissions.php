@@ -2,6 +2,7 @@
     return [
     'administrator.user'  => 'Gerenciar Usuarios',
     'administrator.options'  => 'Gerenciar Recursos',
+    'api.nfe'  => 'visualizar NFE MK ',
     'towers.view'   => 'Visualizar Gestor Torres',
     'towers.create'  => 'Adicionar-Modulo-Torres',
     'towers.edit'   => 'Editar-Modulo-Torres',
@@ -23,6 +24,6 @@
     'vacation_manager.calendar'=> 'Visualizar Calendario',
     'service.view' => 'Visualizar-Modulo-Serviço',
     'service.create'=> 'Criar-Modulo-Serviço',
-    'service.edit'=> 'Editar-Modulo-erviço',
+    'service.edit'=> 'Editar-Modulo-Serviço',
     'service.delete'=> 'Deletar-Modulo-Serviço',
 ];
