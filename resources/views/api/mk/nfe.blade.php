@@ -9,33 +9,47 @@
         <div class="card shadow-sm mb-4">
             <div class="card-body">
                 <form method="GET" action="{{ url('/api/mk/nfe') }}" class="row g-3 align-items-end">
-                    <div class="col-md-3">
-                        <label for="month" class="form-label fw-semibold">Mês</label>
-                        <select name="month" id="month" class="form-select">
-                            @for ($i = 1; $i <= 12; $i++)
-                                <option value="{{ str_pad($i, 2, '0', STR_PAD_LEFT) }}"
-                                    {{ request('month') == str_pad($i, 2, '0', STR_PAD_LEFT) ? 'selected' : '' }}>
-                                    {{ str_pad($i, 2, '0', STR_PAD_LEFT) }}
-                                </option>
-                            @endfor
-                        </select>
-                    </div>
-                    <div class="col-md-3">
-                        <label for="year" class="form-label fw-semibold">Ano</label>
-                        <select name="year" id="year" class="form-select">
-                            @for ($year = now()->year; $year >= now()->year - 5; $year--)
-                                <option value="{{ $year }}" {{ request('year') == $year ? 'selected' : '' }}>
-                                    {{ $year }}
-                                </option>
-                            @endfor
-                        </select>
-                    </div>
-                    <div class="col-md-3">
-                        <button type="submit" class="btn dcm-btn-primary w-100">
-                            <i class="bi bi-search me-1"></i> Buscar
-                        </button>
-                    </div>
-                </form>
+    <div class="col-md-3">
+        <label for="month" class="form-label fw-semibold">Mês</label>
+        <select name="month" id="month" class="form-select">
+            @for ($i = 1; $i <= 12; $i++)
+                <option value="{{ str_pad($i, 2, '0', STR_PAD_LEFT) }}"
+                    {{ request('month') == str_pad($i, 2, '0', STR_PAD_LEFT) ? 'selected' : '' }}>
+                    {{ str_pad($i, 2, '0', STR_PAD_LEFT) }}
+                </option>
+            @endfor
+        </select>
+    </div>
+
+    <div class="col-md-3">
+        <label for="year" class="form-label fw-semibold">Ano</label>
+        <select name="year" id="year" class="form-select">
+            @for ($year = now()->year; $year >= now()->year - 5; $year--)
+                <option value="{{ $year }}" {{ request('year') == $year ? 'selected' : '' }}>
+                    {{ $year }}
+                </option>
+            @endfor
+        </select>
+    </div>
+
+    <div class="col-md-3 d-flex align-items-center">
+        <div class="form-check">
+            <input type="hidden" name="validate" value="n">
+            <input class="form-check-input" type="checkbox" name="validate" id="validate" value="y"
+                   {{ request('validate', 'n') === 'y' ? 'checked' : '' }}>
+            <label class="form-check-label fw-semibold" for="validate">
+                verificar NFE
+            </label>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <button type="submit" class="btn dcm-btn-primary w-100">
+            <i class="bi bi-search me-1"></i> Buscar
+        </button>
+    </div>
+</form>
+
             </div>
         </div>
 
@@ -160,9 +174,11 @@
                                 <td class="text-center">{{ $nota['numero'] ?? '-' }}</td>
                                 <td class="text-center">{{ \Carbon\Carbon::parse($nota['emissao'])->format('d/m/Y') }}</td>
                                 <td class="text-center">
-                                     <a href="{{ $mkauthUrl }}/{{$mkauthSearchLogin}}{{ $nota['login'] }}" target="_blank" style="color: inherit; text-decoration: none;">
+                                    <a href="{{ $mkauthUrl }}/{{ $mkauthSearchLogin }}{{ $nota['login'] }}"
+                                        target="_blank" style="color: inherit; text-decoration: none;">
                                         {{ $nota['login'] }}
-                                    </a></td>
+                                    </a>
+                                </td>
                                 <td>{{ $nota['cliente_nome'] }}</td>
                                 <td class="text-center">{{ $nota['cidade_ibge'] }}</td>
                                 <td>{{ $nota['plano_nome'] }}</td>
