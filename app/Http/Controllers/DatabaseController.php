@@ -177,6 +177,16 @@ class DatabaseController extends Controller
             Artisan::call('migrate', ['--force' => true]);
             Log::info('Migrations rodadas com sucesso');
 
+            // Executa o Hook
+            try {
+                \App\Support\SystemUpdateHook::run();
+            } catch (\Throwable $hookException) {
+                Log::error('Erro ao executar SystemUpdateHook', [
+                    'erro' => $hookException->getMessage()
+                ]);
+                // NÃO interrompe o update se o hook falhar
+            }
+
             Artisan::call('optimize:clear');
             Artisan::call('config:clear');
             Artisan::call('cache:clear');
