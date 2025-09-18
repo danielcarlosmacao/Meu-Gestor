@@ -18,6 +18,11 @@ public function buscarNotas(Request $request)
 {
     $ano = $request->query('year');
     $mes = $request->query('month');
+    $validate = $request->query('validate');
+
+    $mkauthUrl = rtrim(config('custom.mkauth_url_site'), '/');
+    $mkauthSearchLogin = ltrim(config('custom.mkauth_search_login'), '/');
+    
 
     if (!$ano || !$mes || !preg_match('/^\d{4}$/', $ano) || !preg_match('/^\d{2}$/', $mes)) {
                     return view('api.mk.nfe', [
@@ -88,6 +93,9 @@ public function buscarNotas(Request $request)
         return view('api.mk.nfe', [
             'notas' => $notas,
             'agrupado' => $agrupado,
+            'mkauthUrl' => $mkauthUrl,
+            'mkauthSearchLogin' => $mkauthSearchLogin,
+            'validate' => $validate,
             'mensagem' => null,
         ]);
 
