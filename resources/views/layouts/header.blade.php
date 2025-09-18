@@ -171,7 +171,9 @@
                                     </div>
                                     <div class="col-md-5">
                                         <h6>API</h6>
+                                        @can('api.nfe')
                                         <a href="{{ route('api.mk.nfe') }}">NFE Mk-Auth</a>
+                                        @endcan
                                     </div>
                                 </div>
                             </div>

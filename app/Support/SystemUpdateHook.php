@@ -18,7 +18,7 @@ class SystemUpdateHook
 
             $newPermissions = [
                 // 'reports.export',
-                // 'finance.view',
+                 'api.nfe',
             ];
 
             if (!empty($newPermissions)) {
@@ -38,7 +38,7 @@ class SystemUpdateHook
                 Log::info('[SystemUpdateHook] Nenhuma nova permissão a ser criada.');
             }
 
-            
+
 
         } catch (\Throwable $e) {
             Log::error('[SystemUpdateHook] Erro ao executar hook', [

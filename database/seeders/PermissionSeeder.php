@@ -54,6 +54,9 @@ class PermissionSeeder extends Seeder
         'service.create',
         'service.edit',
         'service.delete',
+
+        //API
+        'api.nfe',
     ];
 
     // Criar permissões (se não existirem)
