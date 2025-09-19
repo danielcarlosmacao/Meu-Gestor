@@ -22,12 +22,20 @@ class UserController extends Controller
         return view('admin.users.index', compact('users'));
     }
 
-    public function edit(User $user)
-    {
-        $roles = Role::all();
-        $permissions = Permission::all();
-        return view('admin.users.edit', compact('user', 'roles', 'permissions'));
+public function edit(User $user)
+{
+    $roles = Role::all();
+    $permissions = Permission::all();
+
+    // 🔑 Mapeia as permissões de cada role em um array associativo
+    $rolePermissions = [];
+    foreach ($roles as $role) {
+        $rolePermissions[$role->name] = $role->permissions->pluck('name')->toArray();
     }
+
+    return view('admin.users.edit', compact('user', 'roles', 'permissions', 'rolePermissions'));
+}
+
     public function updatePermissions(Request $request, User $user)
     {
 
@@ -101,11 +109,17 @@ class UserController extends Controller
     }
 */
     public function create()
-    {
-        $roles = Role::all();
-        $permissions = Permission::all();
-        return view('admin.users.create', compact('roles', 'permissions'));
-    }
+{
+    $roles = Role::with('permissions')->get(); // carrega roles + permissões
+    $permissions = Permission::all();
+
+    // Cria um array associativo com as permissões de cada role
+    $rolePermissions = $roles->mapWithKeys(function ($role) {
+        return [$role->name => $role->permissions->pluck('name')->toArray()];
+    });
+
+    return view('admin.users.create', compact('roles', 'permissions', 'rolePermissions'));
+}
 
     public function store(Request $request)
     {

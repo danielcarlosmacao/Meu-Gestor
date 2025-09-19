@@ -31,6 +31,7 @@ use App\Http\Controllers\PostitController;
 use App\Http\Controllers\Admin\RecipientController;
 use App\Http\Controllers\Admin\NotificationController;
 use App\Http\Controllers\Admin\ActivityLogController;
+use App\Http\Controllers\Admin\RoleController;
 
 use App\Http\Controllers\MkAuthController;
 
@@ -83,7 +84,17 @@ Route::middleware(['auth', 'permission:administrator.user'])->group(function () 
     Route::post('/admin/users/{user}/reset-password', [UserController::class, 'resetPassword'])->name('admin.users.reset-password');
     Route::get('/admin/sessions', [UserController::class, 'usersOnline'])->name('admin.users.sessions');
     Route::delete('/admin/sessions/{user}', [UserController::class, 'destroySession'])->name('admin.sessions.destroy');
-    Route::get('/admin/admin.systempanel', function () {return view('admin.systempanel');})->name('admin.systempanel');
+    Route::get('/admin/admin.systempanel', function () {
+        return view('admin.systempanel'); })->name('admin.systempanel');
+
+    // Rotas de Roles
+    Route::get('/admin/roles', [RoleController::class, 'index'])->name('admin.roles.index');
+    Route::get('/admin/roles/create', [RoleController::class, 'create'])->name('admin.roles.create');
+    Route::post('/admin/roles', [RoleController::class, 'store'])->name('admin.roles.store');
+    Route::get('/admin/roles/{role}', [RoleController::class, 'show'])->name('admin.roles.show');
+    Route::get('/admin/roles/{role}/edit', [RoleController::class, 'edit'])->name('admin.roles.edit');
+    Route::put('/admin/roles/{role}', [RoleController::class, 'update'])->name('admin.roles.update');
+    Route::delete('/admin/roles/{role}', [RoleController::class, 'destroy'])->name('admin.roles.destroy');
 
 });
 
@@ -127,32 +138,11 @@ Route::middleware(['auth', 'permission:administrator.options'])->group(function 
     Route::post('/admin/database/import', [DatabaseController::class, 'import'])->name('database.import');
     Route::post('/admin/system/update', [DatabaseController::class, 'updateSystem'])->name('system.update');
 
-    
+
     Route::get('admin/activity-logs', [ActivityLogController::class, 'index'])->name('activitylogs.index');
     Route::get('admin/system-logs', [ActivityLogController::class, 'laravelLog'])->name('systemlogs.index');
 
-
-    Route::get('/admin/recipients', [RecipientController::class, 'index'])->name('admin.recipients.index');
-    Route::post('/admin/recipients', [RecipientController::class, 'store'])->name('admin.recipients.store');
-    Route::put('/admin/recipients/{id}', [RecipientController::class, 'update'])->name('admin.recipients.update');
-    Route::delete('/admin/recipients/{id}', [RecipientController::class, 'destroy'])->name('admin.recipients.destroy');
-    Route::get('/admin/recipients/logs', [RecipientController::class, 'logs'])->name('admin.recipients.logs');
-
 });
-
-Route::middleware(['auth', 'permission:administrator.options'])->prefix('admin')->name('admin.')->group(function () {
-    Route::resource('notification', NotificationController::class)->only(['index', 'store', 'destroy']);
-    // Rotas personalizadas para envio
-    Route::post('notification/{notification}/send', [NotificationController::class, 'send'])->name('notification.send');
-    Route::post('notification/{notification}/resend', [NotificationController::class, 'resend'])->name('notification.resend');
-    Route::post('notification/{notification}/cleanSent', [NotificationController::class, 'cleanSent'])->name('notification.cleanSent');
-    Route::put('notification/{notification}', [NotificationController::class, 'update'])->name('notification.update');
-    Route::get('notification/logs', [NotificationController::class, 'logs'])->name('notification.logs');
-    Route::delete('notification/logs/{id}', [NotificationController::class, 'logsDelete'])->name('notification.logs.delete');
-
-});
-
-
 
 // towers.view
 Route::middleware(['auth', 'permission:towers.view'])->group(function () {
@@ -216,12 +206,12 @@ Route::middleware(['auth', 'permission:fleets.view'])->group(function () {
     Route::get('/fleet/vehicle_workshop', [WorkshopController::class, 'index'])->name('fleet.vehicle_workshop.index');
     Route::get('/fleet/veiculos/{vehicle}/manutencoes', [VehicleMaintenanceController::class, 'byVehicle'])->name('fleet.vehicle.maintenances');
     //report
-Route::get('/vehicle-maintenance/report/form', function() {
-    return view('fleet.vehicles.vehicle_maintenances_report');
-})->name('vehicle-maintenance.report.form');
+    Route::get('/vehicle-maintenance/report/form', function () {
+        return view('fleet.vehicles.vehicle_maintenances_report');
+    })->name('vehicle-maintenance.report.form');
 
-Route::get('/vehicle-maintenance/report/pdf', [VehicleMaintenanceController::class, 'handlePdfReport'])
-    ->name('vehicle-maintenance.report.pdf');
+    Route::get('/vehicle-maintenance/report/pdf', [VehicleMaintenanceController::class, 'handlePdfReport'])
+        ->name('vehicle-maintenance.report.pdf');
 });
 //fleets.create
 Route::middleware(['auth', 'permission:fleets.create'])->group(function () {
@@ -245,31 +235,51 @@ Route::middleware(['auth', 'permission:fleets.delete'])->group(function () {
     Route::delete('/fleet/vehicle_workshop/{id}', [WorkshopController::class, 'destroy'])->name('fleet.vehicle_workshop.destroy');
 });
 //service.view
-Route::middleware(['auth','permission:service.view'])->group(function () {
+Route::middleware(['auth', 'permission:service.view'])->group(function () {
     Route::get('/service/clients', [ClientController::class, 'index'])->name('service.clients.index');
     Route::get('/service/equipment_maintenances', [EquipmentMaintenanceController::class, 'index'])->name('service.equipment_maintenances.index');
     Route::get('/service/maintenances', [MaintenanceController::class, 'index'])->name('service.maintenances.index');
 });
 //service.create
-Route::middleware(['auth','permission:service.create'])->group(function () {
+Route::middleware(['auth', 'permission:service.create'])->group(function () {
     Route::post('/service/equipment_maintenances', [EquipmentMaintenanceController::class, 'store'])->name('service.equipment_maintenances.store');
     Route::post('/service/clients', [ClientController::class, 'store'])->name('service.clients.store');
     Route::post('/service/maintenances', [MaintenanceController::class, 'store'])->name('service.maintenances.store');
 });
 //service.update
-Route::middleware(['auth','permission:service.edit'])->group(function () {
+Route::middleware(['auth', 'permission:service.edit'])->group(function () {
     Route::put('/service/maintenances/{maintenance}', [MaintenanceController::class, 'update'])->name('service.maintenances.update');
     Route::put('/service/clients/{client}', [ClientController::class, 'update'])->name('service.clients.update');
     Route::put('/service/equipment_maintenances/{equipment_maintenance}', [EquipmentMaintenanceController::class, 'update'])->name('service.equipment_maintenances.update');
 });
 //service.delete
-Route::middleware(['auth','permission:service.delete'])->group(function () {
+Route::middleware(['auth', 'permission:service.delete'])->group(function () {
     Route::delete('/service/maintenances/{maintenance}', [MaintenanceController::class, 'destroy'])->name('service.maintenances.destroy');
     Route::delete('/service/equipment_maintenances/{equipment_maintenance}', [EquipmentMaintenanceController::class, 'destroy'])->name('service.equipment_maintenances.destroy');
     Route::delete('/service/clients/{client}', [ClientController::class, 'destroy'])->name('service.clients.destroy');
 });
 
+//extras 
+//recipients.view
+Route::middleware(['auth', 'permission:recipients.view'])->group(function () {
+    Route::get('/admin/recipients', [RecipientController::class, 'index'])->name('admin.recipients.index');
+    Route::post('/admin/recipients', [RecipientController::class, 'store'])->name('admin.recipients.store');
+    Route::put('/admin/recipients/{id}', [RecipientController::class, 'update'])->name('admin.recipients.update');
+    Route::delete('/admin/recipients/{id}', [RecipientController::class, 'destroy'])->name('admin.recipients.destroy');
+    Route::get('/admin/recipients/logs', [RecipientController::class, 'logs'])->name('admin.recipients.logs');
 
+});
+//notification.view
+Route::middleware(['auth', 'permission:notification.view'])->prefix('admin')->name('admin.')->group(function () {
+    Route::resource('notification', NotificationController::class)->only(['index', 'store', 'destroy']);
+    // Rotas personalizadas para envio
+    Route::post('notification/{notification}/send', [NotificationController::class, 'send'])->name('notification.send');
+    Route::post('notification/{notification}/resend', [NotificationController::class, 'resend'])->name('notification.resend');
+    Route::post('notification/{notification}/cleanSent', [NotificationController::class, 'cleanSent'])->name('notification.cleanSent');
+    Route::put('notification/{notification}', [NotificationController::class, 'update'])->name('notification.update');
+    Route::get('notification/logs', [NotificationController::class, 'logs'])->name('notification.logs');
+    Route::delete('notification/logs/{id}', [NotificationController::class, 'logsDelete'])->name('notification.logs.delete');
+});
 
 
 Route::get('/deploy/{token}', function ($token) {

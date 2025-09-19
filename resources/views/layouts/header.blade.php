@@ -154,7 +154,7 @@
                         </li>
                     @endcan
                     <!-- extra -->
-                    @can('administrator.user')
+                    @can('extra.view')
                         <li class="nav-item dropdown position-static" id="menuExtra">
                             <a class="nav-link dropdown-toggle" href="#">
                                 EXTRAS 
@@ -166,8 +166,12 @@
                                     </div>
                                     <div class="col-md-5">
                                         <h6>notificaçoes</h6>
+                                        @can('recipients.view')
                                         <a href="{{ route('admin.recipients.index') }}">Notificaçoes do sistema</a>
+                                        @endcan
+                                        @can('notification.view')
                                         <a href="{{ route('admin.notification.index') }}">Lembretes via whatsapp</a>
+                                        @endcan
                                     </div>
                                     <div class="col-md-5">
                                         <h6>API</h6>
@@ -199,6 +203,7 @@
                                     <div class="col-md-5">
                                         <h6>usuarios</h6>
                                         <a href="{{ route('admin.usuarios.index') }}">Usuarios</a>
+                                        <a href="{{ route('admin.roles.index') }}">Perfil de usuario</a>
                                         <a href="{{ route('admin.users.sessions') }}">Sessões ativas</a>
                                     </div>
                                 </div>

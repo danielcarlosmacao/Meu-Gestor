@@ -18,6 +18,9 @@ class SystemUpdateHook
 
             $newPermissions = [
                 // 'reports.export',
+                    'extra.view',
+                    'recipients.view',
+                    'notification.view',
             ];
 
             if (!empty($newPermissions)) {

@@ -55,7 +55,10 @@ class PermissionSeeder extends Seeder
         'service.edit',
         'service.delete',
 
-        //API
+        //extras
+        'extra.view',
+        'recipients.view',
+        'notification.view',
         'api.nfe',
     ];
 
