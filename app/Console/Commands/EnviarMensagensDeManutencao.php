@@ -93,14 +93,14 @@ class EnviarMensagensDeManutencao extends Command
                         'sent_at' => now(),
                     ]);
 
-                    $this->info("✅ Mensagem enviada para {$recipient->number} ({$recipient->name})");
+                    $this->info("Mensagem enviada para {$recipient->number} ({$recipient->name})");
                 } catch (\Throwable $e) {
                     $log->update([
                         'status' => 'failed',
                         'response' => $e->getMessage(),
                     ]);
 
-                    $this->error("❌ Erro ao enviar para {$recipient->number}: " . $e->getMessage());
+                    $this->error("Erro ao enviar para {$recipient->number}: " . $e->getMessage());
 
                     Log::error('Erro no envio de WhatsApp', [
                         'recipient_id' => $recipient->id,
