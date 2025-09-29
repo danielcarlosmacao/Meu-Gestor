@@ -3,11 +3,11 @@
 namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
-use App\Services\WhatsappService;
 use App\Models\Maintenance;
 use App\Models\Recipient;
 use App\Models\WhatsappLog;
-use Carbon\Carbon;
+use App\Services\WhatsappService;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Log;
 
 class EnviarMensagensDeManutencao extends Command
@@ -61,15 +61,17 @@ class EnviarMensagensDeManutencao extends Command
 
             foreach ($recipients as $recipient) {
                 $key = $manutencao->id.'-'.$recipient->id;
+
                 if (isset($logsEnviados[$key])) {
                     $this->info("Mensagem já enviada para {$recipient->number} ({$recipient->name}) — pulando.");
                     continue;
                 }
 
-                $mensagem = "*$appName*: Olá {$recipient->name}! A torre {$towerName} tem uma manutenção "
+                $mensagem = "*{$appName}*: Olá {$recipient->name}! A torre {$towerName} tem uma manutenção "
                     . ($manutencao->status === 'pending' ? 'pendente' : 'agendada')
                     . " para hoje ({$hoje->format('d/m/Y')}).";
 
+                // Cria log inicial como "pending"
                 $log = WhatsappLog::create([
                     'recipient_id' => $recipient->id,
                     'maintenance_id' => $manutencao->id,
@@ -77,8 +79,13 @@ class EnviarMensagensDeManutencao extends Command
                     'message' => $mensagem,
                 ]);
 
+                // Marca no cache para não reenviar dentro da mesma execução
+                $logsEnviados[$key] = true;
+
                 try {
+                    $this->info("Enviando mensagem para {$recipient->number} ({$recipient->name})...");
                     $resposta = $whatsapp->sendMessage($recipient->number, $mensagem);
+                    $this->info("Resposta recebida: " . json_encode($resposta));
 
                     $log->update([
                         'status' => 'sent',
@@ -86,22 +93,26 @@ class EnviarMensagensDeManutencao extends Command
                         'sent_at' => now(),
                     ]);
 
-                    $this->info("Mensagem enviada para {$recipient->number} ({$recipient->name}): $resposta");
+                    $this->info("✅ Mensagem enviada para {$recipient->number} ({$recipient->name})");
                 } catch (\Throwable $e) {
                     $log->update([
                         'status' => 'failed',
                         'response' => $e->getMessage(),
                     ]);
 
-                    $this->error("Erro ao enviar para {$recipient->number}: " . $e->getMessage());
+                    $this->error("❌ Erro ao enviar para {$recipient->number}: " . $e->getMessage());
 
                     Log::error('Erro no envio de WhatsApp', [
                         'recipient_id' => $recipient->id,
                         'maintenance_id' => $manutencao->id,
                         'error' => $e->getMessage(),
                     ]);
+
+                    continue; // garante que passa para o próximo recipient
                 }
             }
         }
+
+        $this->info('Processo de envio concluído.');
     }
 }
