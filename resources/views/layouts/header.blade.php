@@ -15,17 +15,17 @@
 
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
 
- <!-- Flatpickr CSS -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" />
+    <!-- Flatpickr CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" />
 
-<!-- Flatpickr JS -->
-<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <!-- Flatpickr JS -->
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 
-<!-- Flatpickr Português BR -->
-<script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/pt.js"></script>
+    <!-- Flatpickr Português BR -->
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/pt.js"></script>
 
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<script src="{{ asset('js/confirm-action.js') }}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="{{ asset('js/confirm-action.js') }}"></script>
 
 
 
@@ -98,7 +98,8 @@
                                     </div>
                                     <div class="col-md-6">
                                         <h6>Outros</h6>
-                                        <a href="{{ route('vehicle-maintenance.report.form') }}">Relatorio de Manutenções</a>
+                                        <a href="{{ route('vehicle-maintenance.report.form') }}">Relatorio de
+                                            Manutenções</a>
                                     </div>
                                 </div>
                             </div>
@@ -157,26 +158,32 @@
                     @can('extra.view')
                         <li class="nav-item dropdown position-static" id="menuExtra">
                             <a class="nav-link dropdown-toggle" href="#">
-                                EXTRAS 
+                                EXTRAS
                                 <i class="bi bi-puzzle"></i>
                             </a>
                             <div class="dropdown-menu mega-menu">
                                 <div class="row">
-                                    <div class="col-md-1">
+                                    @can('stock.view')
+                                    <div class="col-md-4">
+                                        <h6>Estoque</h6>
+                                        <a href="{{ route('stock.items.index') }}"><i class="fa fa-cogs"></i> Inventario</a>
+                                        <a href="{{ route('stock.movements.index') }}"><i class="fa fa-cogs"></i>Movimentação</a>
+                                        <a href="{{ route('stock.items.showProduction') }}"><i class="fa fa-cogs"></i>Estoque Vs Produção</a>
                                     </div>
-                                    <div class="col-md-5">
-                                        <h6>notificaçoes</h6>
+                                    @endcan
+                                    <div class="col-md-4">
+                                        <h6>Notificaçoes</h6>
                                         @can('recipients.view')
-                                        <a href="{{ route('admin.recipients.index') }}">Notificaçoes do sistema</a>
+                                            <a href="{{ route('admin.recipients.index') }}">Notificaçoes do sistema</a>
                                         @endcan
                                         @can('notification.view')
-                                        <a href="{{ route('admin.notification.index') }}">Lembretes via whatsapp</a>
+                                            <a href="{{ route('admin.notification.index') }}">Lembretes via whatsapp</a>
                                         @endcan
                                     </div>
-                                    <div class="col-md-5">
+                                    <div class="col-md-4">
                                         <h6>API</h6>
                                         @can('api.nfe')
-                                        <a href="{{ route('api.mk.nfe') }}">NFE Mk-Auth</a>
+                                            <a href="{{ route('api.mk.nfe') }}">NFE Mk-Auth</a>
                                         @endcan
                                     </div>
                                 </div>
@@ -186,7 +193,7 @@
                     <!-- administrador -->
                     @can('administrator.user')
                         <li class="nav-item dropdown position-static" id="menuAdmin">
-                            <a class="nav-link dropdown-toggle" href="#">ADMINISTRADOR 
+                            <a class="nav-link dropdown-toggle" href="#">ADMINISTRADOR
                                 <i class="bi bi-person-gear ms-2"></i></a>
                             <div class="dropdown-menu mega-menu">
                                 <div class="row">
@@ -213,7 +220,7 @@
                     <!-- Verifica se o usuário está logado -->
                     @auth
                         <li class="nav-item dropdown position-static" id="menuUser">
-                            <a class="nav-link dropdown-toggle" href="#" > <i
+                            <a class="nav-link dropdown-toggle" href="#"> <i
                                     class="bi bi-person-fill me-1"></i>{{ Auth::user()->name }}</a>
                             <div class="dropdown-menu mega-menu">
                                 <div class="row">
@@ -269,7 +276,7 @@
 
     <!-- Hover script -->
     <script>
-        const hoverMenus = ['menutower', 'menuFrota', 'menuServico', 'menuFerias','menuExtra', 'menuAdmin', 'menuUser'];
+        const hoverMenus = ['menutower', 'menuFrota', 'menuServico', 'menuFerias', 'menuExtra', 'menuAdmin', 'menuUser'];
 
         hoverMenus.forEach(id => {
             const menu = document.getElementById(id);
@@ -289,8 +296,8 @@
             });
         });
     </script>
-    
-    <!-- alert tipo toast no sistema --> 
+
+    <!-- alert tipo toast no sistema -->
     @include('layouts.toast')
 
 </body>

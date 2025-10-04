@@ -60,6 +60,13 @@ class PermissionSeeder extends Seeder
         'recipients.view',
         'notification.view',
         'api.nfe',
+
+        //stock
+        'stock.view',
+        'stock.items.create',
+        'stock.items.edit',
+        'stock.items.delete',
+        'stock.movements.create',
     ];
 
     // Criar permissões (se não existirem)
