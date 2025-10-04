@@ -9,6 +9,14 @@
             </h2>
         </div>
 
+        @if (!is_null($totalProductionValue))
+            <div class="mb-3">
+                <span class="badge bgc-primary fs-5">
+                    Total em Produção: R$ {{ number_format($totalProductionValue, 2, ',', '.') }}
+                </span>
+            </div>
+        @endif
+
         <table class="table table-bordered table-hover align-middle">
             <thead class="bgc-primary text-white">
                 <tr>
@@ -38,13 +46,13 @@
                             @if ($item['stock_qty'] > 0)
                                 <span class="badge bg-info text-dark">{{ $item['stock_qty'] }}</span>
                             @elseif($item['status'] === 'not_found')
-                            <span class="badge bg-secondary">Não Cadastrado</span>
+                                <span class="badge bg-secondary">Não Cadastrado</span>
                             @else
                                 <span class="badge bg-warning text-dark">Sem Estoque</span>
                             @endif
                         </td>
                         <td>{{ $price !== '-' ? 'R$ ' . $price : '-' }}</td>
-                       
+
                     </tr>
                 @endforeach
             </tbody>

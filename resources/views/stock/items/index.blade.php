@@ -12,8 +12,14 @@
                         <a href="{{ route('stock.items.create') }}" class="btn dcm-btn-primary mb-3"><i class="bi bi-plus"></i></a>
                     @endcan
                 </h2>
-
             </div>
+            @if (!is_null($totalStockValue))
+                <div class="mb-3">
+                    <span class="badge bgc-primary fs-5">
+                        Total do Estoque: R$ {{ number_format($totalStockValue, 2, ',', '.') }}
+                    </span>
+                </div>
+            @endif
 
             <table class="table table-bordered table-striped">
                 <thead class="bgc-primary text-white">
@@ -33,7 +39,7 @@
                             <td>{{ $item->current_stock }}</td>
                             <td>{{ $item->min_stock ?? '-' }}</td>
                             <td>{{ $item->price ? 'R$ ' . number_format($item->price, 2, ',', '.') : '-' }}</td>
-                            <td>{{ __('status.' . $item->status)}}</td>
+                            <td>{{ __('status.' . $item->status) }}</td>
                             <td class="text-center align-middle p-1">
                                 <div class="btn-group">
                                     <button type="button" class="btn btn-sm dcm-btn-primary dropdown-toggle"
