@@ -1,0 +1,199 @@
+:root {
+  --color-primary: #24b153;
+  --color-secondary: #6fbe89;
+  --color-text: #0a6428;
+  --color-hover: #186d34;
+
+
+}
+
+/*cores padrao*/
+.bgc-primary,
+.bgc-primary th {
+  background-color: var(--color-primary) !important;
+  color: white !important;
+}
+
+nav.navbar.bgc-primary {
+  width: 100vw;
+  /* força ocupar toda a largura visível */
+  margin: 0;
+  padding: 0;
+}
+
+.text-bgc-primary {
+  color: var(--color-text);
+}
+
+.text-black {
+  color: #db1414;
+  font-weight: normal;
+  /* garante que não fica negrito */
+}
+
+
+/*Botao primario*/
+
+.dcm-btn-primary {
+  color: #fff;
+  background-color: var(--color-primary);
+  border-color: var(--color-primary);
+}
+
+.dcm-btn-primary:hover {
+  color: #fff;
+  background-color: var(--color-hover);
+  border-color: var(--color-hover);
+}
+
+.dcm-btn-primary:focus,
+.dcm-btn-primary.focus {
+  color: #fff;
+  background-color: var(--color-hover);
+  border-color: var(--color-hover);
+  outline: 0;
+  box-shadow: 0 0 0 0.25rem var(--color-secondary);
+  /* ou var(--color-focus-shadow) se quiser */
+}
+
+.dcm-btn-primary:active,
+.dcm-btn-primary.active,
+.show>.dcm-btn-primary.dropdown-toggle {
+  color: #fff;
+  background-color: var(--color-secondary);
+  border-color: var(--color-secondary);
+}
+
+.dcm-btn-primary:active:focus,
+.dcm-btn-primary.active:focus,
+.show>.dcm-btn-primary.dropdown-toggle:focus {
+  box-shadow: 0 0 0 0.25rem var(--color-secondary);
+}
+
+.dcm-btn-primary:disabled,
+.dcm-btn-primary.disabled {
+  color: #fff;
+  background-color: var(--color-primary);
+  border-color: var(--color-primary);
+  opacity: 0.65;
+}
+
+
+/* efeito paginacao*/
+.page-item.active .page-link,
+.page-item .page-link:focus,
+.page-item .page-link:active {
+  background-color: var(--color-secondary);
+  border-color: var(--color-primary);
+  color: var(--color-text);
+}
+
+.page-item .page-link {
+  color: var(--color-text);
+}
+
+/*menu superior*/
+
+.dropdown-menu.mega-menu {
+  width: 100vw;
+  left: 0;
+  right: 0;
+  top: 100%;
+  padding: 1.5rem;
+  background-color: #fff;
+  border-top: 3px solid var(--color-secondary);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+  z-index: 1000;
+  border-radius: 0;
+  display: none;
+  position: absolute;
+}
+
+.dropdown.show .dropdown-menu {
+  display: block;
+}
+
+.mega-menu .row>div {
+  padding: 0 1rem;
+}
+
+.mega-menu h6 {
+  font-weight: bold;
+  font-size: 1.1rem;
+  margin-bottom: 0.75rem;
+}
+
+.mega-menu a {
+  display: block;
+  color: #333;
+  padding: 0.4rem 0.6rem;
+  font-size: 1.05rem;
+  font-weight: 500;
+  border-radius: 6px;
+  text-decoration: none !important;
+  transition: all 0.2s ease;
+}
+
+.mega-menu a:hover {
+  background-color: var(--color-secondary);
+  color: var(--color-text);
+}
+
+@media (max-width: 768px) {
+  .exo-menu .drop-down-ul {
+    display: none;
+  }
+}
+
+
+/*footer*/
+.sticky-footer {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+}
+
+
+tr.user-inactive td {
+  background-color: #f8f9fa;
+  /* cinza claro */
+  color: #6c757d;
+  /* texto apagado */
+  opacity: 0.7;
+}
+
+/* Hover destacado */
+tbody tr:hover td {
+  background-color: #eef2f7;
+  opacity: 1;
+}
+
+/* Função print das paginas--------------*/
+@media print {
+  body * {
+    visibility: hidden;
+    /* Esconde tudo */
+  }
+
+  #print-area,
+  #print-area * {
+    visibility: visible;
+    /* Mostra apenas a tabela */
+  }
+
+  #print-area {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+  }
+
+  button {
+    display: none !important;
+  }
+  a {
+    display: none !important;
+  }
+}

@@ -1,0 +1,65 @@
+<?php
+
+class gestorwf {
+
+    public function get_show_nfe($emissao) {
+
+        // Validação básica do parâmetro (YYYY-MM)
+        if (!preg_match('/^\d{4}-\d{2}$/', $emissao)) {
+            echo json_encode([
+                'status' => 'erro',
+                'mensagem' => 'Formato inválido. Use YYYY-MM'
+            ]);
+            return;
+        }
+
+        // Monta range de datas para o mês
+        $inicioMes = $emissao . '-01 00:00:00';
+        $fimMes = date('Y-m-t 23:59:59', strtotime($inicioMes)); // último dia do mês
+
+        $comandoSQL = "
+            SELECT 
+                n.id,
+                n.numero,
+                n.modelo,
+                n.referencia,
+                n.emissao,
+                n.cfop,
+                n.login,
+                n.valor_total,
+                c.nome AS cliente_nome,
+                c.cidade_ibge,
+		c.local_dici,
+                c.plano AS cliente_plano,
+                p.nome AS plano_nome,
+		p.tipo,
+                p.veldown
+            FROM sis_nfe n
+            LEFT JOIN sis_cliente c ON n.login = c.login
+            LEFT JOIN sis_plano p ON c.plano = p.nome
+            WHERE n.emissao BETWEEN :inicio AND :fim
+            ORDER BY n.numero ASC
+        ";
+
+        $rotinaSQL = DB::prepare($comandoSQL);
+        $rotinaSQL->bindParam('inicio', $inicioMes);
+        $rotinaSQL->bindParam('fim', $fimMes);
+        $rotinaSQL->execute();
+        $resultadosSQL = $rotinaSQL->fetchAll(PDO::FETCH_ASSOC);
+        $numeroDeLinhas = $rotinaSQL->rowCount();
+
+        if ($numeroDeLinhas == 0) {
+            echo json_encode([
+                'status' => 'erro',
+                'mensagem' => 'Nenhuma nota encontrada para o período informado'
+            ]);
+            return;
+        }
+
+        echo json_encode([
+            'status' => 'sucesso',
+            'total_registros' => $numeroDeLinhas,
+            'notas' => $resultadosSQL
+        ]);
+    }
+}
