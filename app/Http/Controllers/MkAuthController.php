@@ -94,8 +94,7 @@ class MkAuthController extends Controller
             $dados = json_decode($jsonDecrypted, true);
 
             if (!is_array($dados)) {
-                throw new \Exception($apiKey . " " . $apiIv);
-                //throw new \Exception('Falha ao descriptografar dados da API.');
+                throw new \Exception('Falha ao descriptografar dados da API.');
             }
 
             // 🔹 5️⃣ Corrige encoding
