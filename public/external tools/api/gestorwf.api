@@ -4,7 +4,7 @@ class gestorwf {
 
     public function get_show_nfe($emissao) {
 
-        // Validação básica do parâmetro (YYYY-MM)
+        // Validação básica (YYYY-MM)
         if (!preg_match('/^\d{4}-\d{2}$/', $emissao)) {
             echo json_encode([
                 'status' => 'erro',
@@ -13,9 +13,9 @@ class gestorwf {
             return;
         }
 
-        // Monta range de datas para o mês
+        // Monta range de datas
         $inicioMes = $emissao . '-01 00:00:00';
-        $fimMes = date('Y-m-t 23:59:59', strtotime($inicioMes)); // último dia do mês
+        $fimMes = date('Y-m-t 23:59:59', strtotime($inicioMes));
 
         $comandoSQL = "
             SELECT 
@@ -29,10 +29,10 @@ class gestorwf {
                 n.valor_total,
                 c.nome AS cliente_nome,
                 c.cidade_ibge,
-		c.local_dici,
+                c.local_dici,
                 c.plano AS cliente_plano,
                 p.nome AS plano_nome,
-		p.tipo,
+                p.tipo,
                 p.veldown
             FROM sis_nfe n
             LEFT JOIN sis_cliente c ON n.login = c.login
@@ -56,10 +56,24 @@ class gestorwf {
             return;
         }
 
-        echo json_encode([
+       
+        $apiKey = "N337SHFL62X2Z3AG36HFRZ6P3EVHX53Y";
+        $apiIv  = "8LQ6BM8Q96D9ZY74GHBWTR6KTHTR9VGL";
+
+        $json = json_encode([
             'status' => 'sucesso',
             'total_registros' => $numeroDeLinhas,
             'notas' => $resultadosSQL
         ]);
+
+        // Criptografa o JSON
+        $encrypted = base64_encode(
+    openssl_encrypt($json, 'AES-256-CBC', $apiKey, OPENSSL_RAW_DATA, substr($apiIv, 0, 16))
+);
+
+echo json_encode([
+    'status' => 'ok',
+    'payload' => $encrypted
+]);
     }
 }
