@@ -62,7 +62,7 @@
                     <label class="form-label">Ativa?</label>
                     <select name="active" class="form-select" required>
                         <option value="yes">Sim</option>
-                        <option value="no">Não</option>
+                        <option value="no" selected>Não</option>
                     </select>
                 </div>
 
