@@ -72,7 +72,7 @@ class StockItemController extends Controller
             'name' => 'required|string|max:255',
             'min_stock' => 'nullable|integer|min:0',
             'price' => 'nullable|numeric|min:0',
-            // Não sobrescreve current_stock
+            'current_stock' => 'nullable|numeric|min:0',
         ]);
 
         // Atualiza o status: checked = active, unchecked = inactive

@@ -33,7 +33,7 @@
 
             <div class="mb-3">
                 <label for="current_stock" class="form-label">Estoque Atual</label>
-                <input type="number" id="current_stock" value="{{ $item->current_stock }}" class="form-control" readonly>
+                <input type="number" name="current_stock" id="current_stock" value="{{ $item->current_stock }}" class="form-control" >
             </div>
 
             <div class="mb-3">
