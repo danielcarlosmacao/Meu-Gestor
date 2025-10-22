@@ -8,6 +8,7 @@
             @can('stock.movements.create')
                 <a href="{{ route('stock.movements.create') }}" class="btn dcm-btn-primary mb-3"><i class="bi bi-plus"></i></a>
             @endcan
+                <a href="{{ route('stock.movements.reportForm') }}" class="btn dcm-btn-primary mb-3"><i class="bi bi-receipt"></i></a>
         </h2>
 
     </div>

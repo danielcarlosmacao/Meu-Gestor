@@ -16,12 +16,17 @@ Route::middleware(['auth'])->prefix('stock')->group(function () {
 
     Route::get('production', [StockItemController::class, 'showProduction'])->name('stock.items.showProduction');
 
-
+    //reports
+    Route::get('movements/report', [StockMovementController::class, 'reportForm'])->name('stock.movements.reportForm');
+    Route::get('movements/report/view', [StockMovementController::class, 'reportView'])->name('stock.movements.reportView');
+    
     // Rotas explícitas para Movimentações
     Route::get('movements', [StockMovementController::class, 'index'])->name('stock.movements.index');
     Route::get('movements/create', [StockMovementController::class, 'create'])->name('stock.movements.create');
     Route::post('movements', [StockMovementController::class, 'store'])->name('stock.movements.store');
     Route::get('movements/{id}', [StockMovementController::class, 'show'])->name('stock.movements.show');
     Route::post('movements/{id}/update-prices', [StockMovementController::class, 'updatePrices'])->name('movements.updatePrices');
+    
+
 
 });
