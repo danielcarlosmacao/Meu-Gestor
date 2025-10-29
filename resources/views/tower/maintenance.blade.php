@@ -140,7 +140,7 @@
                             <div class="mb-3">
                                 <label for="next_maintenance_date" class="form-label">Próxima Manutenção</label>
                                 <input type="date" class="form-control" id="next_maintenance_date"
-                                    name="next_maintenance_date" required>
+                                    name="next_maintenance_date" >
                             </div>
                             <div class="mb-3">
                                 <label for="status" class="form-label">Situação</label>

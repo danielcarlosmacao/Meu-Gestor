@@ -55,16 +55,17 @@
 
 
         <div class="d-flex justify-content-between align-items-center mb-3">
-            
             <a href="{{ route('stock.movements.index') }}" class="btn btn-secondary">Voltar</a>
 
-            <form action="{{ route('movements.updatePrices', $movement->id) }}" method="POST"
-                onsubmit="return confirm('Tem certeza que deseja atualizar os valores dos itens com base no estoque atual?');">
-                @csrf
-                <button type="submit" class="btn btn-warning">
-                    Atualizar Preços
-                </button>
-            </form>
+            @if ($movement->type == 'output')
+                <form action="{{ route('movements.updatePrices', $movement->id) }}" method="POST"
+                    onsubmit="return confirm('Tem certeza que deseja atualizar os valores dos itens com base no estoque atual?');">
+                    @csrf
+                    <button type="submit" class="btn btn-warning">
+                        Atualizar Preços
+                    </button>
+                </form>
+            @endif
         </div>
 
     </div>
