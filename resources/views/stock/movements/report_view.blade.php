@@ -13,6 +13,7 @@
         .badge { padding: 2px 5px; border-radius: 4px; color: #fff; font-size: 11px; }
         .entrada { background: #198754; }
         .saida { background: #dc3545; }
+        .semvalor { color: red; font-weight: bold; }
     </style>
 </head>
 <body>
@@ -27,12 +28,11 @@
 @endif
 
 </br>
+
 {{-- ======================================================
     RESUMO POR ITEM
 ====================================================== --}}
-
 <h4 style="text-align: center;">Resumo por Item</h4>
-
 
 <table>
     <thead>
@@ -47,7 +47,9 @@
         <tr>
             <td>{{ $item['name'] }}</td>
             <td class="right">{{ $item['total_qty'] }}</td>
-            <td class="right">{{ number_format($item['total_value'], 2, ',', '.') }}</td>
+            <td class="right {{ $item['total_value'] == 0 ? 'semvalor' : '' }}">
+                {{ number_format($item['total_value'], 2, ',', '.') }}
+            </td>
         </tr>
         @endforeach
     </tbody>
@@ -56,11 +58,12 @@
 <h4>Total Geral: R$ {{ number_format($grandTotal, 2, ',', '.') }}</h4>
 
 </br>
+
 {{-- ======================================================
     RESUMO DE TODAS AS MOVIMENTAÇÕES
 ====================================================== --}}
-
 <h4 style="text-align: center;">Resumo de Todas as Movimentações</h4>
+
 <table>
     <thead>
         <tr>
@@ -94,21 +97,28 @@
                 <td>{{ $mov->extra_items ?? '-' }}</td>
                 <td>
                     @foreach($mov->items as $i)
-                        • {{ $i->name }} ({{ $i->pivot->quantity }} un, R$ {{ number_format($i->pivot->price, 2, ',', '.') }})<br>
+                        • {{ $i->name }} ({{ $i->pivot->quantity }} un, 
+                        <span class="{{ $i->pivot->price == 0 ? 'semvalor' : '' }}">
+                            R$ {{ number_format($i->pivot->price, 2, ',', '.') }}
+                        </span>)<br>
                     @endforeach
                 </td>
                 <td class="right">{{ $totalQtd }}</td>
-                <td class="right">{{ number_format($totalVal, 2, ',', '.') }}</td>
+                <td class="right {{ $totalVal == 0 ? 'semvalor' : '' }}">
+                    {{ number_format($totalVal, 2, ',', '.') }}
+                </td>
             </tr>
         @endforeach
     </tbody>
 </table>
 
 </br>
+
 {{-- ======================================================
     DETALHAMENTO DAS MOVIMENTAÇÕES
 ====================================================== --}}
-<h4 style="text-align: center;"> Detalhamento das Movimentações</h4>
+<h4 style="text-align: center;">Detalhamento das Movimentações</h4>
+
 <table>
     <thead>
         <tr>
@@ -124,6 +134,9 @@
     <tbody>
         @foreach($movements as $mov)
             @foreach($mov->items as $item)
+                @php
+                    $total = $item->pivot->quantity * $item->pivot->price;
+                @endphp
                 <tr>
                     <td>{{ $mov->created_at->format('d/m/Y H:i') }}</td>
                     <td>
@@ -133,8 +146,12 @@
                     </td>
                     <td>{{ $item->name }}</td>
                     <td class="right">{{ $item->pivot->quantity }}</td>
-                    <td class="right">{{ number_format($item->pivot->price, 2, ',', '.') }}</td>
-                    <td class="right">{{ number_format($item->pivot->quantity * $item->pivot->price, 2, ',', '.') }}</td>
+                    <td class="right {{ $item->pivot->price == 0 ? 'semvalor' : '' }}">
+                        {{ number_format($item->pivot->price, 2, ',', '.') }}
+                    </td>
+                    <td class="right {{ $total == 0 ? 'semvalor' : '' }}">
+                        {{ number_format($total, 2, ',', '.') }}
+                    </td>
                     <td>{{ $mov->user->name ?? '-' }}</td>
                 </tr>
             @endforeach
@@ -143,9 +160,6 @@
 </table>
 
 <hr>
-
-
-
 <p><small>Relatório gerado em {{ date('d/m/Y H:i') }}</small></p>
 
 </body>
