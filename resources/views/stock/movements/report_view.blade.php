@@ -7,7 +7,7 @@
         body { font-family: Arial, sans-serif; font-size: 12px; }
         h2, h4 { margin: 0 0 10px 0; }
         table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-        table th, table td { border: 1px solid #333; padding: 6px; }
+        table th, table td { border: 1px solid #333; padding: 6px; vertical-align: top; }
         table th { background: #eee; }
         .right { text-align: right; }
         .badge { padding: 2px 5px; border-radius: 4px; color: #fff; font-size: 11px; }
@@ -26,7 +26,14 @@
 <p><strong>Tipo:</strong> {{ $type === 'input' ? 'Entradas' : 'Saídas' }}</p>
 @endif
 
-<h4>Resumo por Item</h4>
+</br>
+{{-- ======================================================
+    RESUMO POR ITEM
+====================================================== --}}
+
+<h4 style="text-align: center;">Resumo por Item</h4>
+
+
 <table>
     <thead>
         <tr>
@@ -48,9 +55,60 @@
 
 <h4>Total Geral: R$ {{ number_format($grandTotal, 2, ',', '.') }}</h4>
 
-<hr>
+</br>
+{{-- ======================================================
+    RESUMO DE TODAS AS MOVIMENTAÇÕES
+====================================================== --}}
 
-<h4>Detalhamento das Movimentações</h4>
+<h4 style="text-align: center;">Resumo de Todas as Movimentações</h4>
+<table>
+    <thead>
+        <tr>
+            <th>Data</th>
+            <th>Tipo</th>
+            <th>Descrição</th>
+            <th>Itens Extras</th>
+            <th>Itens Movimentados</th>
+            <th class="right">Quantidade Total</th>
+            <th class="right">Valor Total (R$)</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach($movements as $mov)
+            @php
+                $totalQtd = 0;
+                $totalVal = 0;
+                foreach($mov->items as $i) {
+                    $totalQtd += $i->pivot->quantity;
+                    $totalVal += $i->pivot->quantity * $i->pivot->price;
+                }
+            @endphp
+            <tr>
+                <td>{{ $mov->created_at->format('d/m/Y H:i') }}</td>
+                <td>
+                    <span class="badge {{ $mov->type === 'input' ? 'entrada' : 'saida' }}">
+                        {{ $mov->type === 'input' ? 'Entrada' : 'Saída' }}
+                    </span>
+                </td>
+                <td>{{ $mov->description ?? '-' }}</td>
+                <td>{{ $mov->extra_items ?? '-' }}</td>
+                <td>
+                    @foreach($mov->items as $i)
+                        • {{ $i->name }} ({{ $i->pivot->quantity }} un, R$ {{ number_format($i->pivot->price, 2, ',', '.') }})<br>
+                    @endforeach
+                </td>
+                <td class="right">{{ $totalQtd }}</td>
+                <td class="right">{{ number_format($totalVal, 2, ',', '.') }}</td>
+            </tr>
+        @endforeach
+    </tbody>
+</table>
+
+</br>
+{{-- ======================================================
+    DETALHAMENTO DAS MOVIMENTAÇÕES
+====================================================== --}}
+<h4 style="text-align: center;"> Detalhamento das Movimentações</h4>
 <table>
     <thead>
         <tr>
@@ -83,6 +141,10 @@
         @endforeach
     </tbody>
 </table>
+
+<hr>
+
+
 
 <p><small>Relatório gerado em {{ date('d/m/Y H:i') }}</small></p>
 
