@@ -7,9 +7,9 @@
         <button class="btn dcm-btn-primary btn-sm ms-2" data-bs-toggle="modal" data-bs-target="#addNotificationModal">
             <i class="bi bi-plus-lg"></i>
         </button>
-                    <a href="{{ route('admin.notification.logs') }}" class="btn dcm-btn-primary btn-sm">
-                <i class="bi bi-journal-text"></i>
-            </a>
+        @if(auth()->user()->hasRole('administrator'))
+            <a href="{{ route('admin.notification.logs') }}" class="btn dcm-btn-primary btn-sm"><i class="bi bi-journal-text"></i></a>
+            @endif
     </h2>
 
 
@@ -44,6 +44,17 @@
                     <td>{{ $notification->send_at->format('d/m/Y H:i') }}</td>
                     <td>
                         <div class="d-flex gap-2 flex-wrap align-items-center">
+                        <button 
+                                class="btn btn-primary btn-sm" 
+                                data-bs-toggle="modal" 
+                                data-bs-target="#editNotificationModal"
+                                data-id="{{ $notification->id }}"
+                                data-msg="{{ $notification->msg }}"
+                                data-send_at="{{ $notification->send_at }}"
+                            >
+                                Editar
+                            </button>
+                        @if(auth()->user()->hasRole('administrator'))
                             @if (!$notification->sent)
                                 <form action="{{ route('admin.notification.send', $notification->id) }}" method="POST">
                                     @csrf
@@ -62,22 +73,12 @@
                                 <button class="btn btn-warning btn-sm">Reenviar</button>
                             </form>
 
-                            <button 
-                                class="btn btn-primary btn-sm" 
-                                data-bs-toggle="modal" 
-                                data-bs-target="#editNotificationModal"
-                                data-id="{{ $notification->id }}"
-                                data-msg="{{ $notification->msg }}"
-                                data-send_at="{{ $notification->send_at }}"
-                            >
-                                Editar
-                            </button>
-
                             <form action="{{ route('admin.notification.destroy', $notification->id) }}" method="POST" onsubmit="return confirm('Tem certeza?')">
                                 @csrf
                                 @method('DELETE')
                                 <button class="btn btn-danger btn-sm">Excluir</button>
                             </form>
+                            @endif
                         </div>
                     </td>
                 </tr>

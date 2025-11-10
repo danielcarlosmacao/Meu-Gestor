@@ -18,11 +18,6 @@ class SystemUpdateHook
 
             $newPermissions = [
                 // 'reports.export',
-                'stock.view',
-                'stock.items.create',
-                'stock.items.edit',
-                'stock.items.delete',
-                'stock.movements.create',
             ];
 
             if (!empty($newPermissions)) {

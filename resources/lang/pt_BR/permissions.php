@@ -27,7 +27,7 @@
     'service.delete'=> 'Deletar modulo serviço',
     'extra.view'=> 'visualiza menu extra',
     'recipients.view'=> 'visualiza notificaçoes do sistema',
-    'notification.view'=> 'visualiza notificoes manuais',
+    'notification.view'=> 'visualiza e Enviar notificoes manuais',
     'api.nfe'  => 'visualizar NFE MK ',
     'stock.view'  => 'Visualiza Estoque ',
     'stock.items.create'  => 'Adicionar Item',

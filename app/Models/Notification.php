@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class Notification extends Model
 {
     use SoftDeletes;
-    protected $fillable = ['info', 'msg', 'sent', 'send_at'];
+    protected $fillable = ['user_id',  'info', 'msg', 'sent', 'send_at'];
     protected $casts = ['send_at' => 'datetime',];
     
 
@@ -21,4 +21,10 @@ class Notification extends Model
 {
     return $this->hasMany(NotificationLog::class);
 }
+public function user()
+{
+    return $this->belongsTo(User::class);
+}
+
+
 }

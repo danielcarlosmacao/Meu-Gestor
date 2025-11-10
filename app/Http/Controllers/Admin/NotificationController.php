@@ -13,38 +13,53 @@ use App\Services\SettingService;
 class NotificationController extends Controller
 {
     public function index(SettingService $settingService)
-    {
+{
+    $perPage = $settingService->getPerPage();
+    $user = auth()->user();
 
-        $perPage = $settingService->getPerPage();
-
-        $notifications = Notification::with('recipients')->latest()->paginate($perPage);
-        $recipients = Recipient::whereHas('references', function ($query) {
-            $query->where('name', 'notification');
-        })->get();
-
-
-        return view('admin.notification.index', compact('notifications', 'recipients'));
+    // ✅ SE O USUÁRIO FOR ADMINISTRADOR → VÊ TODAS
+    if ($user->hasRole('administrator')) {
+        $notifications = Notification::with('recipients')
+            ->latest()
+            ->paginate($perPage);
+    } else {
+        // ✅ USUÁRIO COMUM → VÊ APENAS AS SUAS
+        $notifications = Notification::whereHas('recipients', function ($query) use ($user) {
+                $query->where('user_id', $user->id);
+            })
+            ->with('recipients')
+            ->latest()
+            ->paginate($perPage);
     }
+
+    $recipients = Recipient::whereHas('references', function ($query) {
+        $query->where('name', 'notification');
+    })->get();
+
+    return view('admin.notification.index', compact('notifications', 'recipients'));
+}
+
+
 
     public function store(Request $request)
-    {
-        $request->validate([
-            'msg' => 'required|string',
-            'recipient_ids' => 'required|array|min:1',
-            'send_at' => 'nullable|date',
+{
+    $request->validate([
+        'msg' => 'required|string',
+        'recipient_ids' => 'required|array|min:1',
+        'send_at' => 'nullable|date',
+    ]);
 
-        ]);
+    $notification = Notification::create([
+        'user_id' => auth()->id(),   
+        'info' => $request->input('info'),
+        'msg' => $request->input('msg'),
+        'send_at' => $request->input('send_at'),
+    ]);
 
-        $notification = Notification::create([
-            'info' => $request->input('info'),
-            'msg' => $request->input('msg'),
-            'send_at' => $request->input('send_at'),
-        ]);
+    $notification->recipients()->attach($request->input('recipient_ids'));
 
-        $notification->recipients()->attach($request->input('recipient_ids'));
-
-        return redirect()->route('admin.notification.index')->with('success', 'Notificação criada com sucesso!');
-    }
+    return redirect()->route('admin.notification.index')->with('success', 'Notificação criada com sucesso!');
+}
 
     public function update(Request $request, Notification $notification)
     {
