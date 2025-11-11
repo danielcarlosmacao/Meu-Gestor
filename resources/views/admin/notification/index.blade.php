@@ -11,12 +11,10 @@
             <a href="{{ route('admin.notification.logs') }}" class="btn dcm-btn-primary btn-sm"><i class="bi bi-journal-text"></i></a>
             @endif
     </h2>
-
-
     <table class="table table-striped mt-4">
         <thead class="bgc-primary">
             <tr>
-                <th>ID</th>
+                <th>Usuario</th>
                 <th>Mensagem</th>
                 <th>Destinatários</th>
                 <th>Enviada?</th>
@@ -27,8 +25,8 @@
         <tbody>
             @foreach ($notifications as $notification)
                 <tr>
-                    <td>{{ $notification->id }}</td>
-                    <td>{{ $notification->msg }}</td>
+                    <td>{{ $notification->user->name ?? 'Usuário removido' }}</td>
+                    <td>{{ $notification->info }}</td>
                     <td>
                         @foreach ($notification->recipients as $r)
                             <span class="badge bg-info text-dark">{{ $r->name }}</span>

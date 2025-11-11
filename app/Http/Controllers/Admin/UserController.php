@@ -165,14 +165,20 @@ public function edit(User $user)
     public function resetPassword(User $user)
     {
         // Pode usar uma senha fixa ou gerar uma aleatória
-        $newPassword = Str::random(8); // Ex: 'h8d92kLm'
+        $newPassword = Str::random(8); 
 
         $user->update([
             'password' => Hash::make($newPassword),
         ]);
 
         // Você pode mostrar essa senha no frontend, ou enviar por e-mail
-        return redirect()->back()->with('success', 'Senha redefinida para: ' . $newPassword);
+        return redirect()->route('admin.usuarios.index')
+    ->with('new_password', $newPassword)
+    ->with('debug', 'ROTA CHEGOU AQUI');
+
+
+
+
     }
 
     public function usersOnline()

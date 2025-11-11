@@ -11,6 +11,15 @@
             <i class="bi bi-plus-lg"></i> Adicionar Usuário
         </a>
     </div>
+    @if(session('new_password'))
+    <div class="alert alert-warning shadow-sm">
+        <strong>Nova senha gerada:</strong> 
+        <span style="font-size: 1.2em">{{ session('new_password') }}</span>
+        <br>
+        <small>Atualize a página para ocultar esta mensagem.</small>
+    </div>
+@endif
+
 
     <div class="table-responsive shadow-sm rounded">
         <table class="table align-middle mb-0 table-hover">
