@@ -15,7 +15,7 @@
         <thead class="bgc-primary">
             <tr>
                 <th>Usuario</th>
-                <th>Mensagem</th>
+                <th>Informação</th>
                 <th>Destinatários</th>
                 <th>Enviada?</th>
                 <th>Data envio</th>
