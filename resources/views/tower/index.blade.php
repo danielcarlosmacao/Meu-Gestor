@@ -1,7 +1,6 @@
 @extends('layouts.header')
-@section('title', 'Torres')
-@section('content')
 
+@section('content')
 
     <div class="container mb-2 mb-md-5 mt-2 mt-md-5">
         <h2 class="text-center">controle de torres
@@ -13,64 +12,58 @@
         </h2>
 
     </div>
-
-    <div class="container table-responsive">
-        <table class="table table-striped ">
+<div class="container">
+    <div class="container  table-responsive">
+        <table id="towersTable" class="table table-bordered table-striped table-hover" style="cursor:pointer;">
             <thead class="bgc-primary text-white">
                 <tr>
-                    <th scope="col">Nome</th>
-                    <th scope="col">Voltagem</th>
-                    <th scope="col">Equipamentos</th>
-                    <th scope="col">Bateria</th>
-                    <th scope="col">%</th>
-                    <th scope="col">Data Inst. bateria</th>
-                    <th scope="col">Tempo em Produção</th>
-                    <th scope="col">Placa</th>
-                    <th scope="col">%</th>
+                    <th data-col="name">Nome</th>
+                    <th data-col="voltage">Voltagem</th>
+                    <th data-col="equipments">Equipamentos</th>
+                    <th data-col="battery_percentage">Bateria</th>
+                    <th data-col="battery_percentage">% Bateria</th>
+
+                    <th data-col="battery_install_ord">Data Inst. Bateria</th>
+
+                    <th data-col="production_ord">Tempo Produção</th>
+
+                    <th data-col="total_watts_placa">Total Watts Placa</th>
+                    <th data-col="plate_percentage">% Placa</th>
                     <th scope="col"></th>
                 </tr>
             </thead>
+
             <tbody>
-                @foreach ($towers as $tower)
+                @foreach($towerData as $t)
                     <tr>
-                        @php
-                            if ($tower->activeBattery === null || $tower->activeBattery === '') {
-                                $production_percentage = '0';
-                            } else {
-                                $voltageRatio = $tower->voltage / 12;
-                                $totalAmp =
-                                    $voltageRatio > 0
-                                        ? ($tower->activeBattery->amount * $tower->activeBattery->battery->amps) /
-                                            $voltageRatio
-                                        : 0;
-                                $production_percentage =
-                                    $totalAmp > 0 ? ($tower->summary->battery_required / $totalAmp) * 100 : 0;
-                            }
 
-                            $consumptionAhDay = $tower->summary->consumption_ah_day ?? 0;
-                            $platerrequire = $hours_Generation > 0 ? $consumptionAhDay / $hours_Generation : 0;
-                            $plater_percentage =
-                                $tower->summary->amps_plate > 0
-                                    ? number_format(($platerrequire / $tower->summary->amps_plate) * 100, 2) . '%'
-                                    : '0%';
-
-                        @endphp
-                        <th scope="row">
-                            <a href="{{ route('tower.show', $tower->id) }}" class="text-decoration-none text-black">
-                                {{ $tower->name }}</a>
-                        </th>
-                        <td>{{ $tower->voltage }}</td>
-                        <td>{{ $tower->active_equipments_count }}</td>
-                        <td>{{ $tower->activeBattery->battery->name ?? 'Sem bateria' }}</td>
-                        <td>{{ number_format($production_percentage, 2) . '%' }}</td>
-                        <td>{{ optional(optional($tower->activeBattery)->installation_date)->format('d/m/Y') ?? 'Sem bateria' }}
+                        {{-- Nome com link --}}
+                        <td>
+                            <a href="{{ route('tower.show', $t['id']) }}" class="text-decoration-none text-black">
+                                {{ $t['name'] }}
+                            </a>
                         </td>
-                        <td>{{ $tower->activeBattery->years_since_installation ?? 'Sem bateria' }}</td>
-                        <td>{{ round($tower->summary->watts_plate) }} W - {{ round($tower->summary->amps_plate) }} A</td>
-                        <td>{{ $plater_percentage }}</td>
+
+                        <td>{{ $t['voltage'] }}</td>
+                        <td>{{ $t['equipments'] }}</td>
+
+                        <td>{{ $t['battery'] }}</td>
+                        <td>{{ $t['battery_percentage'] }}%</td>
+
+                        {{-- Data instalação: mostra d/m/Y mas ordena por Y-m-d --}}
+                        <td data-value="{{ $t['battery_install_ord'] }}">
+                            {{ $t['battery_install_date'] }}
+                        </td>
+
+                        <td data-value="{{ $t['production_ord'] }}">
+                            {{ $t['production_time'] }}
+                        </td>
+
+                        <td>{{ $t['total_watts_placa'] . " W  - " . $t['total_amps_placa'] ." A "}}</td>
+                        <td>{{ $t['plate_percentage'] }}%</td>
                         <td class="text-center align-middle p-1">
                             @can('towers.delete')
-                                <form action="{{ route('tower.destroy', $tower->id) }}" method="POST"
+                                <form action="{{ route('tower.destroy', $t['id']) }}" method="POST"
                                     style="display:inline;">
                                     @csrf
                                     @method('DELETE')
@@ -81,19 +74,23 @@
                                 </form>
                             @endcan
                         </td>
+
                     </tr>
                 @endforeach
             </tbody>
         </table>
-        <div class="d-flex justify-content-center mt-4">
-            {{ $towers->links() }}
-        </div>
-
-
-
     </div>
 
-    <div class="modal fade" id="addTower" tabindex="-1" aria-labelledby="addTowerLabel" aria-hidden="true">
+    {{-- Paginação --}}
+    <div class="d-flex justify-content-center mt-4">
+        {{ $pagination->links() }}
+    </div>
+
+</div>
+
+
+
+<div class="modal fade" id="addTower" tabindex="-1" aria-labelledby="addTowerLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-md">
             <div class="modal-content shadow rounded-4 border-0">
 
@@ -139,13 +136,14 @@
             </div>
         </div>
     </div>
+ 
 
+{{-- ===============================================
+    SCRIPT DE ORDENAÇÃO (FUNCIONAL E OTIMIZADO)
+=============================================== --}}
+<script>
 
-
-
-
-    <script>
-        const routeDestroy = "{{ route('tower.destroy', ['id' => ':id']) }}";
+            const routeDestroy = "{{ route('tower.destroy', ['id' => ':id']) }}";
         const refDestroy = "esta torre";
 
         // Exemplo simples de validação Bootstrap 5 nativa
@@ -162,6 +160,70 @@
                 }, false);
             });
         })();
-    </script>
+
+        
+document.addEventListener("DOMContentLoaded", () => {
+
+    const table = document.getElementById("towersTable");
+    const headers = table.querySelectorAll("th");
+
+    headers.forEach((th, idx) => {
+        th.addEventListener("click", () => {
+
+            // aumenta paginate quando ordenar
+            const url = new URL(window.location.href);
+            url.searchParams.set("perPage", "100");
+            window.history.replaceState({}, "", url);
+
+            const currentDir = th.getAttribute("data-sort") || "desc";
+            const newDir = currentDir === "asc" ? "desc" : "asc";
+
+            headers.forEach(h => h.removeAttribute("data-sort"));
+            th.setAttribute("data-sort", newDir);
+
+            sortTable(idx, newDir);
+        });
+    });
+
+    function parseValue(value) {
+        if (typeof value !== 'string') value = String(value ?? '');
+        value = value.trim();
+
+        // Se vier do data-value numérico, apenas retorna
+        const num = parseFloat(value);
+        if (!isNaN(num)) return num;
+
+        // Se for data YYYY-MM-DD
+        if (/^\d{4}-\d{2}-\d{2}$/.test(value)) {
+            return new Date(value).getTime();
+        }
+
+        // remove % e vírgulas
+        const normalized = value.replace('%', '').replace(',', '.');
+
+        const n = parseFloat(normalized);
+        if (!isNaN(n)) return n;
+
+        return normalized.toLowerCase();
+    }
+
+    function sortTable(colIndex, direction) {
+        const rows = Array.from(table.querySelector("tbody").rows);
+
+        rows.sort((rowA, rowB) => {
+
+            const A = parseValue(rowA.cells[colIndex].dataset.value ?? rowA.cells[colIndex].innerText);
+            const B = parseValue(rowB.cells[colIndex].dataset.value ?? rowB.cells[colIndex].innerText);
+
+            if (A < B) return direction === "asc" ? -1 : 1;
+            if (A > B) return direction === "asc" ? 1 : -1;
+            return 0;
+        });
+
+        const tbody = table.querySelector("tbody");
+        rows.forEach(r => tbody.appendChild(r));
+    }
+});
+</script>
 
 @endsection
