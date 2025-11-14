@@ -3,7 +3,13 @@
 
 @section('content')
     <div class="container mt-4">
-        <h3 class="mb-3">Logs de Atividade</h3>
+
+            <div class="container mb-2 mb-md-5 mt-2 mt-md-5">
+        <h2 class="text-center">Logs de Atividade
+            <a href="{{ route('activitylogs.index') . "?full=s&debug=s" }}" class="btn dcm-btn-primary btn-sm"><i class="bi bi-journal-text"></i></a>
+        </h2>
+
+    </div>
         <div class="card shadow rounded-2xl">
             <div class="card-body">
 
@@ -11,7 +17,7 @@
                 <div class="d-flex justify-content-end mb-2">
                     {{ $logs->links() }}
                 </div>
-
+                
                 <table class="table table-bordered table-hover align-middle">
                     <thead class="bgc-primary">
                         <tr>
@@ -37,7 +43,7 @@
                                     $rowClass = 'table-success';
                                     $badgeClass = 'success';
                                     $icon = 'bi-plus-circle';
-                                } elseif (\Illuminate\Support\Str::contains($action, ['Atualizado', 'Atualizada','Atualizou'])) {
+                                } elseif (\Illuminate\Support\Str::contains($action, ['Atualizado', 'Atualizada','Atualizou','Movimentação'])) {
                                     $rowClass = 'table-warning';
                                     $badgeClass = 'warning';
                                     $icon = 'bi-pencil-square';
