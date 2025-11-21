@@ -18,11 +18,6 @@ class SystemUpdateHook
 
             $newPermissions = [
                 // 'reports.export',
-                'collaborators.courses.view',
-                'collaborators.courses.view.pdf',
-                'collaborators.courses.create',
-                'collaborators.courses.edit',
-                'collaborators.courses.delete',
             ];
 
             if (!empty($newPermissions)) {

@@ -16,70 +16,77 @@ class PermissionSeeder extends Seeder
     public function run(): void
     {
         // Lista de permissões
-    $permissions = [
+        $permissions = [
 
-        //permissoes gerais
-        'administrator.user',
-        'administrator.options',
-        
-        // Permissões de Torres
-        'towers.view',
-        'towers.manage',
-        'towers.create',
-        'towers.edit',
-        'towers.delete',
-        'towers.maintenance',
+            //permissoes gerais
+            'administrator.user',
+            'administrator.options',
 
-        // Permissões de Frotas
-        'fleets.view',
-        'fleets.create',
-        'fleets.edit',
-        'fleets.delete',
+            // Permissões de Torres
+            'towers.view',
+            'towers.manage',
+            'towers.create',
+            'towers.edit',
+            'towers.delete',
+            'towers.maintenance',
 
-        // Permissões de Ferias
-        'vacations.view',
-        'vacations.create',
-        'vacations.edit',
-        'vacations.delete',
-        'collaborators.view',
-        'collaborators.create',
-        'collaborators.edit',
-        'collaborators.delete',
+            // Permissões de Frotas
+            'fleets.view',
+            'fleets.create',
+            'fleets.edit',
+            'fleets.delete',
 
-        // Permissões de calendario
-        'vacation_manager.calendar',
+            // Permissões de Ferias
+            'vacations.view',
+            'vacations.create',
+            'vacations.edit',
+            'vacations.delete',
+            'collaborators.view',
+            'collaborators.create',
+            'collaborators.edit',
+            'collaborators.delete',
 
-        //permição serviços
-        'service.view',
-        'service.create',
-        'service.edit',
-        'service.delete',
+            // Permissões de calendario
+            'vacation_manager.calendar',
 
-        //extras
-        'extra.view',
-        'recipients.view',
-        'notification.view',
-        'api.nfe',
+            //permição serviços
+            'service.view',
+            'service.create',
+            'service.edit',
+            'service.delete',
 
-        //stock
-        'stock.view',
-        'stock.items.create',
-        'stock.items.edit',
-        'stock.items.delete',
-        'stock.movements.create',
-    ];
+            //extras
+            'extra.view',
+            'recipients.view',
+            'notification.view',
+            'api.nfe',
 
-    // Criar permissões (se não existirem)
-    foreach ($permissions as $permission) {
-        Permission::firstOrCreate(['name' => $permission, 'guard_name' => 'web']);
-    }
+            //stock
+            'stock.view',
+            'stock.items.create',
+            'stock.items.edit',
+            'stock.items.delete',
+            'stock.movements.create',
 
-    // Criar a role administrator (se não existir)
-    $adminRole = Role::firstOrCreate(['name' => 'administrator', 'guard_name' => 'web']);
+            //collaborators.courses
+            'collaborators.courses.view',
+            'collaborators.courses.view.pdf',
+            'collaborators.courses.create',
+            'collaborators.courses.edit',
+            'collaborators.courses.delete',
+        ];
 
-    // Atribuir todas as permissões para a role administrator
-    $adminRole->syncPermissions($permissions);
+        // Criar permissões (se não existirem)
+        foreach ($permissions as $permission) {
+            Permission::firstOrCreate(['name' => $permission, 'guard_name' => 'web']);
+        }
 
-    $this->command->info('Permissões e role Administrator criadas com sucesso!');
+        // Criar a role administrator (se não existir)
+        $adminRole = Role::firstOrCreate(['name' => 'administrator', 'guard_name' => 'web']);
+
+        // Atribuir todas as permissões para a role administrator
+        $adminRole->syncPermissions($permissions);
+
+        $this->command->info('Permissões e role Administrator criadas com sucesso!');
     }
 }
