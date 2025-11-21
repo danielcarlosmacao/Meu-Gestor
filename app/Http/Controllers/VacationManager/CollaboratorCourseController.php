@@ -8,13 +8,22 @@ use Illuminate\Http\Request;
 use App\Models\Collaborator;
 use App\Models\CollaboratorCourse;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
+use App\Services\SettingService;
 
 class CollaboratorCourseController extends Controller
 {
-    public function index()
+    public function index(SettingService $settingService)
     {
-        $courses = CollaboratorCourse::with('collaborator')->paginate(20);
+        $perPage = $settingService->getPerPage();
+        $courses = CollaboratorCourse::with('collaborator')
+            ->whereHas('collaborator', function ($q) {
+                $q->where('status', 'active');
+            })
+            ->orderBy('valid_until', 'desc')
+            ->orderBy('title', 'asc')
+            ->orderBy('description', 'asc')
+            ->paginate($perPage);
+
         $collaborators = Collaborator::where('status', 'active')->orderBy('name')->get();
 
         return view('vacation_manager.courses.index', compact('courses', 'collaborators'));
