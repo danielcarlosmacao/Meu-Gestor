@@ -23,6 +23,7 @@ use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\VacationManager\CollaboratorController;
 use App\Http\Controllers\VacationManager\VacationController;
 use App\Http\Controllers\VacationManager\VacationCalendarController;
+use App\Http\Controllers\VacationManager\CollaboratorCourseController;
 use App\Http\Controllers\DatabaseController;
 use App\Http\Controllers\Service\ClientController;
 use App\Http\Controllers\Service\EquipmentMaintenanceController;
@@ -56,6 +57,7 @@ Route::middleware(['auth'])->group(function () {
 });
 
 require __DIR__ . '/auth.php';
+require __DIR__ . '/stock.php';
 
 // ---------------------------------------------------------------------------------------------------
 
@@ -118,6 +120,13 @@ Route::middleware(['auth', 'permission:vacations.view'])->group(function () {
     Route::delete('/vacation_manager/vacations/{id}', [VacationController::class, 'destroy'])->name('vacation_manager.vacations.destroy');
     // CALENDÁRIO
     Route::get('/vacation_manager/calendar', [VacationCalendarController::class, 'index'])->name('vacation_manager.calendar');
+
+    //
+    Route::get('/vacation_manager/collaborators/courses', [CollaboratorCourseController::class, 'index'])->name('vacation_manager.collaborator.courses.index');
+    Route::post('/vacation_manager/collaborators/courses', [CollaboratorCourseController::class, 'store'])->name('vacation_manager.collaborator.courses.store');
+    Route::put('/vacation_manager/collaborators/courses/{course:token}', [CollaboratorCourseController::class, 'update'])->name('vacation_manager.collaborator.courses.update');
+    Route::get('/vacation_manager/collaborators/courses/{course:token}', [CollaboratorCourseController::class, 'show'])->name('vacation_manager.collaborator.courses.show');
+    Route::delete('/vacation_manager/collaborators/courses/{course:token}', [CollaboratorCourseController::class, 'destroy'])->name('vacation_manager.collaborator.courses.destroy');
 });
 
 
@@ -299,4 +308,3 @@ Route::get('/deploy/{token}', function ($token) {
 Route::get('/api/mk/nfe', [MkAuthController::class, 'buscarNotas'])->name('api.mk.nfe');
 
 
-require __DIR__ . '/stock.php';

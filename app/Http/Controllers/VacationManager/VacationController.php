@@ -16,7 +16,7 @@ class VacationController extends Controller
     {
         $perPage = $settingService->getPerPage();
         $vacations = Vacation::with('Collaborator')->orderBy('start_date','desc')->paginate($perPage);
-        $collaborators = Collaborator::orderBy('name')->get();
+        $collaborators = Collaborator::where('status', 'active')->orderBy('name')->get();
 
         return view('vacation_manager.vacations.index', compact('vacations', 'collaborators'));
     }

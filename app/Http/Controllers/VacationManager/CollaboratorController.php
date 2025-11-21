@@ -13,7 +13,7 @@ class CollaboratorController extends Controller
     public function index(SettingService $settingService)
     {
         $perPage = $settingService->getPerPage();
-        $collaborators = Collaborator::orderBy('name', 'asc')->paginate($perPage);
+        $collaborators = Collaborator::orderBy('status', 'asc')->orderBy('name', 'asc')->paginate($perPage);
         return view('vacation_manager.collaborators.index', compact('collaborators'));
     }
 

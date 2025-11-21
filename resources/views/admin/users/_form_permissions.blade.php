@@ -24,7 +24,7 @@
                 'Gestor de Torres' => fn($p) => str_contains($p->name, 'towers'),
                 'Gestor de Frota' => fn($p) => str_contains($p->name, 'fleets'),
                 'Gestor de Serviços' => fn($p) => str_contains($p->name, 'service'),
-                'Gestor de Férias' => fn($p) => str_contains($p->name, 'vacations') || str_contains($p->name, 'vacation_manager') || str_contains($p->name, 'collaborators'),
+                'RH' => fn($p) => str_contains($p->name, 'vacations') || str_contains($p->name, 'vacation_manager') || str_contains($p->name, 'collaborators'),
                 'Gestor Extras' => fn($p) => str_contains($p->name, 'extra') || str_contains($p->name, 'recipients') || str_contains($p->name, 'notification') ||  str_contains($p->name, 'api') ||  str_contains($p->name, 'stock'),
                 'Administrador' => fn($p) => str_contains($p->name, 'user') || str_contains($p->name, 'admin'),
             ];

@@ -19,4 +19,11 @@ class collaborator extends Model
 {
     return $this->hasMany(Vacation::class);
 }
+
+public function courses()
+{
+    return $this->hasMany(CollaboratorCourse::class);
+}
+
+
 }

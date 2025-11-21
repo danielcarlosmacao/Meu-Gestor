@@ -128,26 +128,28 @@
                     <!-- Ferias  -->
                     @can('vacations.view')
                         <li class="nav-item dropdown position-static" id="menuFerias">
-                            <a class="nav-link dropdown-toggle" href="#">FERIAS <i
-                                    class="bi bi-calendar-week ms-2"></i></a>
+                            <a class="nav-link dropdown-toggle" href="#">RH 
+                                <i class="bi bi-people"></i>
+                            </a>
                             <div class="dropdown-menu mega-menu">
                                 <div class="row">
-                                    <div class="col-md-1">
+                                    <div class="col-md-6">
+                                        <h6>Equipe</h6>
+                                        @can('collaborators.view')
+                                            <a href="{{ route('vacation_manager.collaborators.index') }}">Colaboradores</a>
+                                        @endcan
+                                        @can('collaborators.courses.view')
+                                        <a href="{{ route('vacation_manager.collaborator.courses.index') }}">Certificados</a>
+                                        @endcan
                                     </div>
                                     <div class="col-md-6">
-                                        <h6>Gestão das ferias</h6>
-                                        @can('collaborators.view')
-                                            <a href="{{ route('vacation_manager.collaborators.index') }}">Colaboradores </a>
-                                        @endcan
+                                        <h6>Ferias</h6>
                                         @can('vacations.edit')
                                             <a href="{{ route('vacation_manager.vacations.index') }}">Registro de ferias</a>
                                         @endcan
                                         @can('vacation_manager.calendar')
                                             <a href="{{ route('vacation_manager.calendar') }}">Calendario</a>
                                         @endcan
-                                    </div>
-                                    <div class="col-md-6">
-                                        <h6></h6>
 
                                     </div>
                                 </div>

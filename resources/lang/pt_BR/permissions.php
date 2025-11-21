@@ -12,7 +12,7 @@
     'fleets.create'  => 'Adicionar Modulo Frota',
     'fleets.edit'  => 'Editar Modulo Frota',
     'fleets.delete'  => 'Deletar Modulo Frota',
-    'vacations.view'=> 'visualizar Gesto Ferias',
+    'vacations.view'=> 'visualizar modulo RH',
     'vacations.create'=> 'Adicionar Ferias',
     'vacations.edit'=> 'Editar Feria',
     'vacations.delete'=> 'Deletar Feria',
@@ -34,4 +34,10 @@
     'stock.items.edit'  => 'Editar Item',
     'stock.items.delete'  => 'Deletar Item',
     'stock.movements.create'  => 'Movimentar Estoque',
+    'collaborators.courses.view'=> 'visualizar cursos de colaboradores',
+    'collaborators.courses.view.pdf'=> 'visualizar PDF de cursos de colaboradores',
+    'collaborators.courses.create'=> 'criar cursos de colaboradores',
+    'collaborators.courses.edit'=> 'editar cursos de colaboradores',
+    'collaborators.courses.delete'=> 'Deletar cursos de colaboradores',
+
 ];
