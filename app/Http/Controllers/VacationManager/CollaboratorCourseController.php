@@ -74,6 +74,23 @@ class CollaboratorCourseController extends Controller
             ->with('success', 'Curso atualizado com sucesso!');
     }
 
+    public function download(CollaboratorCourse $course)
+    {
+        $collaboratorName = $course->collaborator->name;
+        $title = $course->title;
+        $validity = $course->valid_until
+            ? \Carbon\Carbon::parse($course->valid_until)->format('d-m-Y')
+            : 'Sem validade';
+
+        $fileName = "{$collaboratorName} - {$title} - {$validity}.pdf";
+
+        return response()->download(
+            storage_path('app/public/' . $course->file_path),
+            $fileName
+        );
+    }
+
+
     public function destroy(CollaboratorCourse $course)
     {
         if (Storage::disk('public')->exists($course->file_path)) {

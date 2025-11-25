@@ -44,14 +44,20 @@
                             @if ($course->token)
                                 @can('collaborators.courses.view.pdf')
                                     <a href="{{ route('vacation_manager.collaborator.courses.show', $course->token) }}"
-                                        class="btn btn-sm btn-secondary" target="_blank">
+                                        class="btn btn-sm dcm-btn-primary ms-1" target="_blank">
                                         PDF
+                                    </a>
+
+                                    <a href="{{ route('vacation_manager.collaborator.courses.download', $course->token) }}"
+                                        class="btn btn-sm dcm-btn-primary ms-1">
+                                        <i class="bi bi-download"></i>
                                     </a>
                                 @endcan
                             @else
                                 -
                             @endif
                         </td>
+
 
                         <td>
                             @can('collaborators.courses.edit')

@@ -127,6 +127,8 @@ Route::middleware(['auth', 'permission:vacations.view'])->group(function () {
     Route::put('/vacation_manager/collaborators/courses/{course:token}', [CollaboratorCourseController::class, 'update'])->name('vacation_manager.collaborator.courses.update');
     Route::get('/vacation_manager/collaborators/courses/{course:token}', [CollaboratorCourseController::class, 'show'])->name('vacation_manager.collaborator.courses.show');
     Route::delete('/vacation_manager/collaborators/courses/{course:token}', [CollaboratorCourseController::class, 'destroy'])->name('vacation_manager.collaborator.courses.destroy');
+    Route::get('/vacation_manager/collaborators/courses/{course:token}/download', [CollaboratorCourseController::class, 'download'])->name('vacation_manager.collaborator.courses.download');
+
 });
 
 
