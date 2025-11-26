@@ -43,7 +43,7 @@
                                         <th>%</th>
                                         <th>Produção</th>
                                         <th>
-                                            <a href="#" onclick="if(confirm('Recalcular percentuais das baterias desta torre?')){ window.location='{{ route('tower.recalcular.baterias', $tower->id) }}'; }"class="btn dcm-btn-primary">
+                                            <a href="#" onclick="if(confirm('Deseja fixar o % da bateria nas baterias antigas?')){ window.location='{{ route('tower.recalcular.baterias', $tower->id) }}'; }"class="btn dcm-btn-primary">
                                                 <i class="fa fa-refresh"></i>%
                                             </a>
                                         </th>
