@@ -3,6 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\BatteryProduction;
+use App\Models\Battery;
+use App\Models\Tower;
+use App\Models\TowerSummaries;
 
 use Illuminate\Http\Request;
 use Carbon\Carbon;
@@ -22,25 +25,64 @@ class BatteryProductionController extends Controller
 
         $validated['tower_id'] = $towerId;
 
-        // Verificar se já existe uma bateria ativa para esta torre
-        if ($validated['active'] === 'yes') {
-            $jaExiste = BatteryProduction::where('tower_id', $towerId)
-                ->where('active', 'yes')
-                ->exists();
+        // Se installation_date vier vazio → pega a data de hoje
+        if (empty($validated['installation_date'])) {
+            $validated['installation_date'] = now()->toDateString();
+        }
 
-            if ($jaExiste) {
-                return back()
-                    ->withErrors(['active' => 'Já existe uma bateria ativa para esta torre.'])
-                    ->withInput();
+        // -------------------------------------------------------
+        // 🔥 Se for ativa → desativar a bateria ativa anterior
+        // -------------------------------------------------------
+        if ($validated['active'] === 'yes') {
+
+            $oldActive = BatteryProduction::where('tower_id', $towerId)
+                ->where('active', 'yes')
+                ->first();
+
+            if ($oldActive) {
+                $oldActive->update([
+                    'active' => 'no',
+                    'removal_date' => now()->toDateString(),
+                ]);
             }
         }
 
-        $batteryProduction = BatteryProduction::create($validated);
+        // Primeiro cria o registro sem percentage
+        $bp = BatteryProduction::create($validated);
 
-        // Registrar log de atividade
+        // -------------------------------------------------------
+        // 🔥 Calcular percentage SOMENTE se for ativa
+        // -------------------------------------------------------
+        if ($bp->active === 'yes') {
+
+            $tower = $bp->tower;
+            $battery = $bp->battery;
+            $summary = $tower->summary;
+
+            if ($tower && $battery && $summary) {
+
+                $voltageRatio = $tower->voltage / 12;
+
+                $totalAmp = $voltageRatio > 0
+                    ? ($bp->amount * $battery->amps) / $voltageRatio
+                    : 0;
+
+                $percentage = $totalAmp > 0
+                    ? ($summary->battery_required / $totalAmp) * 100
+                    : 0;
+
+                $bp->update([
+                    'production_percentage' => round($percentage, 2)
+                ]);
+            }
+        }
+
+        // -------------------------------------------------------
+        // LOG
+        // -------------------------------------------------------
         activity()
-            ->performedOn($batteryProduction) // o "subject" será o BatteryProduction criado
-            ->causedBy(auth()->user())        // quem fez a ação
+            ->performedOn($bp)
+            ->causedBy(auth()->user())
             ->withProperties([
                 'tower_id' => $towerId,
                 'battery_id' => $validated['battery_id'],
@@ -49,8 +91,12 @@ class BatteryProductionController extends Controller
             ])
             ->log('Adicionou uma nova bateria à torre');
 
-        return redirect()->route('tower.show', $towerId)->with('success', 'Bateria adicionada com sucesso!');
+        return redirect()
+            ->route('tower.show', $towerId)
+            ->with('success', 'Bateria adicionada com sucesso!');
     }
+
+
 
 
     public function edit($id)
@@ -73,37 +119,78 @@ class BatteryProductionController extends Controller
             'production_percentage' => 'nullable|numeric',
         ]);
 
+        // Se for ativar esta, desativa a anterior
         if ($validated['active'] === 'yes') {
-            $jaExiste = BatteryProduction::where('tower_id', $bp->tower_id)
+            $oldActive = BatteryProduction::where('tower_id', $bp->tower_id)
                 ->where('active', 'yes')
                 ->where('id', '!=', $bp->id)
-                ->exists();
+                ->first();
 
-            if ($jaExiste) {
-                return response()->json(['message' => 'Já existe uma bateria ativa'], 422);
+            if ($oldActive) {
+                $oldActive->update([
+                    'active' => 'no',
+                    'removal_date' => now(),
+                ]);
             }
         }
 
-        // capturar valores antes 
+        // valores antigos
         $oldValues = $bp->getOriginal();
 
+        // aplica update
         $bp->update($validated);
 
-        // capturar valores depois
-        $newValues = $bp->getAttributes();
+        // ---------------------------------------------------------
+        // 🔥 NOVA REGRA: Se removal_date for apagada, zera o %
+        // ---------------------------------------------------------
+        if (empty($bp->removal_date)) {
+            $bp->update([
+                'production_percentage' => null
+            ]);
+        } else {
+            // -----------------------------------------------------
+            // Apenas recalcula % se ainda for ativa
+            // -----------------------------------------------------
+            if ($bp->active === 'yes') {
 
-        // registrar log
+                $tower = $bp->tower;
+                $battery = $bp->battery;
+                $summary = $tower->summary;
+
+                if ($summary) {
+
+                    $voltageRatio = $tower->voltage / 12;
+
+                    $totalAmp =
+                        $voltageRatio > 0
+                        ? ($bp->amount * $battery->amps) / $voltageRatio
+                        : 0;
+
+                    $production_percentage =
+                        $totalAmp > 0
+                        ? ($summary->battery_required / $totalAmp) * 100
+                        : 0;
+
+                    $bp->update([
+                        'production_percentage' => round($production_percentage, 2)
+                    ]);
+                }
+            }
+        }
+
+        // log
         activity()
             ->performedOn($bp)
             ->causedBy(auth()->user())
             ->withProperties([
                 'old' => $oldValues,
-                'new' => $newValues,
+                'new' => $bp->getAttributes(),
             ])
             ->log('Atualizou uma bateria da torre');
 
         return response()->json(['message' => 'Atualizado com sucesso']);
     }
+
 
     public function destroy($id)
     {
@@ -124,6 +211,46 @@ class BatteryProductionController extends Controller
             ->log('Removeu uma bateria da torre');
 
         return response()->json(['message' => 'Bateria excluída com sucesso']);
+    }
+
+    public function recalcularPercentuais($towerId)
+    {
+        $tower = Tower::findOrFail($towerId);
+
+        $summary = TowerSummaries::where('tower_id', $towerId)->first();
+        if (!$summary || !$summary->battery_required) {
+            return redirect()
+                ->route('tower.show', $towerId)
+                ->with('error', 'battery_required não encontrado para esta torre.');
+        }
+
+        $baterias = BatteryProduction::where('tower_id', $towerId)->get();
+
+        foreach ($baterias as $bp) {
+
+            // só recalcula se removal_date estiver preenchido
+            if ($bp->removal_date && is_null($bp->production_percentage)) {
+
+                $voltageRatio = $tower->voltage / 12;
+
+                $totalAmp =
+                    $voltageRatio > 0
+                    ? ($bp->amount * $bp->battery->amps) / $voltageRatio
+                    : 0;
+
+                $percentage =
+                    $totalAmp > 0
+                    ? ($summary->battery_required / $totalAmp) * 100
+                    : 0;
+
+                $bp->production_percentage = round($percentage, 2);
+                $bp->save();
+            }
+        }
+
+        return redirect()
+            ->route('tower.show', $towerId)
+            ->with('success', 'Percentuais recalculados com sucesso!');
     }
 
 

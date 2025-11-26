@@ -42,7 +42,11 @@
                                         <th>Ah total</th>
                                         <th>%</th>
                                         <th>Produção</th>
-                                        <th>.</th>
+                                        <th>
+                                            <a href="#" onclick="if(confirm('Recalcular percentuais das baterias desta torre?')){ window.location='{{ route('tower.recalcular.baterias', $tower->id) }}'; }"class="btn dcm-btn-primary">
+                                                <i class="fa fa-refresh"></i>%
+                                            </a>
+                                        </th>
                                     </tr>
                                 </thead>
                                 <tbody>

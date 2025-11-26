@@ -201,6 +201,9 @@ Route::middleware(['auth', 'permission:towers.manage'])->group(function () {
     //PlateProduction
     Route::post('/towers/{id}/plate', [PlateProductionController::class, 'store']);
     Route::delete('/plateproduction/{id}', [PlateProductionController::class, 'destroy'])->name('plateproduction.destroy');
+
+    Route::get('/tower/{id}/recalcular-baterias', [BatteryProductionController::class, 'recalcularPercentuais'])->name('tower.recalcular.baterias');
+
 });
 // towers.maintenance
 Route::middleware(['auth', 'permission:towers.maintenance'])->group(function () {
