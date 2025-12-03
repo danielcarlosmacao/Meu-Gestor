@@ -282,6 +282,7 @@ Route::middleware(['auth', 'permission:recipients.view'])->group(function () {
     Route::put('/admin/recipients/{id}', [RecipientController::class, 'update'])->name('admin.recipients.update');
     Route::delete('/admin/recipients/{id}', [RecipientController::class, 'destroy'])->name('admin.recipients.destroy');
     Route::get('/admin/recipients/logs', [RecipientController::class, 'logs'])->name('admin.recipients.logs');
+    Route::get('/api/mk/nfe', [MkAuthController::class, 'buscarNotas'])->name('api.mk.nfe');
 
 });
 //notification.view
@@ -310,6 +311,6 @@ Route::get('/deploy/{token}', function ($token) {
 
 
 
-Route::get('/api/mk/nfe', [MkAuthController::class, 'buscarNotas'])->name('api.mk.nfe');
+
 
 

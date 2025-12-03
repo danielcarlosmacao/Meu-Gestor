@@ -245,7 +245,13 @@ class BatteryProductionController extends Controller
 
                 $bp->production_percentage = round($percentage, 2);
                 $bp->save();
+            }if ($bp->production_percentage  && is_null($bp->removal_date)) {
+                
+                 $percentage = NULL;
+                 $bp->production_percentage = $percentage;
+                $bp->save();
             }
+            
         }
 
         return redirect()

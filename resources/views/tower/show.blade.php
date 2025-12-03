@@ -134,16 +134,16 @@
                                         <td>{{ $hours_autonomy }}</td>
                                     </tr>
                                     <tr>
-                                        <td>Consumo Ah/Hora</td>
-                                        <td>{{ $summary->time_ah_consumption }}</td>
+                                        <td>Consumo Ah Hora/Dia</td>
+                                        <td>{{ $summary->time_ah_consumption }}  &nbsp; {{ $summary->time_ah_consumption*24 }}</td>
                                         <td>Bateria necessária</td>
                                         <td>{{ $summary->battery_required }}</td>
                                     </tr>
                                     <tr>
-                                        <td>Consumo Ah/Dia</td>
+                                        <td>Consumo em Watts</td>
                                         <td>{{ $summary->consumption_ah_day }}</td>
                                         <td>Ah necessário gerar por 5h/dia</td>
-                                        <td>{{ $platerrequire }}</td>
+                                        <td>{{ number_format($platerrequire,2) }}</td>
                                     </tr>
                                     <tr>
                                         <td>Watts do painel</td>
