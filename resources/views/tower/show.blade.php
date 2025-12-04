@@ -156,6 +156,12 @@
                                         </td>
                                     </tr>
                                     <tr>
+                                        <td>Watts da placa em ah</td>
+                                        <td>{{ number_format($summary->watts_plate /  $tower->voltage,2)}} A </td>
+                                        <td>Watts da placa em ah por dia</td>
+                                        <td>{{ number_format((($summary->watts_plate /  $tower->voltage)*$hours_Generation),2) }} </td>
+                                    </tr>
+                                    <tr>
                                         <td>Voltagem</td>
                                         <td>{{ $tower->voltage }} </td>
                                         <td></td>
