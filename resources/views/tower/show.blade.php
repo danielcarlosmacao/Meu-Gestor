@@ -160,9 +160,9 @@
                                         </td>
                                     </tr>
                                     <tr>
-                                        <td>Geração Watts em ah por dia</td>
+                                        <td>Geração Watts em Ah por dia</td>
                                         <td>{{ number_format(($wattsamps*$hours_Generation),0) }} </td>
-                                        <td>Geração Watts em ah</td>
+                                        <td>Geração Watts em Ah</td>
                                         <td>
                                             
                                             {{ number_format($wattsamps,2)}} A 
