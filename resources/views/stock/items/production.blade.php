@@ -25,6 +25,9 @@
                     <th>Produção Ativa</th>
                     <th>Estoque</th>
                     <th>Preço (R$)</th>
+                    @if (!is_null($totalProductionValue))
+                    <th></th>
+                    @endif
                 </tr>
             </thead>
             <tbody>
@@ -52,6 +55,12 @@
                             @endif
                         </td>
                         <td>{{ $price !== '-' ? 'R$ ' . $price : '-' }}</td>
+                         @if (!is_null($totalProductionValue))
+                         <td>
+                         {{ $price !== '-' ? 'R$ ' . $item['price'] * $item['in_production'] : '-' }}
+                        </td>
+
+                         @endif
 
                     </tr>
                 @endforeach
