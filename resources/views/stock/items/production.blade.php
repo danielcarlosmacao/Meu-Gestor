@@ -34,6 +34,8 @@
                 @foreach ($data as $item)
                     @php
                         $price = is_numeric($item['price']) ? number_format((float) $item['price'], 2, ',', '.') : '-';
+                        $pricetotal = $price !== '-' ? 'R$ ' . $item['price'] * $item['in_production'] : '-';
+                        $pricetotalformat = is_numeric($pricetotal) ? number_format((float) $pricetotal, 2, ',', '.') : $pricetotal;
                     @endphp
                     <tr class="text-center">
                         <td class=" text-start fw-semibold">{{ $item['equipment_name'] }}</td>
@@ -57,7 +59,7 @@
                         <td>{{ $price !== '-' ? 'R$ ' . $price : '-' }}</td>
                          @if (!is_null($totalProductionValue))
                          <td>
-                         {{ $price !== '-' ? 'R$ ' . $item['price'] * $item['in_production'] : '-' }}
+                         {{ $pricetotalformat }}
                         </td>
 
                          @endif
