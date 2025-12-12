@@ -23,12 +23,17 @@
                     <th>Status</th>
                     <th>Oficina</th>
                     <th>Serviços</th>
+                    <th>Info</th>
                     <th>Ações</th>
                 </tr>
             </thead>
             <tbody>
                 @foreach ($maintenances as $maintenance)
                     <tr>
+                        @php
+                            $full = $maintenance->parts_used ?? '';
+                            $short = Str::limit($full, 20, '...');
+                        @endphp
                         <td>
                             <div
                                 style="width: 20px; height: 20px; background-color:{{ $maintenance->vehicle->color ?? '' }} ; border-radius: 4px;">
@@ -51,6 +56,18 @@
                                 <span class="badge bg-secondary">{{ $service->name }}</span>
                             @endforeach
                         </td>
+                        <td>
+                            <span id="parts_short_{{ $maintenance->id }}">{{ $short }}</span>
+                            <span id="parts_full_{{ $maintenance->id }}" style="display:none;">{{ $full }}</span>
+
+                            @if (strlen($full) > 20)
+                                <button type="button" class="btn btn-link btn-sm p-0"
+                                    onclick="toggleParts({{ $maintenance->id }})" id="btn_parts_{{ $maintenance->id }}">
+                                    Mais
+                                </button>
+                            @endif
+                        </td>
+
                         <td>
                             @can('fleets.edit')
                                 <button class="btn btn-warning btn-sm" data-bs-toggle="modal"
@@ -76,6 +93,28 @@
     ])
     <script>
         const maxMileages = @json($maxMileages);
+
+        //escript exibir infocompleto
+
+        function toggleParts(id) {
+            let shortText = document.getElementById('parts_short_' + id);
+            let fullText = document.getElementById('parts_full_' + id);
+            let button = document.getElementById('btn_parts_' + id);
+
+            if (shortText.style.display === 'none') {
+                // mostrar curto
+                shortText.style.display = 'inline';
+                fullText.style.display = 'none';
+                button.textContent = 'Mais';
+            } else {
+                // mostrar completo
+                shortText.style.display = 'none';
+                fullText.style.display = 'inline';
+                button.textContent = 'Menos';
+            }
+        }
+
+        //
     </script>
 
 @endsection
