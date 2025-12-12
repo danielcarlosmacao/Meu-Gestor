@@ -14,6 +14,7 @@
     <table class="table table-striped mt-4">
         <thead class="bgc-primary">
             <tr>
+                <th></th>
                 <th>Modelo</th>
                 <th>Ano</th>
                 <th>Placa</th>
@@ -27,6 +28,9 @@
         <tbody>
             @foreach($vehicles as $vehicle)
             <tr>
+                <td>
+                    <div style="width: 20px; height: 20px; background-color: {{ $vehicle->color }}; border-radius: 4px;"></div>
+                </td>
                 <td>
                     <a href="{{ route('fleet.vehicle.maintenances', $vehicle->id) }}" class="btn btn-sm">
                         {{ $vehicle->model }}

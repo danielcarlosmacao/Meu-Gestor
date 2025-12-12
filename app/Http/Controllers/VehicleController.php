@@ -25,6 +25,7 @@ class VehicleController extends Controller
             'year' => 'required|digits:4|integer',
             'fuel_type' => 'required|string|max:30',
             'status' => 'required|string|max:20',
+            'color' => 'required|string|max:50',
         ]);
 
         // Cria o veículo
@@ -55,6 +56,7 @@ class VehicleController extends Controller
             'year' => 'required|digits:4|integer',
             'fuel_type' => 'required|string|max:30',
             'status' => 'required|string|max:20',
+            'color' => 'required|string|max:50',
         ]);
 
         // Pega os dados antigos antes da atualização
@@ -62,6 +64,7 @@ class VehicleController extends Controller
 
         // Atualiza com os novos dados
         $vehicle->update($data);
+       
 
         // Log de auditoria
         activity()

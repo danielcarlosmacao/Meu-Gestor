@@ -5,15 +5,16 @@
     <div class="container mt-5">
         <h2 class="text-center">Manutenções de Veículos
             @can('fleets.create')
-            <button class="btn dcm-btn-primary btn-sm ms-2" data-bs-toggle="modal" data-bs-target="#addMaintenanceModal">
-                <i class="bi bi-plus-lg"></i>
-            </button>
+                <button class="btn dcm-btn-primary btn-sm ms-2" data-bs-toggle="modal" data-bs-target="#addMaintenanceModal">
+                    <i class="bi bi-plus-lg"></i>
+                </button>
             @endcan
         </h2>
 
         <table class="table table-striped mt-4">
             <thead class="bgc-primary">
                 <tr>
+                    <th></th>
                     <th>Veículo</th>
                     <th>Data</th>
                     <th>Tipo</th>
@@ -29,7 +30,13 @@
                 @foreach ($maintenances as $maintenance)
                     <tr>
                         <td>
-                            <a href="{{ route('fleet.vehicle.maintenances', $maintenance->vehicle->id) }}" class="btn btn-sm">
+                            <div
+                                style="width: 20px; height: 20px; background-color:{{ $maintenance->vehicle->color ?? '' }} ; border-radius: 4px;">
+                            </div>
+                        </td>
+                        <td>
+                            <a href="{{ route('fleet.vehicle.maintenances', $maintenance->vehicle->id) }}"
+                                class="btn btn-sm">
                                 {{ $maintenance->vehicle->model ?? '-' }} {{ $maintenance->vehicle->year ?? '-' }}
                             </a>
                         </td>
@@ -46,10 +53,10 @@
                         </td>
                         <td>
                             @can('fleets.edit')
-                            <button class="btn btn-warning btn-sm" data-bs-toggle="modal"
-                                data-bs-target="#editMaintenanceModal{{ $maintenance->id }}">
-                                Editar
-                            </button>
+                                <button class="btn btn-warning btn-sm" data-bs-toggle="modal"
+                                    data-bs-target="#editMaintenanceModal{{ $maintenance->id }}">
+                                    Editar
+                                </button>
                             @endcan
                         </td>
                     </tr>
@@ -67,8 +74,8 @@
         'vehicleServices' => $vehicleServices,
         'maintenances' => $maintenances,
     ])
-<script>
-    const maxMileages = @json($maxMileages);
-</script>
+    <script>
+        const maxMileages = @json($maxMileages);
+    </script>
 
 @endsection
