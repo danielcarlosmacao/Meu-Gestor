@@ -18,7 +18,8 @@
                     <tr>
                         <th data-col="name">Nome</th>
                         <th data-col="voltage">Voltagem</th>
-                        <th data-col="equipments">Equipamentos</th>
+                        <th data-col="equipments">Equip.</th>
+                        <th data-col="watts_equipments">Watts Equip</th>
                         <th data-col="battery_percentage">Bateria</th>
                         <th data-col="battery_percentage">% Bateria</th>
 
@@ -31,6 +32,7 @@
                         <th scope="col"></th>
                     </tr>
                 </thead>
+
 
                 <tbody>
                     @foreach ($towerData as $t)
@@ -46,6 +48,7 @@
 
                             <td>{{ $t['voltage'] }}</td>
                             <td>{{ $t['equipments'] }}</td>
+                            <td>{{ $t['watts_equipments'] }} W</td>
 
                             <td>{{ $t['battery'] }}</td>
                             <td>{{ $t['battery_percentage'] }}%</td>

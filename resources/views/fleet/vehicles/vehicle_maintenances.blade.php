@@ -23,7 +23,7 @@
                     <th>Status</th>
                     <th>Oficina</th>
                     <th>Serviços</th>
-                    <th>Info</th>
+                    <th>Info </th>
                     <th>Ações</th>
                 </tr>
             </thead>

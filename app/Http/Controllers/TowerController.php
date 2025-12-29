@@ -15,153 +15,168 @@ use Carbon\Carbon;
 class TowerController extends Controller
 {
 
-public function index(SettingService $settingService, Request $request)
-{
-    // Se clicar para ordenar, usar perPage=100
-    $perPagesystem = $settingService->getPerPage();
+    public function index(SettingService $settingService, Request $request)
+    {
+        // Se clicar para ordenar, usar perPage=100
+        $perPagesystem = $settingService->getPerPage();
+        $perPage = $request->get('perPage', $perPagesystem);
 
-    $perPage = $request->get('perPage', $perPagesystem);
+        // Horas de geração
+        $hoursGeneration = Option::where('reference', 'hours_Generation')->value('value') ?? 5;
 
-    // Horas de geração (necessário para cálculo da % da placa)
-    $hoursGeneration = Option::where('reference', 'hours_Generation')->value('value') ?? 5;
-
-    // Carrega torres + relacionamentos + contagem de equipamentos ativos
-    $paginator = Tower::with([
+        // Carrega torres + relacionamentos
+        $paginator = Tower::with([
             'activeBattery.battery',
             'plateProductions.plate',
             'summary',
+
+            // ⬇️ AQUI está a correção
+            'equipmentProductions' => function ($q) {
+                $q->where('active', 'yes')
+                    ->with('equipment');
+            },
         ])
-        ->withCount([
-            'equipmentProductions as active_equipments_count' => function ($q) {
-                $q->where('active', 'yes');
-            }
-        ])
-        ->orderBy('name', 'asc')
-        ->paginate($perPage);
+            ->withCount([
+                'equipmentProductions as active_equipments_count' => function ($q) {
+                    $q->where('active', 'yes');
+                }
+            ])
+            ->orderBy('name', 'asc')
+            ->paginate($perPage);
 
-    //---------------------------------------------------------------------
-    // MONTA ARRAY towerData PARA A VIEW
-    //---------------------------------------------------------------------
-    $towerData = $paginator->getCollection()->map(function ($tower) use ($hoursGeneration) {
-
-        // -------------------------
-        //  EQUIPAMENTOS
-        // -------------------------
-        $equipQty = $tower->active_equipments_count ?? 0;
-
-        // -------------------------
-        //  BATERIA
-        // -------------------------
-        $batteryProd = $tower->activeBattery ?? null;
-        $battery     = $batteryProd?->battery ?? null;
-
-        $batteryPercentage = 0;
-
-        if ($batteryProd && $battery) {
-
-            $voltageRatio = $tower->voltage > 0 ? ($tower->voltage / 12) : 0;
-
-            $batteryAmps = $battery->amps ?? 0;
-            $amount      = $batteryProd->amount ?? 0;
-
-            $totalAmp = ($voltageRatio > 0 && $batteryAmps > 0)
-                ? ($amount * $batteryAmps) / $voltageRatio
-                : 0;
-
-            $batteryRequired = $tower->summary->battery_required ?? 0;
-
-            $batteryPercentage = $totalAmp > 0
-                ? ($batteryRequired / $totalAmp) * 100
-                : 0;
-        }
-
-        // -------------------------
-        //  DATA INSTALAÇÃO + TEMPO (COM ORDENAÇÃO CORRETA)
-        // -------------------------
-        $installDateFormatted = '-';
-        $installDateOrd = null;
-        $productionTimeYearsFloat = null;
-        $productionTimeLabel = '-';
-
-        if ($batteryProd?->installation_date) {
-            try {
-                $cd = Carbon::parse($batteryProd->installation_date);
-
-                $installDateFormatted = $cd->format('d/m/Y');
-                $installDateOrd       = $cd->format('Y-m-d'); // crucial para ordenação correta
-
-                // tempo de produção em float
-                $productionTimeYearsFloat = $cd->floatDiffInYears(now());
-
-                // formatação anos e meses
-                $anos  = floor($productionTimeYearsFloat);
-                $meses = floor(($productionTimeYearsFloat - $anos) * 12);
-
-                $productionTimeLabel = "{$anos} anos e {$meses} meses";
-
-            } catch (\Exception $e) {
-                // mantém os valores padrão
-            }
-        }
-
-        // -------------------------
-        //  PLACA
-        // -------------------------
-        $plateProd = $tower->plateProductions->first() ?? null;
-        $plate     = $plateProd?->plate ?? null;
-
-        $summary = $tower->summary;
-        $totalWattsPlaca = $summary->watts_plate ?? ($plate?->watts ?? 0);
-
-        // percentual da placa
-        $consumptionAhDay = $summary->consumption_ah_day ?? 0;
-        $ampsPlate        = $summary->amps_plate ?? ($plate?->amps ?? 0);
-
-        $plateRequired = $hoursGeneration > 0 ? ($consumptionAhDay / $hoursGeneration) : 0;
-        $platePercentage = $ampsPlate > 0 ? ($plateRequired / $ampsPlate) * 100 : 0;
 
         //---------------------------------------------------------------------
-        // RETORNA ARRAY COMPLETO PARA A VIEW
+        // MONTA ARRAY towerData PARA A VIEW
         //---------------------------------------------------------------------
-        return [
-            'id' => $tower->id,
-            'name' => $tower->name,
+        $towerData = $paginator->getCollection()->map(function ($tower) use ($hoursGeneration) {
 
-            'voltage' => $tower->voltage,
-            'equipments' => $equipQty,
+            // -------------------------
+            // EQUIPAMENTOS
+            // -------------------------
+            $equipQty = $tower->active_equipments_count ?? 0;
 
-            // bateria
-            'battery' => $battery?->name ?? 'Sem bateria',
-            'battery_percentage' => round($batteryPercentage, 2),
+            // soma total de watts dos equipamentos ativos
+            $wattsEquipments = 0;
 
-            // data
-            'battery_install_date' => $installDateFormatted,
-            'battery_install_ord'  => $installDateOrd, // usado na ordenação
+            foreach ($tower->equipmentProductions as $ep) {
+                if ($ep->active === 'yes' && $ep->equipment) {
+                    $watts = $ep->equipment->watts ?? 0;
+                    $amount = $ep->amount ?? 1;
+                    $wattsEquipments += ($watts * $amount);
+                }
+            }
 
-            // tempo de produção
-            'production_time'     => $productionTimeLabel,
-            'production_ord'      => $productionTimeYearsFloat, // usado na ordenação
+            // -------------------------
+            // BATERIA
+            // -------------------------
+            $batteryProd = $tower->activeBattery ?? null;
+            $battery = $batteryProd?->battery ?? null;
 
-            // placa
-            'total_watts_placa' => round($totalWattsPlaca, 2),
-            'total_amps_placa' => round($ampsPlate, 2),
-            'plate_percentage' => round($platePercentage, 2),
-        ];
-    })->toArray();
+            $batteryPercentage = 0;
 
-    //---------------------------------------------------------------------
-    // RETORNA VIEW
-    //---------------------------------------------------------------------
-    return view('tower.index', [
-        'towerData' => $towerData,
-        'pagination' => $paginator,
-    ]);
-}
+            if ($batteryProd && $battery) {
+
+                $voltageRatio = $tower->voltage > 0 ? ($tower->voltage / 12) : 0;
+
+                $batteryAmps = $battery->amps ?? 0;
+                $amount = $batteryProd->amount ?? 0;
+
+                $totalAmp = ($voltageRatio > 0 && $batteryAmps > 0)
+                    ? ($amount * $batteryAmps) / $voltageRatio
+                    : 0;
+
+                $batteryRequired = $tower->summary->battery_required ?? 0;
+
+                $batteryPercentage = $totalAmp > 0
+                    ? ($batteryRequired / $totalAmp) * 100
+                    : 0;
+            }
+
+            // -------------------------
+            // DATA INSTALAÇÃO + TEMPO
+            // -------------------------
+            $installDateFormatted = '-';
+            $installDateOrd = null;
+            $productionTimeYearsFloat = null;
+            $productionTimeLabel = '-';
+
+            if ($batteryProd?->installation_date) {
+                try {
+                    $cd = Carbon::parse($batteryProd->installation_date);
+
+                    $installDateFormatted = $cd->format('d/m/Y');
+                    $installDateOrd = $cd->format('Y-m-d');
+
+                    $productionTimeYearsFloat = $cd->floatDiffInYears(now());
+
+                    $anos = floor($productionTimeYearsFloat);
+                    $meses = floor(($productionTimeYearsFloat - $anos) * 12);
+
+                    $productionTimeLabel = "{$anos} anos e {$meses} meses";
+                } catch (\Exception $e) {
+                    // mantém padrão
+                }
+            }
+
+            // -------------------------
+            // PLACA
+            // -------------------------
+            $plateProd = $tower->plateProductions->first() ?? null;
+            $plate = $plateProd?->plate ?? null;
+
+            $summary = $tower->summary;
+            $totalWattsPlaca = $summary->watts_plate ?? ($plate?->watts ?? 0);
+
+            $consumptionAhDay = $summary->consumption_ah_day ?? 0;
+            $ampsPlate = $summary->amps_plate ?? ($plate?->amps ?? 0);
+
+            $plateRequired = $hoursGeneration > 0 ? ($consumptionAhDay / $hoursGeneration) : 0;
+            $platePercentage = $ampsPlate > 0 ? ($plateRequired / $ampsPlate) * 100 : 0;
+
+            //---------------------------------------------------------------------
+            // RETORNO
+            //---------------------------------------------------------------------
+            return [
+                'id' => $tower->id,
+                'name' => $tower->name,
+
+                'voltage' => $tower->voltage,
+                'equipments' => $equipQty,
+                'watts_equipments' => round($wattsEquipments, 2), // ✅ NOVO
+
+                // bateria
+                'battery' => $battery?->name ?? 'Sem bateria',
+                'battery_percentage' => round($batteryPercentage, 2),
+
+                // datas
+                'battery_install_date' => $installDateFormatted,
+                'battery_install_ord' => $installDateOrd,
+
+                // produção
+                'production_time' => $productionTimeLabel,
+                'production_ord' => $productionTimeYearsFloat,
+
+                // placa
+                'total_watts_placa' => round($totalWattsPlaca, 2),
+                'total_amps_placa' => round($ampsPlate, 2),
+                'plate_percentage' => round($platePercentage, 2),
+            ];
+        })->toArray();
+
+        //---------------------------------------------------------------------
+        // VIEW
+        //---------------------------------------------------------------------
+        return view('tower.index', [
+            'towerData' => $towerData,
+            'pagination' => $paginator,
+        ]);
+    }
+
 
 
     public function store(Request $request)
     {
-        
+
 
         $request->validate([
             'name' => 'required|string|max:255',
@@ -183,7 +198,7 @@ public function index(SettingService $settingService, Request $request)
             'amps_plate' => '0',
         ]);
 
-          activity()
+        activity()
             ->causedBy(auth()->user())
             ->performedOn($tower)
             ->withProperties([
@@ -203,7 +218,7 @@ public function index(SettingService $settingService, Request $request)
         ]);
 
         $tower = Tower::findOrFail($id);
-        
+
         $oldData = $tower->toArray();
 
         $tower->update([
@@ -213,10 +228,10 @@ public function index(SettingService $settingService, Request $request)
 
         activity()
             ->causedBy(auth()->user())
-            ->performedOn($tower) 
+            ->performedOn($tower)
             ->withProperties([
                 'old' => $oldData,
-                'new' => $tower->toArray() 
+                'new' => $tower->toArray()
             ])
             ->log('Torre Atualizada');
 
@@ -230,8 +245,8 @@ public function index(SettingService $settingService, Request $request)
         $oldData = $tower->toArray();
         $tower->delete(); // Soft delete, se usar SoftDeletes
 
-        
-          activity()
+
+        activity()
             ->causedBy(auth()->user())
             ->performedOn($tower)
             ->withProperties([
