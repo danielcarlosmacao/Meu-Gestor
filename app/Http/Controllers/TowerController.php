@@ -226,6 +226,9 @@ class TowerController extends Controller
             'voltage' => $request->voltage,
         ]);
 
+        // 🔥 RECALCULA CONSUMO (voltage pode ter mudado!)
+        $tower->updateConsumptionAh();
+
         activity()
             ->causedBy(auth()->user())
             ->performedOn($tower)
@@ -237,6 +240,7 @@ class TowerController extends Controller
 
         return redirect()->back()->with('success', 'Torre atualizada com sucesso!');
     }
+
 
     public function destroy($id)
     {
