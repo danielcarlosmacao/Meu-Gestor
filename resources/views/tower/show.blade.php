@@ -43,7 +43,8 @@
                                         <th>%</th>
                                         <th>Produção</th>
                                         <th>
-                                            <a href="#" onclick="if(confirm('Deseja fixar o % da bateria nas baterias antigas?')){ window.location='{{ route('tower.recalcular.baterias', $tower->id) }}'; }"class="btn dcm-btn-primary">
+                                            <a href="#"
+                                                onclick="if(confirm('Deseja fixar o % da bateria nas baterias antigas?')){ window.location='{{ route('tower.recalcular.baterias', $tower->id) }}'; }"class="btn dcm-btn-primary">
                                                 <i class="fa fa-refresh"></i>%
                                             </a>
                                         </th>
@@ -52,7 +53,8 @@
                                 <tbody>
                                     @foreach ($tower->batteryProductions as $bp)
                                         @php
-                                            $voltageRatio = $tower->voltage / 12;
+
+                                            $voltageRatio = $tower->voltage / $bp->battery->voltage;
                                             $totalAmp =
                                                 $voltageRatio > 0
                                                     ? ($bp->amount * $bp->battery->amps) / $voltageRatio
@@ -93,7 +95,16 @@
                                             <td>{{ $bp->battery->amps }}</td>
                                             <td>{{ optional($bp->installation_date)->format('d/m/Y') }}</td>
                                             <td>{{ optional($bp->removal_date)->format('d/m/Y') }}</td>
-                                            <td>{{ number_format($totalAmp, 0) }} A</td>
+                                            <td style="position: relative; padding-top: 4px; line-height: 1.1;">
+    
+                                                {{ number_format($totalAmp, 0) }} A
+
+                                                @if ($bp->battery->voltage != 12)
+                                                    <span class="voltbattery">
+                                                        {{ $bp->battery->voltage }}
+                                                    </span>
+                                                @endif
+                                            </td>
                                             <td>{{ number_format($production_percentage, 2) }}%</td>
                                             <td>{{ $tempProdution }}</td>
                                             <td class="text-center align-middle p-1">
@@ -128,8 +139,8 @@
                                 </thead>
                                 <tbody>
                                     @php
-                                    $wattsamps = $summary->watts_plate /  $tower->voltage;
-                                            
+                                        $wattsamps = $summary->watts_plate / $tower->voltage;
+
                                     @endphp
                                     <tr>
                                         <td>Horas Geração</td>
@@ -139,7 +150,8 @@
                                     </tr>
                                     <tr>
                                         <td>Consumo Ah Hora/Dia</td>
-                                        <td>{{ $summary->time_ah_consumption }}  &nbsp; {{ $summary->time_ah_consumption*24 }}</td>
+                                        <td>{{ $summary->time_ah_consumption }} &nbsp;
+                                            {{ $summary->time_ah_consumption * 24 }}</td>
                                         <td>Bateria necessária</td>
                                         <td>{{ $summary->battery_required }}</td>
                                     </tr>
@@ -147,7 +159,7 @@
                                         <td>Consumo em Watts</td>
                                         <td>{{ $summary->consumption_ah_day }}</td>
                                         <td>Ah necessário gerar por 5h/dia</td>
-                                        <td>{{ number_format($platerrequire,2) }}</td>
+                                        <td>{{ number_format($platerrequire, 2) }}</td>
                                     </tr>
                                     <tr>
                                         <td>Watts do painel</td>
@@ -161,11 +173,11 @@
                                     </tr>
                                     <tr>
                                         <td>Geração Watts em Ah por dia</td>
-                                        <td>{{ number_format(($wattsamps*$hours_Generation),0) }} </td>
+                                        <td>{{ number_format($wattsamps * $hours_Generation, 0) }} </td>
                                         <td>Geração Watts em Ah</td>
                                         <td>
-                                            
-                                            {{ number_format($wattsamps,2)}} A 
+
+                                            {{ number_format($wattsamps, 2) }} A
                                             {{ $wattsamps > 0 ? number_format(($platerrequire / $wattsamps) * 100, 2) . '%' : '0%' }}
                                         </td>
                                     </tr>

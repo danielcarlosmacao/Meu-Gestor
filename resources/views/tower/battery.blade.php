@@ -2,180 +2,210 @@
 @section('title', 'Baterias')
 @section('content')
 
+<div class="container mb-4 mt-4">
+    <h2 class="text-center">
+        Baterias
+        @can('towers.create')
+            <button type="button" class="btn dcm-btn-primary" data-bs-toggle="modal" data-bs-target="#addBattery">
+                <i class="bi bi-plus-lg"></i>
+            </button>
+        @endcan
+    </h2>
+</div>
 
-    <div class="container mb-2 mb-md-5 mt-2 mt-md-5">
-        <h2 class="text-center">Baterias
-            @can('towers.create')
-                <!-- Botão que abre o modal de adição -->
-                <button type="button" class="btn dcm-btn-primary" data-bs-toggle="modal" data-bs-target="#addBattery">
-                    <i class="bi bi-plus-lg"></i>
-                </button>
-            @endcan
-        </h2>
-    </div>
-
-    <div class="container table-responsive">
-        <table class="table table-striped">
-            <thead class="bgc-primary text-white">
+<div class="container table-responsive">
+    <table class="table table-striped">
+        <thead class="bgc-primary text-white">
+            <tr>
+                <th>Nome</th>
+                <th>Marca</th>
+                <th>Tipo</th>
+                <th>Voltagem</th>
+                <th>Ah</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach ($batterys as $battery)
                 <tr>
-                    <th scope="col">Nome</th>
-                    <th scope="col">Marca</th>
-                    <th scope="col">Ah</th>
-                    <th scope="col"></th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach ($batterys as $battery)
-                    <tr>
-                        <th scope="row">
-                            <a href="{{ route('batteryproduction.report', $battery->id) }}"
-                                class="text-decoration-none text-black">
-                                {{ $battery->name }}
-                            </a>
-                        </th>
-                        <td>{{ $battery->mark }}</td>
-                        <td>{{ $battery->amps }}</td>
-                        <td class="text-center align-middle p-1">
-                            <div class="btn-group">
-                                <button type="button" class="btn btn-sm dcm-btn-primary dropdown-toggle"
-                                    data-bs-toggle="dropdown">
-                                    <i class="bi bi-gear"></i> Ações
-                                </button>
-                                <ul class="dropdown-menu dropdown-menu-end">
+                    <td>
+                        <a href="{{ route('batteryproduction.report', $battery->id) }}"
+                            class="text-decoration-none text-black">
+                            {{ $battery->name }}
+                        </a>
+                    </td>
+                    <td>{{ $battery->mark }}</td>
+                    <td>{{ $battery->type ? __('baterry.' . $battery->type) : '' }}</td>
+                    <td>{{ $battery->voltage }}</td>
+                    <td>{{ $battery->amps }}</td>
+                    <td class="text-center">
+                        <div class="btn-group">
+                            <button class="btn btn-sm dcm-btn-primary dropdown-toggle" data-bs-toggle="dropdown">
+                                <i class="bi bi-gear"></i> Ações
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                @can('towers.edit')
                                     <li>
-                                        @can('towers.edit')
-                                            <button type="button" class="dropdown-item edit-battery-btn"
-                                                data-id="{{ $battery->id }}" data-name="{{ $battery->name }}"
-                                                data-mark="{{ $battery->mark }}" data-amps="{{ $battery->amps }}"
-                                                data-bs-toggle="modal" data-bs-target="#editBatteryModal">
-                                                <i class="bi bi-pencil-square"></i> Editar
+                                        <button class="dropdown-item edit-battery-btn"
+                                            data-id="{{ $battery->id }}"
+                                            data-name="{{ $battery->name }}"
+                                            data-mark="{{ $battery->mark }}"
+                                            data-type="{{ $battery->type }}"
+                                            data-voltage="{{ $battery->voltage }}"
+                                            data-amps="{{ $battery->amps }}"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#editBatteryModal">
+                                            <i class="bi bi-pencil-square"></i> Editar
+                                        </button>
+                                    </li>
+                                @endcan
+
+                                @can('towers.delete')
+                                    <li>
+                                        <form action="{{ route('battery.destroy', $battery->id) }}" method="POST">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button class="dropdown-item"
+                                                onclick="return confirm('Tem certeza que deseja deletar?')">
+                                                <i class="bi bi-trash"></i> Deletar
                                             </button>
-                                        @endcan
+                                        </form>
                                     </li>
-                                    <li>
-                                        @can('towers.delete')
-                                            <form action="{{ route('battery.destroy', $battery->id) }}" method="POST"
-                                                style="display:inline;">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit" class="dropdown-item"
-                                                    onclick="return confirm('Tem certeza que deseja deletar esta bateria?')">
-                                                    <i class="bi bi-trash"></i> Deletar
-                                                </button>
-                                            </form>
-                                        @endcan
-                                    </li>
-                                </ul>
-                            </div>
-                        </td>
-                    </tr>
-                @endforeach
-            </tbody>
-        </table>
-        <div class="d-flex justify-content-center mt-4">
-            {{ $batterys->links() }}
-        </div>
-        <br>
+                                @endcan
+                            </ul>
+                        </div>
+                    </td>
+                </tr>
+            @endforeach
+        </tbody>
+    </table>
+
+    <div class="d-flex justify-content-center">
+        {{ $batterys->links() }}
     </div>
+</div>
 
-    <!-- Modal de Adição -->
-    <div class="modal fade" id="addBattery" tabindex="-1" aria-labelledby="addBatteryLabel" aria-hidden="true">
-        <div class="modal-dialog">
+{{-- ================= MODAL ADICIONAR ================= --}}
+<div class="modal fade" id="addBattery" tabindex="-1">
+    <div class="modal-dialog">
+        <form method="POST" action="{{ route('battery.store') }}">
+            @csrf
             <div class="modal-content">
-
                 <div class="modal-header">
-                    <h5 class="modal-title text-bgc-primary" id="addBatteryLabel">Nova Bateria</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                    <h5 class="modal-title">Nova Bateria</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
 
                 <div class="modal-body">
-                    <form action="{{ route('battery.store') }}" method="post">
-                        @csrf
-                        <div class="mb-3">
-                            <label for="name" class="form-label">Nome</label>
-                            <input type="text" class="form-control" id="name" name="name" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="mark" class="form-label">Marca</label>
-                            <input type="text" class="form-control" id="mark" name="mark" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="amps" class="form-label">Amperes</label>
-                            <input type="number" class="form-control" id="amps" name="amps" min="0"
-                                max="1000" step="1" required>
-                        </div>
-                        <div class="text-end">
-                            <button type="submit" class="btn dcm-btn-primary">Salvar</button>
-                        </div>
-                    </form>
+                    <div class="mb-3">
+                        <label>Nome</label>
+                        <input type="text" class="form-control" name="name" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label>Marca</label>
+                        <input type="text" class="form-control" name="mark" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label>Tipo</label>
+                        <select class="form-control" name="type" required>
+                            <option value="">Selecione</option>
+                            <option value="Automotive">Automotiva</option>
+                            <option value="stationary">Estacionária</option>
+                            <option value="LiFePO4">LiFePO4</option>
+                            <option value="others">Outro</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label>Voltagem</label>
+                        <input type="number" class="form-control" name="voltage" min="12" step="12" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label>Amperes</label>
+                        <input type="number" class="form-control" name="amps" required>
+                    </div>
                 </div>
 
+                <div class="modal-footer">
+                    <button class="btn dcm-btn-primary">Salvar</button>
+                </div>
             </div>
-        </div>
+        </form>
     </div>
+</div>
 
-    <!-- Modal de Edição -->
-    <div class="modal fade" id="editBatteryModal" tabindex="-1" aria-labelledby="editBatteryModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <form id="editBatteryForm" method="POST">
-                @csrf
-                @method('PUT')
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title text-bgc-primary" id="editBatteryModalLabel">Editar Bateria</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+{{-- ================= MODAL EDITAR ================= --}}
+<div class="modal fade" id="editBatteryModal" tabindex="-1">
+    <div class="modal-dialog">
+        <form method="POST" id="editBatteryForm">
+            @csrf
+            @method('PUT')
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Editar Bateria</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label>Nome</label>
+                        <input type="text" class="form-control" id="edit_name" name="name" required>
                     </div>
-                    <div class="modal-body">
-                        <input type="hidden" id="edit_id" name="id">
 
-                        <div class="mb-3">
-                            <label for="edit_name" class="form-label">Nome</label>
-                            <input type="text" class="form-control" id="edit_name" name="name" required>
-                        </div>
-
-                        <div class="mb-3">
-                            <label for="edit_mark" class="form-label">Marca</label>
-                            <input type="text" class="form-control" id="edit_mark" name="mark" required>
-                        </div>
-
-                        <div class="mb-3">
-                            <label for="edit_amps" class="form-label">Amperes</label>
-                            <input type="number" class="form-control" id="edit_amps" name="amps" min="0"
-                                max="1000" step="1" required>
-                        </div>
+                    <div class="mb-3">
+                        <label>Marca</label>
+                        <input type="text" class="form-control" id="edit_mark" name="mark" required>
                     </div>
-                    <div class="modal-footer">
-                        <button type="submit" class="btn dcm-btn-primary">Salvar</button>
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+
+                    <div class="mb-3">
+                        <label>Tipo</label>
+                        <select class="form-control" id="edit_type" name="type" required>
+                            <option value="Automotive">Automotiva</option>
+                            <option value="stationary">Estacionária</option>
+                            <option value="LiFePO4">LiFePO4</option>
+                            <option value="others">Outro</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label>Voltagem</label>
+                        <input type="number" class="form-control" id="edit_voltage" name="voltage" required min="12" step="12">
+                    </div>
+
+                    <div class="mb-3">
+                        <label>Amperes</label>
+                        <input type="number" class="form-control" id="edit_amps" name="amps" required>
                     </div>
                 </div>
-            </form>
-        </div>
+
+                <div class="modal-footer">
+                    <button class="btn dcm-btn-primary">Salvar</button>
+                    <button class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                </div>
+            </div>
+        </form>
     </div>
+</div>
 
-    <script>
-        const routeUpdate = "{{ route('battery.update', ['id' => ':id']) }}";
+{{-- ================= JS ================= --}}
+<script>
+    const routeUpdate = "{{ route('battery.update', ':id') }}";
 
-        // Preenche o modal de edição com os dados do botão clicado
-        document.querySelectorAll('.edit-battery-btn').forEach(button => {
-            button.addEventListener('click', () => {
-                const id = button.dataset.id;
-                const name = button.dataset.name;
-                const mark = button.dataset.mark;
-                const amps = button.dataset.amps;
+    document.querySelectorAll('.edit-battery-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.getElementById('edit_name').value = btn.dataset.name;
+            document.getElementById('edit_mark').value = btn.dataset.mark;
+            document.getElementById('edit_type').value = btn.dataset.type;
+            document.getElementById('edit_voltage').value = btn.dataset.voltage;
+            document.getElementById('edit_amps').value = btn.dataset.amps;
 
-                document.getElementById('edit_id').value = id;
-                document.getElementById('edit_name').value = name;
-                document.getElementById('edit_mark').value = mark;
-                document.getElementById('edit_amps').value = amps;
-
-                const form = document.getElementById('editBatteryForm');
-                form.action = routeUpdate.replace(':id', id);
-
-                // Configura botão de deletar dentro do modal
-                document.getElementById('deleteInModalBtn').setAttribute('onclick', `deletar(${id})`);
-            });
+            document.getElementById('editBatteryForm').action =
+                routeUpdate.replace(':id', btn.dataset.id);
         });
-    </script>
+    });
+</script>
 
 @endsection

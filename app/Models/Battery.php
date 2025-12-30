@@ -11,7 +11,7 @@ class Battery extends Model
     
     protected $table = 'batterys';
 
-    protected $fillable = ['name', 'mark', 'amps'];
+    protected $fillable = ['name', 'mark','type','voltage', 'amps'];
 
     public function batteryProductions()
     {

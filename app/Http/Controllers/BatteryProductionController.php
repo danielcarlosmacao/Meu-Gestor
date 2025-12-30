@@ -53,6 +53,7 @@ class BatteryProductionController extends Controller
         // -------------------------------------------------------
         // 🔥 Calcular percentage SOMENTE se for ativa
         // -------------------------------------------------------
+        /*
         if ($bp->active === 'yes') {
 
             $tower = $bp->tower;
@@ -61,7 +62,7 @@ class BatteryProductionController extends Controller
 
             if ($tower && $battery && $summary) {
 
-                $voltageRatio = $tower->voltage / 12;
+                $voltageRatio = $tower->voltage / $bp->battery->voltage;
 
                 $totalAmp = $voltageRatio > 0
                     ? ($bp->amount * $battery->amps) / $voltageRatio
@@ -75,8 +76,9 @@ class BatteryProductionController extends Controller
                     'production_percentage' => round($percentage, 2)
                 ]);
             }
+               
         }
-
+ */
         // -------------------------------------------------------
         // LOG
         // -------------------------------------------------------

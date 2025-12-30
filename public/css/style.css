@@ -193,7 +193,18 @@ tbody tr:hover td {
   button {
     display: none !important;
   }
+
   a {
     display: none !important;
   }
+}
+
+
+/* span  Voltagem da bateria*/
+.voltbattery {
+  position: absolute;
+  top: 1;
+  right: 15px;
+  font-size: 9px;
+  color: #999;
 }
