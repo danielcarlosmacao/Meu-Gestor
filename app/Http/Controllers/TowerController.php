@@ -76,7 +76,7 @@ class TowerController extends Controller
 
             if ($batteryProd && $battery) {
 
-                $voltageRatio = $tower->voltage > 0 ? ($tower->voltage / 12) : 0;
+                $voltageRatio = $tower->voltage > 0 ? ($tower->voltage / $battery->voltage) : 0;
 
                 $batteryAmps = $battery->amps ?? 0;
                 $amount = $batteryProd->amount ?? 0;
