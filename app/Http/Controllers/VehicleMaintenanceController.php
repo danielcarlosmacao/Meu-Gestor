@@ -75,7 +75,7 @@ public function update(Request $request, $id)
         'cost'              => 'nullable|numeric',
         'status'            => 'required|in:pending,completed',
         'mileage'           => 'nullable|integer',
-        'parts_used'        => 'nullable|string|max:255',
+        'parts_used'        => 'nullable|string|max:1000',
         'workshop'          => 'nullable|string|max:255',
         'vehicle_services'  => 'nullable|array',
         'vehicle_services.*'=> 'exists:vehicle_services,id',
