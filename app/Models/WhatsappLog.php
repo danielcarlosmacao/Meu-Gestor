@@ -8,7 +8,8 @@ class WhatsappLog extends Model
 {
     protected $fillable = [
         'recipient_id',
-        'maintenance_id',
+        'ref_type',
+        'ref_id',
         'status',
         'message',
         'response',
@@ -26,8 +27,12 @@ class WhatsappLog extends Model
         return $this->belongsTo(Recipient::class);
     }
 
-    public function maintenance()
+    /**
+     * Relacionamento polimórfico
+     * Pode ser Maintenance, Vacation, etc.
+     */
+    public function ref()
     {
-        return $this->belongsTo(Maintenance::class);
+        return $this->morphTo();
     }
 }

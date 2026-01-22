@@ -9,8 +9,9 @@ Artisan::command('inspire', function () {
 })->purpose('Display an inspiring quote');
 
 
-Schedule::command('manutencao:enviar-whatsapp')
-    ->dailyAt('07:30'); // ou everyMinute() para testes
+Schedule::command('manutencao:enviar-whatsapp')->dailyAt('07:30');
+
+Schedule::command('vacations:enviar-whatsapp')->dailyAt('07:40');
 
 Schedule::command('mensagens:enviar')->everyMinute();
 

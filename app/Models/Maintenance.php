@@ -25,4 +25,9 @@ class Maintenance extends Model
     {
         return $this->belongsTo(Tower::class);
     }
+    
+     public function whatsappLogs()
+    {
+        return $this->morphMany(WhatsappLog::class, 'ref');
+    }
 }

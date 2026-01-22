@@ -15,10 +15,16 @@ class Vacation extends Model
         'end_date',
         'information',
     ];
+ 
 
     public function collaborator()
     {
         return $this->belongsTo(Collaborator::class);
+    }
+
+    public function whatsappLogs()
+    {
+        return $this->morphMany(WhatsappLog::class, 'ref');
     }
 
 }
