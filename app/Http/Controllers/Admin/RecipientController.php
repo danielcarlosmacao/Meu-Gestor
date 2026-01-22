@@ -71,14 +71,19 @@ class RecipientController extends Controller
         return redirect()->back()->with('success', 'Destinatário excluído com sucesso.');
     }
 
-    public function logs(SettingService $settingService)
-    {
-        $perPage = $settingService->getPerPage();
+public function logs(SettingService $settingService)
+{
+    $perPage = $settingService->getPerPage();
 
-        $logs = WhatsappLog::with(['recipient', 'maintenance.tower'])
-            ->orderBy('created_at', 'desc')
-            ->paginate($perPage);
+    $logs = WhatsappLog::with([
+        'recipient',
+        'ref'
+    ])
+    ->orderBy('created_at', 'desc')
+    ->paginate($perPage);
 
-        return view('admin.recipients.logs', compact('logs'));
-    }
+
+    return view('admin.recipients.logs', compact('logs'));
+}
+
 }
