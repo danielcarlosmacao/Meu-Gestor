@@ -39,7 +39,7 @@
     'collaborators.courses.create'=> 'criar cursos de colaboradores',
     'collaborators.courses.edit'=> 'editar cursos de colaboradores',
     'collaborators.courses.delete'=> 'Deletar cursos de colaboradores',
-    'tasks.view' =>'Visualiza tarefas',
+    'tasks.view' =>'Visualiza Calendario de tarefas',
     'tasks.create'=>'Adiciona tarefa',
     'tasks.edit'=>'Edita tarefa',
     'tasks.delete'=>'Deleta tarefa',
