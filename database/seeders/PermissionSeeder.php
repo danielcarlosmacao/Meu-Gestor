@@ -74,6 +74,12 @@ class PermissionSeeder extends Seeder
             'collaborators.courses.create',
             'collaborators.courses.edit',
             'collaborators.courses.delete',
+
+            //tasks
+            'tasks.view',
+            'tasks.create',
+            'tasks.edit',
+            'tasks.delete',
         ];
 
         // Criar permissões (se não existirem)

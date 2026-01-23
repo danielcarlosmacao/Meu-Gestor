@@ -42,6 +42,9 @@ require __DIR__ . '/web/stock.php';
 require __DIR__ . '/web/admin.php';
 
 
+require __DIR__ . '/web/task.php';
+
+
 //Route::get('/user', [UserController::class, 'index'])->name('user.index');
 Route::get('/welcome', function () {
     return view('welcome');

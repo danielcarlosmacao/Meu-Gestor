@@ -1,0 +1,45 @@
+<div class="modal fade" id="editTask{{ $task->id }}">
+    <div class="modal-dialog">
+        <form class="modal-content"
+              method="POST"
+              action="{{ route('tasks.update', $task) }}">
+            @csrf
+            @method('PUT')
+
+            <div class="modal-header">
+                <h5>Editar Tarefa</h5>
+            </div>
+
+            <div class="modal-body">
+
+                <input class="form-control mb-2"
+                    name="title"
+                    value="{{ $task->title }}"
+                    required>
+
+                <textarea class="form-control mb-2"
+                    name="description">{{ $task->description }}</textarea>
+
+                <select class="form-control mb-2" name="status">
+                    <option value="pending"
+                        @selected($task->status === 'pending')>
+                        Pendente
+                    </option>
+                    <option value="completed"
+                        @selected($task->status === 'completed')>
+                        Concluída
+                    </option>
+                </select>
+
+                <input type="color"
+                    name="color"
+                    class="form-control form-control-color"
+                    value="{{ $task->color }}">
+            </div>
+
+            <div class="modal-footer">
+                <button class="btn btn-primary">Atualizar</button>
+            </div>
+        </form>
+    </div>
+</div>

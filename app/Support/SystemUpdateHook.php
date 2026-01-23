@@ -18,6 +18,10 @@ class SystemUpdateHook
 
             $newPermissions = [
                 // 'reports.export',
+                'tasks.view',
+                'tasks.create',
+                'tasks.edit',
+                'tasks.delete'
             ];
 
             if (!empty($newPermissions)) {

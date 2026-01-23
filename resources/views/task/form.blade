@@ -1,0 +1,36 @@
+<div class="modal fade" id="addTask">
+    <div class="modal-dialog">
+        <form method="POST" action="{{ route('tasks.store') }}" class="modal-content">
+            @csrf
+            <div class="modal-header">
+                <h5>Nova Tarefa</h5>
+            </div>
+
+            <div class="modal-body">
+                <input type="hidden" name="task_date" value="{{ $date }}">
+
+                <div class="mb-2">
+                    <label>Título</label>
+                    <input type="text" name="title" class="form-control" required>
+                </div>
+
+                <div class="mb-2">
+                    <label>Descrição</label>
+                    <textarea name="description" class="form-control"></textarea>
+                </div>
+
+                <div class="mb-2">
+                    <label>Status</label>
+                    <select name="status" class="form-control">
+                        <option value="pending">Pendente</option>
+                        <option value="completed">Concluída</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button class="btn btn-success">Salvar</button>
+            </div>
+        </form>
+    </div>
+</div>

@@ -1,0 +1,152 @@
+/* ===== CONTAINER ===== */
+#calendar {
+    max-width: 100%;
+    margin: 0 auto;
+    font-family: 'Inter', 'Segoe UI', sans-serif;
+    font-size: 15px;
+}
+
+/* ===== CABEÇALHO ===== */
+.fc-toolbar-title {
+    font-size: 2rem;
+    font-weight: 600;
+    color: #111;
+    text-transform: capitalize;
+}
+
+/* ===== BOTÕES ===== */
+.fc .fc-button {
+    background-color: #198754;
+    border: none;
+    border-radius: 8px;
+    padding: 6px 14px;
+    font-weight: 500;
+    color: #fff;
+}
+
+.fc .fc-button:focus {
+    box-shadow: none;
+}
+
+/* ===== DIAS DA SEMANA ===== */
+.fc-col-header-cell {
+    background: #f8f9fa;
+    padding: 12px 0;
+    font-weight: 600;
+    font-size: 0.85rem;
+}
+
+.fc-col-header-cell a {
+    color: #111 !important;
+    text-decoration: none !important;
+}
+
+/* ===== CÉLULAS ===== */
+.fc-daygrid-day {
+    padding: 8px;
+}
+
+.fc-daygrid-day-frame {
+    border-radius: 10px;
+    transition: 0.2s;
+}
+/* ========== Houver do calendario ===========*/
+
+
+/* Remove background de seleção */
+.fc-daygrid-day.fc-day-today,
+.fc-daygrid-day.fc-day-selected,
+.fc-daygrid-day:focus,
+.fc-daygrid-day:active {
+    background: transparent !important;
+}
+
+/* Remove highlight automático */
+.fc-highlight {
+    background: transparent !important;
+}
+
+/* Remove focus ring */
+.fc a:focus,
+.fc button:focus {
+    outline: none !important;
+    box-shadow: none !important;
+}
+
+/* Remove seleção por teclado */
+.fc-daygrid-day:focus-within {
+    background: transparent !important;
+}
+
+/* ===============================
+   HOVER CONTROLADO (ÚNICO)
+================================ */
+.fc-daygrid-day-frame:hover {
+    background-color: #7aa6e4;
+    border-radius: 10px;
+    transition: background-color 0.15s ease;
+}
+
+/* Bloqueia hover em dias fora do mês */
+.fc-day-other .fc-daygrid-day-frame:hover {
+    background: transparent !important;
+}
+
+
+
+
+/* ===== NÚMERO DO DIA ===== */
+.fc-daygrid-day-number {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #111 !important;
+    text-decoration: none !important;
+}
+
+/* Remove underline TOTAL */
+.fc a {
+    text-decoration: none !important;
+    color: #111 !important;
+}
+
+/* ===== DIA ATUAL ===== */
+.fc-day-today .fc-daygrid-day-frame {
+    background: #e7f1ff !important;
+    border: 1px solid #cfe2ff;
+}
+
+/* ===== EVENTOS ===== */
+.fc-event {
+    border-radius: 10px;
+    padding: 4px 8px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    border: none;
+}
+
+/* Texto do evento */
+.fc-event-title {
+    color: #111;
+}
+
+/* ===== EVENTOS PENDENTES ===== */
+.fc-event[style*="#fd7e14"],
+.fc-event[style*="#ffc107"] {
+    background-color: #ffd43b !important;
+}
+
+/* ===== EVENTOS CONCLUÍDOS ===== */
+.fc-event[style*="#198754"],
+.fc-event[style*="#28a745"] {
+    background-color: #51cf66 !important;
+}
+
+/* ===== LIMPAR LINHAS FEIAS ===== */
+.fc-scrollgrid {
+    border: none;
+}
+
+.fc-scrollgrid td,
+.fc-scrollgrid th {
+    border: 1px solid #dee2e6;
+}
