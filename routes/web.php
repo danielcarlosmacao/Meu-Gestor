@@ -10,6 +10,7 @@ use Spatie\Permission\Middleware\RoleOrPermissionMiddleware;
 use App\Http\Controllers\PostitController;
 use App\Http\Controllers\Admin\RecipientController;
 use App\Http\Controllers\Admin\NotificationController;
+use App\Http\Controllers\TaskController;
 
 use App\Http\Controllers\MkAuthController;
 
@@ -20,17 +21,11 @@ Route::aliasMiddleware('role', RoleMiddleware::class);
 Route::aliasMiddleware('role_or_permission', RoleOrPermissionMiddleware::class);
 
 //----------------------------------------- AUTHENTICATION --------------------------
-
-Route::get('/dashboard', function () {
-    return view('welcome');
-})->middleware(['auth', 'verified'])->name('dashboard');
-
 Route::middleware(['auth'])->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
-
 // ---------------------------------------------------------------------------------------------------
 
 require __DIR__ . '/auth.php';
@@ -41,14 +36,20 @@ require __DIR__ . '/web/vacation.php';
 require __DIR__ . '/web/stock.php';
 require __DIR__ . '/web/admin.php';
 
-
 require __DIR__ . '/web/task.php';
 
+//---------------------------------------
+Route::get('/', [TaskController::class, 'index'])->middleware('can:tasks.view')->name('welcome');
+Route::get('/welcome', [TaskController::class, 'index'])->middleware('can:tasks.view')->name('welcome');
+Route::get('/dashboard', [TaskController::class, 'index'])->middleware('can:tasks.view')->name('dashboard');
 
-//Route::get('/user', [UserController::class, 'index'])->name('user.index');
-Route::get('/welcome', function () {
+
+/* -----------------------------------------Desativando postit -------------------
+Route::get('/dashboard', function () {
     return view('welcome');
-})->middleware(['auth', 'verified'])->name('welcome1');
+})->middleware(['auth', 'verified'])->name('dashboard');
+
+Route::get('/welcome', function () {return view('welcome');})->middleware(['auth', 'verified'])->name('welcome1');
 
 Route::middleware(['auth'])->group(function () {
     Route::get('/', [PostitController::class, 'index'])->name('welcome');
@@ -57,7 +58,7 @@ Route::middleware(['auth'])->group(function () {
     Route::delete('/postits/{id}', [PostitController::class, 'destroy'])->name('postits.destroy');
 });
 
-
+*/
 
 
 //extras 
