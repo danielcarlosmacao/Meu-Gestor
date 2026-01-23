@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
 use App\Models\Option;
 
@@ -55,59 +56,79 @@ class OptionController extends Controller
     }
     public function updateResource(Request $request)
     {
-       
-    $request->validate([
-        'hours_Generation' => 'required|integer',
-        'hours_autonomy'   => 'required|integer',
-        'pagination'       => 'required|integer',
-        'whatsapp_ip'      => 'nullable|string|max:255',
-        'whatsapp_method'  => 'nullable|string|in:get,post,GET,POST',
-        'whatsapp_user'    => 'nullable|string|max:255',
-        'whatsapp_token'   => 'nullable|string|max:255',
-    ]);
+        $data = $request->validate([
+            'hours_Generation' => 'required|integer|min:1',
+            'hours_autonomy' => 'required|integer|min:1',
+            'pagination' => 'required|integer|min:1|max:100',
+            'whatsapp_method' => 'nullable|in:GET,POST',
+            'whatsapp_ip' => 'nullable|string|max:255',
+            'whatsapp_user' => 'nullable|string|max:255',
+            'whatsapp_token' => 'nullable|string|max:255',
+        ]);
 
-    $keys = [
-        'hours_Generation',
-        'hours_autonomy',
-        'pagination',
-        'whatsapp_method',
-        'whatsapp_ip',
-        'whatsapp_user',
-        'whatsapp_token'
-    ];
+        DB::transaction(function () use ($data) {
 
-    foreach ($keys as $ref) {
-        $value = $request->input($ref);
+            foreach ($data as $reference => $newValue) {
 
-        // Normaliza valores "null" ou realmente null
-        if (is_null($value) || strtolower(trim((string) $value)) === 'null') {
-            $value = '';
-        }
+                // Normaliza valores
+                $newValue = is_null($newValue) || trim((string) $newValue) === 'null'
+                    ? ''
+                    : (string) $newValue;
 
-        // Busca o registro existente
-        $option = Option::where('reference', $ref)->first();
-        $oldData = $option ? $option->toArray() : null;
+                $option = Option::where('reference', $reference)->first();
 
-        // Atualiza ou cria
-        $option = Option::updateOrCreate(
-            ['reference' => $ref],
-            ['value' => $value]
-        );
+                // Se não existir ainda → cria e loga
+                if (!$option) {
+                    $option = Option::create([
+                        'reference' => $reference,
+                        'value' => $newValue,
+                    ]);
 
-        // Log da alteração
-        activity()
-            ->causedBy(auth()->user())
-            ->performedOn($option)
-            ->withProperties([
-                'reference' => $ref,
-                'old' => $oldData,
-                'new' => $option->toArray()
-            ])
-            ->log("Configuração '{$ref}' Atualizada");
+                    activity()
+                        ->causedBy(auth()->user())
+                        ->performedOn($option)
+                        ->withProperties([
+                            'reference' => $reference,
+                            'old' => null,
+                            'new' => $newValue,
+                        ])
+                        ->log("Configuração '{$reference}' criada");
+
+                    continue;
+                }
+
+                // Se valor não mudou → não faz NADA
+                if ((string) $option->value === $newValue) {
+                    continue;
+                }
+
+                // Guarda valor antigo
+                $oldValue = $option->value;
+
+                // Atualiza
+                $option->update(['value' => $newValue]);
+
+                // Loga somente se houve mudança
+                activity()
+                    ->causedBy(auth()->user())
+                    ->performedOn($option)
+                    ->withProperties([
+                        'reference' => $reference,
+                        'old' => [
+                            'value' => $oldValue,
+                        ],
+                        'new' => [
+                            'value' => $newValue,
+                        ],
+                    ])
+                    ->log("Configuração '{$reference}' atualizada");
+
+            }
+        });
+
+        return back()->with('success', 'Apenas as configurações alteradas foram salvas.');
     }
-        return redirect()->back()->with('success', 'Recursos atualizados com sucesso!');
-    }
-    
+
     public function editSystemResource()
     {
         $options = Option::pluck('value', 'reference')->toArray();
