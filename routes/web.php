@@ -39,11 +39,11 @@ require __DIR__ . '/web/admin.php';
 require __DIR__ . '/web/task.php';
 
 //---------------------------------------
-Route::get('/', [TaskController::class, 'index'])->middleware('can:tasks.view')->name('welcome');
-Route::get('/welcome', [TaskController::class, 'index'])->middleware('can:tasks.view')->name('welcome');
-Route::get('/dashboard', [TaskController::class, 'index'])->middleware('can:tasks.view')->name('dashboard');
-
-
+Route::middleware(['auth'])->group(function () {
+    Route::get('/', [TaskController::class, 'index'])->middleware('can:tasks.view')->name('welcome');
+    Route::get('/welcome', [TaskController::class, 'index'])->middleware('can:tasks.view')->name('welcome');
+    Route::get('/dashboard', [TaskController::class, 'index'])->middleware('can:tasks.view')->name('dashboard');
+});
 /* -----------------------------------------Desativando postit -------------------
 Route::get('/dashboard', function () {
     return view('welcome');
