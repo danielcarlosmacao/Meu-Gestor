@@ -88,7 +88,9 @@
                     $totalMaintenances = $vehicleMaintenances->count();
                     $totalCost = $vehicleMaintenances->sum('cost');
                     $lastMileage = $maxMileages[$vehicle->id] ?? '-';
+                    $kmWheeled = $kmWheeled[$vehicle->id] ?? '-';
                     $allCost = $allCost + $totalCost;
+                
                 @endphp
 
                 @if ($totalMaintenances > 0)
@@ -97,6 +99,9 @@
                         <div class="card-info"><strong>Total Manutenções:</strong> {{ $totalMaintenances }}</div>
                         <div class="card-info"><strong>Última Km:</strong>
                             {{ is_numeric($lastMileage) ? number_format($lastMileage, 0, ',', '.') . ' km' : '-' }}
+                        </div>
+                        <div class="card-info"><strong>Km Rodado:</strong>
+                        {{ is_numeric($kmWheeled) ? number_format($kmWheeled, 0, ',', '.') . ' km' : '-' }}
                         </div>
                         <div class="card-info"><strong>Valor Total:</strong> R$
                             {{ number_format($totalCost, 2, ',', '.') }}</div>

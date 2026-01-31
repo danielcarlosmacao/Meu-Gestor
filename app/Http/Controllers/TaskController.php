@@ -15,7 +15,7 @@ class TaskController extends Controller
     // Eventos para o calendário
     public function events()
     {
-        return Task::all()->map(function ($task) {
+        return Task::where('status', 'pending')->get()->map(function ($task) {
             return [
                 'id' => $task->id,
                 'title' => $task->title,
@@ -23,6 +23,7 @@ class TaskController extends Controller
                 'color' => $task->color,
             ];
         });
+
     }
 
     // Lista tarefas do dia

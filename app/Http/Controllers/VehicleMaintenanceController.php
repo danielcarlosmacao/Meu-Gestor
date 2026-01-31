@@ -9,7 +9,8 @@ use App\Models\VehicleService;
 use App\Models\Workshop;
 use App\Services\SettingService;
 use Illuminate\Support\Facades\DB;
-use PDF; // Importar no topo do controller
+use Barryvdh\DomPDF\Facade\Pdf;
+
 
 class VehicleMaintenanceController extends Controller
 {
@@ -150,21 +151,28 @@ public function destroy($id)
 {
     $startDate = $request->input('start_date');
     $endDate = $request->input('end_date');
-    $action = $request->input('action', 'view'); // padrão view
+    $action = $request->input('action', 'view'); 
 
     if (!$startDate || !$endDate) {
         abort(400, 'Período inválido.');
     }
 
+    // Obter todos os veículos ativos
     $vehicles = Vehicle::where('status', 'active')->get();
+    
+    // Obter todos os serviços de veículos ordenados por nome
     $vehicleServices = VehicleService::orderBy('name', 'asc')->get();
+    
+    // Obter todos os workshops
     $workshops = Workshop::all();
 
+    // Obter as manutenções de veículos no intervalo de datas
     $maintenances = VehicleMaintenance::with(['vehicle', 'services'])
         ->whereBetween('maintenance_date', [$startDate, $endDate])
         ->orderBy('maintenance_date', 'desc')
         ->get();
 
+    // Obter as maiores quilometragens por veículo no intervalo de datas
     $maxMileages = DB::table('vehicle_maintenances')
         ->select('vehicle_id', DB::raw('MAX(mileage) as max_mileage'))
         ->whereBetween('maintenance_date', [$startDate, $endDate])
@@ -172,10 +180,37 @@ public function destroy($id)
         ->groupBy('vehicle_id')
         ->pluck('max_mileage', 'vehicle_id');
 
-    $data = compact('vehicles', 'vehicleServices', 'maintenances', 'workshops', 'maxMileages', 'startDate', 'endDate');
+    // Obter as menores quilometragens por veículo no intervalo de datas
+    $minMileages = DB::table('vehicle_maintenances')
+        ->select('vehicle_id', DB::raw('MIN(mileage) as min_mileage'))
+        ->whereBetween('maintenance_date', [$startDate, $endDate])
+        ->whereNull('deleted_at')
+        ->groupBy('vehicle_id')
+        ->pluck('min_mileage', 'vehicle_id');
 
+    // Calcular a quilometragem rodada para cada veículo (máxima - mínima)
+    $kmWheeled = [];
+    foreach ($maxMileages as $vehicleId => $maxMileage) {
+        $minMileage = $minMileages->get($vehicleId, 0); // Valor padrão de 0 caso não tenha mínimo
+        $kmWheeled[$vehicleId] = $maxMileage - $minMileage;
+    }
+    // Passar todos os dados para a view
+    $data = compact(
+        'vehicles', 
+        'vehicleServices', 
+        'maintenances', 
+        'workshops', 
+        'maxMileages', 
+        'minMileages', 
+        'kmWheeled',
+        'startDate', 
+        'endDate'
+    );
+
+    // Gerar o PDF
     $pdf = PDF::loadView('fleet.vehicles.vehicle_maintenances_pdf', $data);
 
+    // Se a ação for 'download', gerar o download do PDF, caso contrário, stream
     if ($action === 'download') {
         return $pdf->download("relatorio_manutencoes_{$startDate}_a_{$endDate}.pdf");
     }
