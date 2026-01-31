@@ -81,28 +81,28 @@
             @php
                 $count = 0;
                 $allCost = 0;
-            @endphp
+            @endphp 
             @foreach ($vehicles as $vehicle)
                 @php
                     $vehicleMaintenances = $maintenances->where('vehicle_id', $vehicle->id);
                     $totalMaintenances = $vehicleMaintenances->count();
                     $totalCost = $vehicleMaintenances->sum('cost');
                     $lastMileage = $maxMileages[$vehicle->id] ?? '-';
-                    $kmWheeled = $kmWheeled[$vehicle->id] ?? '-';
+                    //$kmWheeled = $kmWheeled[$vehicle->id] ?? '-';
                     $allCost = $allCost + $totalCost;
-                
+              
                 @endphp
 
                 @if ($totalMaintenances > 0)
-                    <td>
+                    <td>  
                         <div class="card-title">{{ $vehicle->model }} {{ $vehicle->year }}</div>
                         <div class="card-info"><strong>Total Manutenções:</strong> {{ $totalMaintenances }}</div>
                         <div class="card-info"><strong>Última Km:</strong>
                             {{ is_numeric($lastMileage) ? number_format($lastMileage, 0, ',', '.') . ' km' : '-' }}
-                        </div>
+                        </div>{{-- }}
                         <div class="card-info"><strong>Km Rodado:</strong>
                         {{ is_numeric($kmWheeled) ? number_format($kmWheeled, 0, ',', '.') . ' km' : '-' }}
-                        </div>
+                        </div>{{-- - --}}
                         <div class="card-info"><strong>Valor Total:</strong> R$
                             {{ number_format($totalCost, 2, ',', '.') }}</div>
                     </td>
