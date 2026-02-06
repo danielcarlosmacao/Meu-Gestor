@@ -36,6 +36,7 @@
 
                 events: "{{ route('tasks.events') }}",
 
+                
                 dateClick(info) {
                     window.location.href = `/tasks/day/${info.dateStr}`;
                 }

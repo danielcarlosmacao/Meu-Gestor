@@ -40,9 +40,9 @@ require __DIR__ . '/web/task.php';
 
 //---------------------------------------
 Route::middleware(['auth'])->group(function () {
-    Route::get('/', [TaskController::class, 'index'])->middleware('can:tasks.view')->name('welcome');
-    Route::get('/welcome', [TaskController::class, 'index'])->middleware('can:tasks.view')->name('welcome');
-    Route::get('/dashboard', [TaskController::class, 'index'])->middleware('can:tasks.view')->name('dashboard');
+    Route::get('/', [TaskController::class, 'index'])->name('welcome');
+    Route::get('/welcome', [TaskController::class, 'index'])->name('welcome');
+    Route::get('/dashboard', [TaskController::class, 'index'])->name('dashboard');
 });
 /* -----------------------------------------Desativando postit -------------------
 Route::get('/dashboard', function () {
