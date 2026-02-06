@@ -5,9 +5,7 @@ use App\Http\Controllers\TaskController;
 Route::middleware(['auth'])->prefix('tasks')->group(function () {
 
     //Visualização do calendário e dias
-    Route::get('/', [TaskController::class, 'index'])
-        ->middleware('can:tasks.view')
-        ->name('tasks.calendar');
+    Route::get('/', [TaskController::class, 'index'])->name('tasks.calendar');
 
     Route::get('/events', [TaskController::class, 'events'])
         ->middleware('can:tasks.view')
