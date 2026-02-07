@@ -34,7 +34,7 @@ class NotificationController extends Controller
 
     $recipients = Recipient::whereHas('references', function ($query) {
         $query->where('name', 'notification');
-    })->get();
+    })->orderBy('name' , 'ASC')->get();
 
     return view('admin.notification.index', compact('notifications', 'recipients'));
 }

@@ -49,7 +49,7 @@
     <nav class="navbar navbar-expand-lg navbar-dark bgc-primary w-100">
         <div class="container-fluid">
             <a class="navbar-brand" href="{{ route('welcome') }}">
-                @if (!empty($appOptions['logo']))
+                @if (!empty($appOptions['logo']) && file_exists(public_path($appOptions['logo'])))
                     <img src="{{ asset($appOptions['logo']) }}" alt="Logo do Sistema" style="height: 50px;">
                 @else
                     <strong>{{ config('app.name') }}</strong>

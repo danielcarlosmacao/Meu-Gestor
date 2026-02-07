@@ -11,7 +11,17 @@
                 <div id="calendar"></div>
             </div>
         </div>
+    @else
+        <div class="container mt-5 text-center">
+            @if (!empty($appOptions['logo']) && file_exists(public_path($appOptions['logo'])))
+                <img src="{{ asset($appOptions['logo']) }}" alt="Logo do Sistema" style="height: 50px;">
+            @else
+                <strong>{{ config('app.name') }}</strong>
+            @endif
+        </div>
     @endcan
+
+
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js"></script>
 
     <script>
@@ -36,7 +46,7 @@
 
                 events: "{{ route('tasks.events') }}",
 
-                
+
                 dateClick(info) {
                     window.location.href = `/tasks/day/${info.dateStr}`;
                 }
