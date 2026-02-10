@@ -53,6 +53,7 @@
                     <img src="{{ asset($appOptions['logo']) }}" alt="Logo do Sistema" style="height: 50px;">
                 @else
                     <strong>{{ config('app.name') }}</strong>
+
                 @endif &nbsp;&nbsp;&nbsp;
             </a>
             <div class="collapse navbar-collapse show">
