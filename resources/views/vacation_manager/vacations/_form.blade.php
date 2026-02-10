@@ -34,7 +34,7 @@
                     <div class="mb-3">
                         <label>Dias de ferias</label>
                         <input type="number" name="temp_vacations" id="temp_vacations" class="form-control" 
-                            step="1" min="1" max="60">
+                            step="1" min="1" max="30">
                     </div>
                     <div class="mb-3">
                         <label>Data de Início</label>
