@@ -43,5 +43,6 @@
     'tasks.create'=>'Adiciona tarefa',
     'tasks.edit'=>'Edita tarefa',
     'tasks.delete'=>'Deleta tarefa',
+    'administrator.vpn'=>'Administrar VPN',
 
 ];

@@ -53,7 +53,6 @@
                     <img src="{{ asset($appOptions['logo']) }}" alt="Logo do Sistema" style="height: 50px;">
                 @else
                     <strong>{{ config('app.name') }}</strong>
-
                 @endif &nbsp;&nbsp;&nbsp;
             </a>
             <div class="collapse navbar-collapse show">
@@ -131,7 +130,7 @@
                     <!-- Ferias  -->
                     @can('vacations.view')
                         <li class="nav-item dropdown position-static" id="menuFerias">
-                            <a class="nav-link dropdown-toggle" href="#">RH 
+                            <a class="nav-link dropdown-toggle" href="#">RH
                                 <i class="bi bi-people"></i>
                             </a>
                             <div class="dropdown-menu mega-menu">
@@ -142,7 +141,8 @@
                                             <a href="{{ route('vacation_manager.collaborators.index') }}">Colaboradores</a>
                                         @endcan
                                         @can('collaborators.courses.view')
-                                        <a href="{{ route('vacation_manager.collaborator.courses.index') }}">Certificados</a>
+                                            <a
+                                                href="{{ route('vacation_manager.collaborator.courses.index') }}">Certificados</a>
                                         @endcan
                                     </div>
                                     <div class="col-md-6">
@@ -169,12 +169,15 @@
                             <div class="dropdown-menu mega-menu">
                                 <div class="row">
                                     @can('stock.view')
-                                    <div class="col-md-4">
-                                        <h6>Estoque</h6>
-                                        <a href="{{ route('stock.items.index') }}"><i class="fa fa-cogs"></i> Inventario</a>
-                                        <a href="{{ route('stock.movements.index') }}"><i class="fa fa-cogs"></i>Movimentação</a>
-                                        <a href="{{ route('stock.items.showProduction') }}"><i class="fa fa-cogs"></i>Estoque Vs Produção</a>
-                                    </div>
+                                        <div class="col-md-4">
+                                            <h6>Estoque</h6>
+                                            <a href="{{ route('stock.items.index') }}"><i class="fa fa-cogs"></i>
+                                                Inventario</a>
+                                            <a href="{{ route('stock.movements.index') }}"><i
+                                                    class="fa fa-cogs"></i>Movimentação</a>
+                                            <a href="{{ route('stock.items.showProduction') }}"><i
+                                                    class="fa fa-cogs"></i>Estoque Vs Produção</a>
+                                        </div>
                                     @endcan
                                     <div class="col-md-4">
                                         <h6>Notificaçoes</h6>
@@ -190,6 +193,11 @@
                                         @can('api.nfe')
                                             <a href="{{ route('api.mk.nfe') }}">NFE Mk-Auth</a>
                                         @endcan
+                                        @if (config('services.wireguard.url') && config('services.wireguard.password'))
+                                            @can('administrator.vpn')
+                                                <a href="{{ route('api.vpn.index') }}">VPN WF</a>
+                                            @endcan
+                                        @endif
                                     </div>
                                 </div>
                             </div>
@@ -304,7 +312,7 @@
 
     <!-- alert tipo toast no sistema -->
     @include('layouts.toast')
-    
+
 
 </body>
 

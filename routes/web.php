@@ -38,6 +38,8 @@ require __DIR__ . '/web/admin.php';
 
 require __DIR__ . '/web/task.php';
 
+require __DIR__ . '/web/vpn.php';
+
 //---------------------------------------
 Route::middleware(['auth'])->group(function () {
     Route::get('/', [TaskController::class, 'index'])->name('welcome');

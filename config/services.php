@@ -35,4 +35,9 @@ return [
         ],
     ],
 
+    'wireguard' => [
+        'url' => env('WIREGUARD_URL'),
+        'password' => env('WIREGUARD_PASSWORD'),
+    ],
+
 ];

@@ -80,6 +80,9 @@ class PermissionSeeder extends Seeder
             'tasks.create',
             'tasks.edit',
             'tasks.delete',
+
+            //vpn
+            'administrator.vpn',
         ];
 
         // Criar permissões (se não existirem)
