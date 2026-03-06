@@ -18,7 +18,6 @@ class SystemUpdateHook
 
             $newPermissions = [
                 // 'reports.export',
-                'administrator.vpn',
             ];
 
             if (!empty($newPermissions)) {
