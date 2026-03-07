@@ -5,11 +5,6 @@
 
         <h2 class="mb-4">Gerenciar VPN</h2>
 
-        @if (session('success'))
-            <div class="alert alert-success">
-                {{ session('success') }}
-            </div>
-        @endif
 
         <div class="card mb-4">
             <div class="card-header">
@@ -73,17 +68,10 @@
                                 </td>
 
                                 <td>
-
-                                    <form method="POST" action="{{ route('api.vpn.destroy', $client['id']) }}"
-                                        onsubmit="return confirm('Excluir VPN?')">
-                                        @csrf
-                                        @method('DELETE')
-
-                                        <button class="btn btn-danger">
-                                            Excluir
-                                        </button>
-
-                                    </form>
+                                    <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal"
+                                        onclick="setDeleteId('{{ $client['id'] }}','{{ $client['name'] }}')">
+                                        Excluir
+                                    </button>
 
                                 </td>
 
@@ -145,7 +133,58 @@
         </div>
 
     </div>
+    <!-- Modal confirmar exclusão -->
 
+    <div class="modal fade" id="deleteModal" tabindex="-1">
+
+        <div class="modal-dialog modal-dialog-centered">
+
+            <div class="modal-content">
+
+                <form method="POST" id="deleteForm">
+
+                    @csrf
+                    @method('DELETE')
+
+                    <div class="modal-header">
+
+                        <h5 class="modal-title">
+                            Confirmar exclusão
+                        </h5>
+
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+
+                    </div>
+
+                    <div class="modal-body">
+
+                        <p id="deleteText"></p>
+
+                        <label class="form-label">Digite sua senha</label>
+
+                        <input type="password" name="password" class="form-control" required>
+
+                    </div>
+
+                    <div class="modal-footer">
+
+                        <button class="btn btn-danger">
+                            Excluir
+                        </button>
+
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            Cancelar
+                        </button>
+
+                    </div>
+
+                </form>
+
+            </div>
+
+        </div>
+
+    </div>
     <script>
         function showQr(id, name) {
 
@@ -158,6 +197,20 @@
             document.getElementById('vpnName').innerText = "VPN: " + name;
 
             document.getElementById('downloadBtn').href = downloadUrl;
+
+        }
+
+        function setDeleteId(id, name) {
+
+            let form = document.getElementById('deleteForm');
+
+            let url = "{{ route('api.vpn.destroy', ':id') }}";
+            url = url.replace(':id', id);
+
+            form.action = url;
+
+            document.getElementById('deleteText').innerHTML =
+                "Tem certeza que deseja excluir a VPN: <strong class='text-danger'>" + name + "</strong>?";
 
         }
     </script>

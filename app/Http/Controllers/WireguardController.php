@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Services\WireguardService;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Auth;
 
 class WireguardController extends Controller
 {
@@ -25,8 +27,12 @@ class WireguardController extends Controller
         return redirect()->back()->with('success', 'VPN criada com sucesso');
     }
 
-    public function destroy($id, WireguardService $wg)
+    public function destroy(Request $request, $id, WireguardService $wg)
     {
+        if (!Hash::check($request->password, Auth::user()->password)) {
+            return redirect()->back()->with('error', 'Senha incorreta.');
+        }
+
         $wg->deleteClient($id);
 
         return redirect()->back()->with('success', 'VPN removida');
@@ -43,7 +49,7 @@ class WireguardController extends Controller
     public function download($id, WireguardService $wg)
     {
         $config = $wg->getConfig($id);
-        $idabrev = mb_strimwidth($id , 0, 7, "");
+        $idabrev = mb_strimwidth($id, 0, 7, "");
 
         return response($config)
             ->header('Content-Type', 'text/plain')
