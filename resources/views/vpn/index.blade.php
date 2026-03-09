@@ -9,6 +9,7 @@
         <div class="card mb-4">
             <div class="card-header">
                 Criar nova VPN
+                <a href="{{ config('services.wireguard.url') }}"><i class="bi bi-shield-lock"></i></a>
             </div>
 
             <div class="card-body">
