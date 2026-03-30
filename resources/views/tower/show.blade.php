@@ -8,11 +8,12 @@
         <div class="container mb-2 mb-md-5 mt-2 mt-md-5">
             <h2 class="text-center"> {{ $tower->name }}
                 @can('towers.edit')
-                    <button class="btn dcm-btn-primary btn-sm " data-bs-toggle="modal"
+                    <button class="btn dcm-btn-primary btn-sm" data-bs-toggle="modal"
                         data-bs-target="#editModal{{ $tower->id }}">
                         <i class="bi bi-pencil-fill"></i>
                     </button>
                 @endcan
+                <a href="{{route('tower.gallery.index', $tower->id)}}" class="btn dcm-btn-primary btn-sm"><i class="bi bi-image"></i></a>
             </h2>
         </div>
         <div class="row g-3">

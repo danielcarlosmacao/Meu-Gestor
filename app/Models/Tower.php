@@ -110,5 +110,9 @@ class Tower extends Model
     }
 
 
+    public function gallery()
+    {
+        return $this->hasMany(TowerGallery::class);
+    }
 
 }

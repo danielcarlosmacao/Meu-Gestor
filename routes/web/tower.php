@@ -17,6 +17,8 @@ Route::middleware(['auth', 'permission:towers.view'])->group(function () {
     Route::get('/battery', [BatteryController::class, 'index'])->name('battery.index');
     Route::get('/plate', [PlateController::class, 'index'])->name('plate.index');
     Route::get('/batteryproduction/report/{batteryId}', [BatteryProductionController::class, 'report'])->name('batteryproduction.report');
+    //Gallery
+    Route::get('/gallery/{id}', [TowerController::class, 'gallery'])->name('tower.gallery.index');
 });
 //towers.create
 Route::middleware(['auth', 'permission:towers.create'])->group(function () {
@@ -56,6 +58,13 @@ Route::middleware(['auth', 'permission:towers.manage'])->group(function () {
     Route::delete('/plateproduction/{id}', [PlateProductionController::class, 'destroy'])->name('plateproduction.destroy');
 
     Route::get('/tower/{id}/recalcular-baterias', [BatteryProductionController::class, 'recalcularPercentuais'])->name('tower.recalcular.baterias');
+
+    Route::get('/gallery/{id}', [TowerController::class, 'gallery'])->name('tower.gallery.index');
+    Route::get('/tower/image/{id}', [TowerController::class, 'showImage'])->name('tower.image.show');
+    Route::post('/tower/image', [TowerController::class, 'storeImage'])->name('tower.image.store');
+    Route::delete('/tower/image/{id}', [TowerController::class, 'destroyImage'])->name('tower.image.destroy');
+    Route::post('/tower/image/{id}/restore', [TowerController::class, 'restoreImage'])->name('tower.image.restore');
+    Route::delete('/tower/image/{id}/force', [TowerController::class, 'forceDeleteImage'])->name('tower.image.forceDelete');
 
 });
 // towers.maintenance

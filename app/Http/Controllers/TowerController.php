@@ -10,6 +10,7 @@ use App\Models\Equipment;
 use App\Models\Plate;
 use App\Services\SettingService;
 use App\Models\Option;
+use App\Models\TowerGallery;
 use Carbon\Carbon;
 
 class TowerController extends Controller
@@ -318,5 +319,89 @@ class TowerController extends Controller
         return redirect()->back()->with('success', "Summaries verificadas. Criadas: $criadas");
     }
 
+
+    // LISTAR GALERIA
+    public function gallery($id)
+    {
+        // Verifica se quer mostrar imagens excluídas
+        $showDeleted = request()->query('deleted_at') === 's';
+
+        // Carrega a torre com a galeria
+        $tower = Tower::with([
+            'gallery' => function ($query) use ($showDeleted) {
+                if ($showDeleted) {
+                    $query->onlyTrashed(); // Pega apenas imagens excluídas
+                }
+            }
+        ])->findOrFail($id);
+
+        return view('tower.gallery.index', compact('tower', 'showDeleted'));
+    }
+
+    public function showImage($id)
+    {
+
+        $image = TowerGallery::withTrashed()->findOrFail($id);
+
+
+        $path = storage_path('app/public/' . $image->path);
+
+        if (!file_exists($path)) {
+            abort(404);
+        }
+
+        return response()->file($path);
+    }
+
+    // UPLOAD DE IMAGEM
+    public function storeImage(Request $request)
+    {
+        $request->validate([
+            'tower_id' => 'required|exists:towers,id',
+            'image' => 'required|image|max:2048'
+        ]);
+
+        $path = $request->file('image')->store('towers', 'public');
+
+        TowerGallery::create([
+            'tower_id' => $request->tower_id,
+            'path' => $path,
+        ]);
+
+        return back()->with('success', 'Imagem enviada com sucesso!');
+    }
+
+    // SOFT DELETE (excluir imagem)
+    public function destroyImage($id)
+    {
+        $image = TowerGallery::findOrFail($id);
+        $image->delete();
+
+        return back()->with('success', 'Imagem removida!');
+    }
+
+    // RESTAURAR IMAGEM
+    public function restoreImage($id)
+    {
+        $image = TowerGallery::withTrashed()->findOrFail($id);
+        $image->restore();
+
+        return back()->with('success', 'Imagem restaurada!');
+    }
+
+    // EXCLUSÃO PERMANENTE
+    public function forceDeleteImage($id)
+    {
+        $image = TowerGallery::withTrashed()->findOrFail($id);
+
+        // opcional: deletar arquivo físico
+        if (\Storage::disk('public')->exists($image->path)) {
+            \Storage::disk('public')->delete($image->path);
+        }
+
+        $image->forceDelete();
+
+        return back()->with('success', 'Imagem deletada permanentemente!');
+    }
 
 }
