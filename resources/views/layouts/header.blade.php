@@ -78,6 +78,9 @@
                                         @can('towers.maintenance')
                                             <a href="{{ route('maintenance.index') }}"><i class="fa fa-cogs"></i> Serviços</a>
                                         @endcan
+                                        @can('towers.maintenance')
+                                            <a href="{{ route('tower.gallery.show') }}"><i class="fa fa-cogs"></i>Galeria</a>
+                                        @endcan
                                     </div>
 
                                 </div>

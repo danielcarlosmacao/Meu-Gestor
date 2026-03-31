@@ -12,6 +12,7 @@ use App\Services\SettingService;
 use App\Models\Option;
 use App\Models\TowerGallery;
 use Carbon\Carbon;
+use App\Services\ImageService;
 
 class TowerController extends Controller
 {
@@ -337,6 +338,14 @@ class TowerController extends Controller
 
         return view('tower.gallery.index', compact('tower', 'showDeleted'));
     }
+    public function galleryShow()
+    {
+        // Carrega a torre com a galeria
+        $images = TowerGallery::orderBy('tower_id', 'ASC')->paginate(24);
+        
+
+        return view('tower.gallery.show', compact('images'));
+    }
 
     public function showImage($id)
     {
@@ -354,21 +363,21 @@ class TowerController extends Controller
     }
 
     // UPLOAD DE IMAGEM
-    public function storeImage(Request $request)
+    public function storeImage(Request $request, ImageService $imageService)
     {
         $request->validate([
             'tower_id' => 'required|exists:towers,id',
-            'image' => 'required|image|max:2048'
+            'images.*' => 'required|image|max:2048'
         ]);
 
-        $path = $request->file('image')->store('towers', 'public');
+        if ($request->hasFile('images')) {
+            $imageService->saveImages(
+                $request->file('images'),
+                $request->tower_id
+            );
+        }
 
-        TowerGallery::create([
-            'tower_id' => $request->tower_id,
-            'path' => $path,
-        ]);
-
-        return back()->with('success', 'Imagem enviada com sucesso!');
+        return back()->with('success', 'Imagens enviadas com sucesso!');
     }
 
     // SOFT DELETE (excluir imagem)

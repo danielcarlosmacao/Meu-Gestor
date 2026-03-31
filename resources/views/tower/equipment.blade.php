@@ -20,7 +20,6 @@
                 <tr>
                     <th scope="col">Nome</th>
                     <th scope="col">Watts</th>
-                    <th scope="col">Estoque</th>
                     <th scope="col">Em Produção</th>
                     <th scope="col"></th>
                 </tr>
@@ -30,7 +29,6 @@
                     <tr>
                         <th scope="row">{{ $equipment->name }}</th>
                         <td>{{ $equipment->watts }}</td>
-                        <td>{{ $equipment->stock > 0 ? $equipment->stock : '' }}</td>
                         <td>{{ $equipment->equipment_productions_count }}</td>
                         <td class="text-center align-middle p-1">
                             <div class="btn-group">

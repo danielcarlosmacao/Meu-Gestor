@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Maintenance;
 use App\Models\Tower;
 use App\Services\SettingService;
+use App\Services\ImageService;
 
 class MaintenancesController extends Controller
 {
@@ -27,7 +28,9 @@ class MaintenancesController extends Controller
     }
 
 
-    public function store(Request $request)
+
+
+    public function store(Request $request, ImageService $imageService)
     {
         $validated = $request->validate([
             'tower_id' => 'required|exists:towers,id',
@@ -35,9 +38,18 @@ class MaintenancesController extends Controller
             'maintenance_date' => 'required|date',
             'next_maintenance_date' => 'required|date|after_or_equal:maintenance_date',
             'status' => 'required|in:pending,completed,archived',
+            'images.*' => 'image|max:2048'
         ]);
 
         $maintenance = Maintenance::create($validated);
+
+        // 👇 salvar imagens
+        if ($request->hasFile('images')) {
+            $imageService->saveImages(
+                $request->file('images'),
+                $request->tower_id
+            );
+        }
 
         activity()
             ->causedBy(auth()->user())
@@ -48,7 +60,6 @@ class MaintenancesController extends Controller
             ->log('Manutenção da torre Criada');
 
         return redirect()->back()->with('success', 'Manutenção adicionada com sucesso.');
-
     }
 
     public function update(Request $request, $id)

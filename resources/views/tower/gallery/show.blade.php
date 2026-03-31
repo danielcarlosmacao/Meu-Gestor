@@ -3,34 +3,16 @@
 
 @section('content')
 
-    @php
-        $showDeleted = $showDeleted ?? false;
-    @endphp
 
     <div class="container mb-4 mt-4">
         <h2 class="text-center">
-            Galeria - {{ $tower->name ?? 'Torre' }}
-
-            @can('towers.manage')
-                <button class="btn dcm-btn-primary" data-bs-toggle="modal" data-bs-target="#uploadModal">
-                    <i class="bi bi-plus-lg"></i>
-                </button>
-            @endcan
-            @can('administrator.user')
-                @if ($showDeleted)
-                    <a href="{{ route('tower.gallery.index', $tower->id) }}" class="btn btn-secondary"><i
-                            class="bi bi-house"></i></a>
-                @else
-                    <a href="{{ route('tower.gallery.index', $tower->id) . '?deleted_at=s' }}" class="btn btn-secondary"> <i
-                            class="bi bi-trash"></i></a>
-                @endif
-            @endcan
-    </div>
+            Galeria
+        </h2>
     </div>
 
     <div class="container">
         <div class="row g-3">
-            @forelse($tower->gallery as $image)
+            @forelse($images as $image)
                 @php $url = route('tower.image.show', $image->id); @endphp
                 <div class="col-6 col-md-3 col-lg-2">
                     <div class="card shadow-sm border-0" style="cursor:pointer;">
@@ -45,6 +27,8 @@
                 </div>
             @endforelse
         </div>
+        <div class="d-flex justify-content-center mt-4">
+            {{ $images->links() }}</div>
     </div>
 
     <!-- Modal de visualização -->
@@ -87,27 +71,7 @@
         </div>
     </div>
 
-    <!-- Modal de upload -->
-    <div class="modal fade" id="uploadModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog">
-            <form action="{{ route('tower.image.store') }}" method="POST" enctype="multipart/form-data">
-                @csrf
-                <input type="hidden" name="tower_id" value="{{ $tower->id }}">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title">Enviar imagem</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
-                    </div>
-                    <div class="modal-body">
-                        <input type="file" name="images[]" class="form-control" multiple accept="image/*">
-                    </div>
-                    <div class="modal-footer">
-                        <button class="btn btn-primary">Salvar</button>
-                    </div>
-                </div>
-            </form>
-        </div>
-    </div>
+
 
     <script>
         const modalImage = document.getElementById('modalImage');

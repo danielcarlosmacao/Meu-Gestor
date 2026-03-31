@@ -60,6 +60,7 @@ Route::middleware(['auth', 'permission:towers.manage'])->group(function () {
     Route::get('/tower/{id}/recalcular-baterias', [BatteryProductionController::class, 'recalcularPercentuais'])->name('tower.recalcular.baterias');
 
     Route::get('/gallery/{id}', [TowerController::class, 'gallery'])->name('tower.gallery.index');
+    Route::get('/tower/gallery/show', [TowerController::class, 'galleryShow'])->name('tower.gallery.show');
     Route::get('/tower/image/{id}', [TowerController::class, 'showImage'])->name('tower.image.show');
     Route::post('/tower/image', [TowerController::class, 'storeImage'])->name('tower.image.store');
     Route::delete('/tower/image/{id}', [TowerController::class, 'destroyImage'])->name('tower.image.destroy');

@@ -117,7 +117,7 @@
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
                     </div>
                     <div class="modal-body">
-                        <form action="{{ route('maintenance.store') }}" method="post">
+                        <form action="{{ route('maintenance.store') }}" method="post" enctype="multipart/form-data">
                             @csrf
                             <div class="mb-3">
                                 <label for="tower_id" class="form-label">Torre</label>
@@ -140,7 +140,7 @@
                             <div class="mb-3">
                                 <label for="next_maintenance_date" class="form-label">Próxima Manutenção</label>
                                 <input type="date" class="form-control" id="next_maintenance_date"
-                                    name="next_maintenance_date" >
+                                    name="next_maintenance_date">
                             </div>
                             <div class="mb-3">
                                 <label for="status" class="form-label">Situação</label>
@@ -149,6 +149,13 @@
                                     <option value="completed">Concluída</option>
                                     <option value="archived">Arquivada</option>
                                 </select>
+                            </div>
+
+                            <div class="modal-header">
+                                <label for="image" class="form-label">Anexar imagem</label>
+                            </div>
+                            <div class="modal-body">
+                                <input type="file" name="images[]" class="form-control" multiple accept="image/*">
                             </div>
                             <div class="text-end">
                                 <button type="submit" class="btn dcm-btn-primary">Salvar</button>
