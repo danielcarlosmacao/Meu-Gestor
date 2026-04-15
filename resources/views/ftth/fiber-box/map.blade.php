@@ -173,7 +173,7 @@
                     @csrf
 
 
-                    <input type="hidden" name="pon_id" value="{{ $pon }}">
+                    <input type="hidden" name="pon_id" value="{{ $pon->id }}">
 
                     <div class="modal-content">
 
