@@ -60,27 +60,32 @@
                     @can('towers.view')
                         <!-- gestao de torre -->
                         <li class="nav-item dropdown position-static" id="menutower">
-                            <a class="nav-link dropdown-toggle" href="#">TORRES <i
+                            <a class="nav-link dropdown-toggle" href="#">REDE<i
                                     class="bi bi-broadcast ms-2"></i></a>
                             <div class="dropdown-menu mega-menu">
                                 <div class="row">
                                     <div class="col-md-1">
                                     </div>
                                     <div class="col-md-6">
-                                        <h6>Gestão das torres</h6>
+                                        <h6>Gestão da Rede</h6>
                                         <a href="{{ route('tower.index') }}">Torres</a>
+                                        @can('ftth.view')
+                                            <a href="{{ route('pon.index') }}"><i class="fa fa-cogs"></i>Rede Optica</a>
+                                        @endcan
+                                        @can('towers.maintenance')
+                                            <a href="{{ route('maintenance.index') }}"><i class="fa fa-cogs"></i>Manutenção de Torres</a>
+                                        @endcan
+                                        @can('towers.manage')
+                                            <a href="{{ route('tower.gallery.show') }}"><i class="fa fa-cogs"></i>Galeria</a>
+                                        @endcan
+                                    </div>
+                                    <div class="col-md-5">
+                                        <h6>Adicionais</h6>
+
+
                                         <a href="{{ route('battery.index') }}">Baterias</a>
                                         <a href="{{ route('equipment.index') }}">Equipamentos</a>
                                         <a href="{{ route('plate.index') }}">Placas solar</a>
-                                    </div>
-                                    <div class="col-md-5">
-                                        <h6>Extra</h6>
-                                        @can('towers.maintenance')
-                                            <a href="{{ route('maintenance.index') }}"><i class="fa fa-cogs"></i> Serviços</a>
-                                        @endcan
-                                        @can('towers.maintenance')
-                                            <a href="{{ route('tower.gallery.show') }}"><i class="fa fa-cogs"></i>Galeria</a>
-                                        @endcan
                                     </div>
 
                                 </div>
@@ -283,7 +288,7 @@
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
     {{--}}
-    
+
     <!-- Bootstrap JS (necessário para modal funcionar) -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 

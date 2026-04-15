@@ -8,4 +8,6 @@
     'archived'  => 'Arquivado',
     'Failed'  => 'falhou',
     'Sent'  => 'enviado',
+    'used'  => 'Usado',
+    'unused'  => 'Livre',
 ];

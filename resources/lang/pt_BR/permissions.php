@@ -2,7 +2,7 @@
     return [
     'administrator.user'  => 'Gerenciar Usuarios',
     'administrator.options'  => 'Gerenciar Recursos',
-    'towers.view'   => 'Visualizar Gestor Torres',
+    'towers.view'   => 'Visualizar Gestor Redes',
     'towers.create'  => 'Adicionar Modulo Torres',
     'towers.edit'   => 'Editar Modulo Torres',
     'towers.delete'  => 'Deletar Modulo Torres',
@@ -44,5 +44,8 @@
     'tasks.edit'=>'Edita tarefa',
     'tasks.delete'=>'Deleta tarefa',
     'administrator.vpn'=>'Administrar VPN',
+    'ftth.view'   => 'Visualizar Gestor Ftth',
+    'ftth.create'  => 'Adicionar Modulo Ftth',
+    'ftth.delete'  => 'Deletar Modulo Ftth',
 
 ];

@@ -18,6 +18,9 @@ class SystemUpdateHook
 
             $newPermissions = [
                 // 'reports.export',
+                'ftth.view',
+                'ftth.create',
+                'ftth.delete',
             ];
 
             if (!empty($newPermissions)) {

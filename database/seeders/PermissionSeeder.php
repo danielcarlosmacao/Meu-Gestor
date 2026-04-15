@@ -83,6 +83,12 @@ class PermissionSeeder extends Seeder
 
             //vpn
             'administrator.vpn',
+
+            //ftth
+
+            'ftth.view',
+            'ftth.create',
+            'ftth.delete',
         ];
 
         // Criar permissões (se não existirem)

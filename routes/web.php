@@ -40,6 +40,8 @@ require __DIR__ . '/web/task.php';
 
 require __DIR__ . '/web/vpn.php';
 
+require __DIR__ . '/web/ftth.php';
+
 //---------------------------------------
 Route::middleware(['auth'])->group(function () {
     Route::get('/', [TaskController::class, 'index'])->name('welcome');

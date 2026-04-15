@@ -23,6 +23,7 @@ class DatabaseSeeder extends Seeder
             PermissionSeeder::class,
         ]);
         $this->call(AdminUserSeeder::class);
+        $this->call(FtthSplinterLossesSeeder::class);
 
 
     }
