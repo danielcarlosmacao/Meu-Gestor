@@ -20,6 +20,8 @@ return new class extends Migration {
 
             $table->string('signal')->nullable();
 
+            $table->string('coordinates');
+
             $table->timestamps();
 
             $table->softDeletes();
