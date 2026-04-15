@@ -71,7 +71,6 @@
         </div>
 
     </div>
-
     <div class="modal fade" id="modalPon">
 
         <div class="modal-dialog">
@@ -82,32 +81,52 @@
 
                 <div class="modal-content">
 
-                    <div class="modal-header">
-                        <h5>Nova PON</h5>
+                    {{-- HEADER --}}
+                    <div class="modal-header bgc-primary text-white">
+                        <h5 class="modal-title fw-bold">
+                            Nova PON
+                        </h5>
+
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal">
+                        </button>
                     </div>
 
                     <div class="modal-body">
 
-                        <div class="mb-2">
-                            <label>OLT</label>
-                            <input name="olt" class="form-control">
+                        {{-- OLT --}}
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">OLT</label>
+                            <input name="olt" class="form-control shadow-sm"
+                                placeholder="Ex: OLT-01 / Slot 1 / Porta 2">
                         </div>
 
-                        <div class="mb-2">
-                            <label>Descrição</label>
-                            <input name="info" class="form-control">
+                        {{-- DESCRIÇÃO --}}
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Descrição</label>
+                            <input name="info" class="form-control shadow-sm" placeholder="Ex: PON-01">
                         </div>
 
-                        <div class="mb-2">
-                            <label>Sinal</label>
-                            <input name="signal" class="form-control">
+                        {{-- SINAL --}}
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Sinal</label>
+                            <input name="signal" class="form-control shadow-sm" placeholder="Ex: 4 dBm">
+                        </div>
+
+                        {{-- COORDENADAS --}}
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Coordenadas</label>
+                            <input name="coordinates" class="form-control shadow-sm" placeholder="Ex: -10.12345, -62.12345">
                         </div>
 
                     </div>
 
                     <div class="modal-footer">
 
-                        <button class="btn btn-primary">
+                        <button type="button" class="btn btn-light border" data-bs-dismiss="modal">
+                            Cancelar
+                        </button>
+
+                        <button class="btn btn-primary px-4">
                             Salvar
                         </button>
 

@@ -639,5 +639,25 @@
             }
 
         });
+
+
+
+        const colorPicker = document.getElementById('colorPicker');
+        const colorHex = document.getElementById('colorHex');
+
+        // Quando escolher no seletor
+        colorPicker.addEventListener('input', () => {
+            colorHex.value = colorPicker.value;
+        });
+
+        // Quando digitar manualmente
+        colorHex.addEventListener('input', () => {
+            if (/^#([0-9A-F]{3}){1,2}$/i.test(colorHex.value)) {
+                colorPicker.value = colorHex.value;
+            }
+        });
+
+        // Valor inicial sincronizado
+        colorHex.value = colorPicker.value;
     </script>
 @endsection

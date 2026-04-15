@@ -25,7 +25,8 @@ class PonController extends Controller
 
             'olt' => $request->olt,
             'info' => $request->info,
-            'signal' => $request->signal
+            'signal' => $request->signal,
+            'coordinates' => $request->coordinates
 
         ]);
 

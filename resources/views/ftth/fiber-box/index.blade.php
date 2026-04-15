@@ -109,26 +109,41 @@
 
                 <div class="modal-content">
 
-                    <div class="modal-header">
-                        <h5 class="modal-title">Nova Caixa</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    {{-- HEADER --}}
+                    <div class="modal-header bgc-primary text-white">
+                        <h5 class="modal-title fw-bold">Nova Caixa</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                     </div>
 
                     <div class="modal-body">
 
-                        <div class="mb-2">
-                            <label>Numero</label>
-                            <input name="number" class="form-control" required>
+                        {{-- NUMERO --}}
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Número</label>
+                            <span class="badge bg-success">
+                                Menor disponivel: {{ $nextnumber }}
+                            </span>
+                            <span class="badge bg-success">
+                                Próximo: {{ $nextnumbermax }}
+                            </span>
+                            <div class="d-flex align-items-center gap-2">
+                                <input name="number" type="number" class="form-control shadow-sm" step="1"
+                                    min="1" required>
+
+
+                            </div>
                         </div>
 
-                        <div class="mb-2">
-                            <label>Descrição</label>
-                            <input name="info" class="form-control">
+                        {{-- DESCRIÇÃO --}}
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Descrição</label>
+                            <input name="info" class="form-control shadow-sm">
                         </div>
 
-                        <div class="mb-2">
-                            <label>Coordenadas</label>
-                            <input name="coordinates" class="form-control">
+                        {{-- COORDENADAS --}}
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Coordenadas</label>
+                            <input name="coordinates" class="form-control shadow-sm">
                         </div>
 
                     </div>
@@ -146,5 +161,4 @@
         </div>
 
     </div>
-
 @endsection

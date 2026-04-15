@@ -12,7 +12,9 @@ class FtthPon extends Model
     protected $fillable = [
         'olt',
         'info',
-        'signal'
+        'signal',
+        'coordinates',
+
     ];
 
     public function boxes()

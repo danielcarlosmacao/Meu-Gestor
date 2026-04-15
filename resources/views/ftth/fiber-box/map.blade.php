@@ -10,9 +10,8 @@
                 {{ $pon->info }}
                 <a href="{{ route('pon.index') }}" class="btn dcm-btn-primary ">
                     <i class="bi bi-house"></i>
-                </a> 
-                <a href="{{ route('fiberbox.index', ['pon' => $pon->id]) }}"
-                    class="btn dcm-btn-primary ">
+                </a>
+                <a href="{{ route('fiberbox.index', ['pon' => $pon->id]) }}" class="btn dcm-btn-primary ">
                     <i class="bi bi-list"></i>
                 </a>
 
@@ -153,17 +152,17 @@
             |---------------------------------------
             */
             @can('ftth.create')
-            map.on('click', function(e) {
+                map.on('click', function(e) {
 
-                let lat = e.latlng.lat;
-                let lng = e.latlng.lng;
+                    let lat = e.latlng.lat;
+                    let lng = e.latlng.lng;
 
-                document.getElementById('coordinates').value = lat + ',' + lng;
+                    document.getElementById('coordinates').value = lat + ',' + lng;
 
-                let modal = new bootstrap.Modal(document.getElementById('modalCreateBox'));
-                modal.show();
+                    let modal = new bootstrap.Modal(document.getElementById('modalCreateBox'));
+                    modal.show();
 
-            });
+                });
             @endcan
         </script>
 
@@ -173,25 +172,39 @@
                 <form method="POST" action="{{ route('fiberbox.store') }}">
                     @csrf
 
-                    <input type="hidden" name="pon_id" value="{{ $pon->id }}">
+
+                    <input type="hidden" name="pon_id" value="{{ $pon }}">
 
                     <div class="modal-content">
 
-                        <div class="modal-header">
-                            <h5>Nova CTO</h5>
+                        {{-- HEADER --}}
+                        <div class="modal-header bgc-primary text-white">
+                            <h5 class="modal-title fw-bold">Nova Caixa</h5>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                         </div>
 
                         <div class="modal-body">
 
-                            <div class="mb-2">
-                                <label>Número</label>
-                                <input name="number" class="form-control" required>
+                            {{-- NUMERO --}}
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold">Número</label>
+                                <span class="badge bg-success">
+                                    Maior: {{ $nextnumber }}
+                                </span>
+                                <div class="d-flex align-items-center gap-2">
+                                    <input name="number" type="number" class="form-control shadow-sm" step="1"
+                                        min="1" required>
+
+
+                                </div>
                             </div>
 
-                            <div class="mb-2">
-                                <label>Info</label>
-                                <input name="info" class="form-control">
+                            {{-- DESCRIÇÃO --}}
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold">Descrição</label>
+                                <input name="info" class="form-control shadow-sm">
                             </div>
+
 
                             <div class="mb-2">
                                 <label>Coordenadas</label>

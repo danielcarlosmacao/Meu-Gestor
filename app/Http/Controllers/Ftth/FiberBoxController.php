@@ -22,6 +22,36 @@ class FiberBoxController extends Controller
 
         $boxes = FtthFiberBox::where('pon_id', $pon->id)->get();
 
+        $lastnumber = FtthFiberBox::max('number');
+        $nextnumbermax = $lastnumber ? $lastnumber + 1 : 1;
+        /*
+                $numbers = FtthFiberBox::orderBy('number')->pluck('number');
+
+                $nextnumber = 1;
+
+                foreach ($numbers as $num) {
+                    if ($num != $nextnumber) {
+                        break;
+                    }
+                    $nextnumber++;
+                }
+        */
+        $existsOne = \DB::table('ftth_fiber_boxes')->where('number', 1)->exists();
+
+        if (!$existsOne) {
+            $nextnumber = 1;
+        } else {
+            $result = \DB::selectOne("
+        SELECT MIN(t1.number + 1) AS next
+        FROM ftth_fiber_boxes t1
+        LEFT JOIN ftth_fiber_boxes t2
+            ON t2.number = t1.number + 1
+        WHERE t2.number IS NULL
+    ");
+
+            $nextnumber = $result->next;
+        }
+
         $boxIds = $boxes->pluck('id');
 
         $cables = FtthCableFiberBox::with([
@@ -38,20 +68,24 @@ class FiberBoxController extends Controller
             return view('ftth.fiber-box.map', compact(
                 'boxes',
                 'pon',
+                'nextnumber',
+                'nextnumbermax',
                 'cables'
             ));
         } else {
             return view('ftth.fiber-box.index', compact(
                 'boxes',
+                'nextnumber',
+                'nextnumbermax',
                 'pon'
             ));
         }
     }
     public function ponsmap(Request $request)
     {
-        $olt =  $request->olt;
+        $olt = $request->olt;
         $infoolt = FtthPon::where('olt', $olt)->get();
-        
+
         // Boxes de todas as PONs dessa OLT
         $boxes = FtthFiberBox::with('pon')
             ->whereHas('pon', function ($q) use ($olt) {
