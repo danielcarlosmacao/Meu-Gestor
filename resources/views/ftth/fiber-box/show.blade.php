@@ -537,24 +537,43 @@
                         let power = mirror ? mirror.optical_power : '';
 
                         container.innerHTML += `
-                    <div class="row mb-2">
-                        <div class="col-md-6">
-                            <input type="hidden" name="fibers[${i}][fiber_identification]" value="${fiberName}">
-                            <input class="form-control" value="${fiberName}" disabled>
-                        </div>
+    <div class="row mb-2 align-items-center fiber-item">
 
-                        <div class="col-md-6">
-                            <input type="number" step="0.01"
-                                name="fibers[${i}][optical_power]"
-                                class="form-control"
-                                value="${power}">
-                        </div>
-                    </div>
-                `;
+        <div class="col-md-5">
+            <input type="hidden" name="fibers[${i}][fiber_identification]" value="${fiberName}">
+            <input class="form-control shadow-sm" value="${fiberName}" disabled>
+        </div>
+
+        <div class="col-md-5">
+            <input type="number" step="0.01"
+                name="fibers[${i}][optical_power]"
+                class="form-control shadow-sm"
+                value="${power}">
+        </div>
+        
+<div class="col-md-1 d-flex align-items-center p-0">
+<button type="button" 
+        class="btn btn-sm btn-outline-danger remove-fiber"
+        style="padding: 4px 8px;">
+    <i class="bi bi-dash-lg"></i>
+</button>
+        </div>
+
+    </div>
+`;
                     }
 
                 });
 
+            }
+
+        });
+
+        document.addEventListener('click', function(e) {
+
+            if (e.target.closest('.remove-fiber')) {
+                let row = e.target.closest('.fiber-item');
+                if (row) row.remove();
             }
 
         });
