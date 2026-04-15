@@ -610,6 +610,7 @@
             let fiber1 = document.getElementById('fiber1');
             let fiber2 = document.getElementById('fiber2');
 
+            
             // -----------------------------
             // FIBER 1
             // -----------------------------
