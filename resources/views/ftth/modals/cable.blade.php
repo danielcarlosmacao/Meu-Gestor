@@ -34,7 +34,8 @@
 
                             <div class="d-flex gap-2">
                                 <!-- Seletor de cor -->
-                                <input type="color" id="colorPicker" value="{{ $colorCablePon }}" class="form-control form-control-color shadow-sm"
+                                <input type="color" id="colorPicker" value="{{ $colorCablePon }}"
+                                    class="form-control form-control-color shadow-sm"
                                     style="height: 38px; width: 60px;">
 
                                 <!-- Campo para digitar o HEX -->
@@ -58,7 +59,7 @@
 
                                 @foreach ($boxesPon as $b)
                                     <option value="{{ $b->id }}">
-                                        CTO {{ $b->number }}
+                                        {{ $b->info }}
                                     </option>
                                 @endforeach
                             </select>
