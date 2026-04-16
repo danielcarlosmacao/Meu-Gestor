@@ -157,6 +157,17 @@ class FiberBoxController extends Controller
 
         })->get();
 
+        $lastCableForBox = FtthCableFiberBox::where('output_fiber_box_id', $box->id)
+            ->latest('id') // pega o mais recente
+            ->first();
+        $inputCableForBox = FtthCableFiberBox::where('input_fiber_box_id', $box->id)
+            ->latest('id')
+            ->first();
+
+        $colorCablePon = $lastCableForBox
+            ? $lastCableForBox->color
+            : ($inputCableForBox ? $inputCableForBox->color : '#2563eb'); // fallback azul
+
 
         $splinters = FtthSplinter::with('loss')
             ->where('fiber_box_id', $box->id)
@@ -211,6 +222,7 @@ class FiberBoxController extends Controller
             'box',
             'boxesPon',
             'cables',
+            'colorCablePon',
             'fibers',
             'allFibers',
             'splinters',

@@ -35,7 +35,11 @@
 
                         @foreach ($pons as $pon)
                             <tr>
-                                <td>{{ $pon->olt }}</td>
+                                <td>
+                                <a href="{{ route('pon.ponsmap', ['olt' => $pon->olt]) }}"
+                                    class="text-dark text-decoration-none fw-bold">{{ $pon->olt }}
+                                </a>
+                                </td>
                                 <td>
                                     <a href="{{ route('fiberbox.index', ['pon' => $pon->id]) }}"
                                         class="text-dark text-decoration-none fw-bold">{{ $pon->info }}
