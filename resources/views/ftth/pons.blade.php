@@ -50,20 +50,18 @@
 
                                 <td>
                                     @can('ftth.delete')
-                                        <form method="POST" action="{{ route('pon.destroy', $pon->id) }}"
-                                            style="display:inline">
-                                            @csrf
-                                            @method('DELETE')
-
-                                            <button class="btn btn-sm btn-danger"
-                                                onclick="return confirm('Tem certeza que deseja excluir este registro? Essa ação não pode ser desfeita.')">
-                                                Excluir
-                                            </button>
-                                        </form>
+                                        <button class="btn btn-sm btn-outline-danger"
+                                                    onclick="openConfirmModal(
+                                                        '{{ route('pon.destroy', $pon->id) }}',
+                                                        'Tem certeza que deseja excluir esta PON?',
+                                                        'Essa alteração não poderá ser revertida.',
+                                                        'DELETE'
+                                                    )">
+                                                    
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
                                     @endcan
-
                                 </td>
-
                             </tr>
                         @endforeach
 

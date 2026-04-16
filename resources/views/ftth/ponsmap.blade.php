@@ -63,7 +63,7 @@
                     white-space:nowrap;
                     box-shadow:0 2px 6px rgba(0,0,0,0.3);
                 ">
-                    CTO ${box.number} - ${box.info ?? ''}
+                   ${box.number} - ${box.info ?? ''}
                 </div>
 
                 <div style="

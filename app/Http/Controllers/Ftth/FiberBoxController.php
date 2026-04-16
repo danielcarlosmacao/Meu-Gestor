@@ -232,4 +232,139 @@ class FiberBoxController extends Controller
         ));
     }
 
+
+
+    ////////////////////////////////////////////////////////////////////////////////
+
+    public function recalculate($id)
+    {
+        $visited = [];
+
+        $this->recalculateCascade($id, $visited);
+
+        return back()->with('success', 'Rede recalculada com sucesso.');
+    }
+
+    private function recalculateCascade($id, &$visited = [])
+    {
+        // evita loop infinito
+        if (in_array($id, $visited)) {
+            return;
+        }
+
+        $visited[] = $id;
+
+        /*
+        |--------------------------------------------------------------------------
+        | 1. Recalcula a CTO atual
+        |--------------------------------------------------------------------------
+        */
+        $this->recalculateLocal($id);
+
+        /*
+        |--------------------------------------------------------------------------
+        | 2. Busca cabos que SAEM dessa CTO
+        |--------------------------------------------------------------------------
+        */
+        $cables = FtthCableFiberBox::where('input_fiber_box_id', $id)->get();
+
+        foreach ($cables as $cable) {
+
+            if (!$cable->output_fiber_box_id)
+                continue;
+
+            /*
+            |--------------------------------------------------------------------------
+            | 3. Próxima CTO (recursivo)
+            |--------------------------------------------------------------------------
+            */
+            $this->recalculateCascade($cable->output_fiber_box_id, $visited);
+        }
+    }
+    ////////////////////////////////////////////////////////////////////////////////
+    private function recalculateLocal($id)
+    {
+        $box = FtthFiberBox::find($id);
+
+        if (!$box)
+            return;
+
+        /*
+        |--------------------------------------------------------------------------
+        | 1. ATUALIZA FIBRAS VINDAS DE CABOS
+        |--------------------------------------------------------------------------
+        */
+        $fibers = FtthFiberCable::where('fiber_box_id', $box->id)->get();
+
+        foreach ($fibers as $fiber) {
+
+            $cable = FtthCableFiberBox::find($fiber->cable_fiber_box_id);
+
+            if (!$cable)
+                continue;
+
+            // cabo chegando na CTO
+            if ($cable->output_fiber_box_id == $box->id) {
+
+                $originFiber = FtthFiberCable::where('fiber_box_id', $cable->input_fiber_box_id)
+                    ->where('fiber_identification', $fiber->fiber_identification)
+                    ->first();
+
+                if ($originFiber) {
+                    $fiber->update([
+                        'optical_power' => $originFiber->optical_power
+                    ]);
+                }
+            }
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | 2. SPLINTERS
+        |--------------------------------------------------------------------------
+        */
+        $splinters = FtthSplinter::where('fiber_box_id', $box->id)->get();
+
+        foreach ($splinters as $splinter) {
+
+            $inputFiber = FtthFiberCable::find($splinter->splinter_input);
+
+            if (!$inputFiber || $inputFiber->optical_power === null)
+                continue;
+
+            $loss = $splinter->loss->value ?? 0;
+
+            $newSignal = $inputFiber->optical_power - $loss;
+
+            FtthFiberCable::where('splinter_id', $splinter->id)
+                ->update([
+                    'optical_power' => $newSignal
+                ]);
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | 3. FUSÕES
+        |--------------------------------------------------------------------------
+        */
+        $fusions = FtthFiberFusion::whereHas('fiber1', function ($q) use ($box) {
+            $q->where('fiber_box_id', $box->id);
+        })->get();
+
+        foreach ($fusions as $fusion) {
+
+            $fiber1 = $fusion->fiber1;
+            $fiber2 = $fusion->fiber2;
+
+            if (!$fiber1 || !$fiber2)
+                continue;
+
+            // evita update desnecessário
+            if ($fiber2->optical_power != $fiber1->optical_power) {
+                $fiber2->update([
+                    'optical_power' => $fiber1->optical_power
+                ]);
+            }
+        }
+    }
 }

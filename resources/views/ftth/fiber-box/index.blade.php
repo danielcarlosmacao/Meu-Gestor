@@ -59,19 +59,16 @@
 
                                 <td class="text-end">
                                     @can('ftth.delete')
-                                        {{-- ÚNICA AÇÃO: EXCLUIR --}}
-                                        <form method="POST" action="{{ route('fiberbox.destroy', $box->id) }}"
-                                            class="d-inline">
-
-                                            @csrf
-                                            @method('DELETE')
-
-                                            <button class="btn btn-sm btn-danger"
-                                                onclick="return confirm('Tem certeza que deseja excluir esta caixa?')">
-                                                Excluir
-                                            </button>
-
-                                        </form>
+                                        <button class="btn btn-sm btn-outline-danger"
+                                                    onclick="openConfirmModal(
+                                                        '{{ route('fiberbox.destroy', $box->id) }}',
+                                                        'Tem certeza que deseja excluir esta caixa?',
+                                                        'Essa alteração não poderá ser revertida.',
+                                                        'DELETE'
+                                                    )">
+                                                    
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
                                     @endcan
 
                                 </td>
@@ -123,12 +120,9 @@
                             <span class="badge bg-success">
                                 Menor disponivel: {{ $nextnumber }}
                             </span>
-                            <span class="badge bg-success">
-                                Próximo: {{ $nextnumbermax }}
-                            </span>
                             <div class="d-flex align-items-center gap-2">
                                 <input name="number" type="number" class="form-control shadow-sm" step="1"
-                                    min="1" required>
+                                    min="{{ $nextnumber }}" required value="{{$nextnumber}}">
 
 
                             </div>

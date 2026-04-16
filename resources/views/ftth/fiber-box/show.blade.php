@@ -40,14 +40,29 @@
     </style>
 
     <div class="container mb-1 mb-md-4 mt-1 mt-md-4">
-        <h2 class="text-center">
-            {{ $box->info }}
+        <div class="d-flex justify-content-center align-items-center gap-2 flex-wrap">
+
+            <h2 class="mb-0">
+                {{ $box->info }}
+            </h2>
+
             <a href="{{ route('fiberbox.index', ['pon' => $box->pon_id]) }}" class="btn dcm-btn-primary">
                 <i class="bi bi-house"></i>
             </a>
-        </h2>
 
+            <button type="button" class="btn dcm-btn-primary"
+                onclick="openConfirmModal(
+                    '{{ route('fiberbox.recalculate.local', $box->id) }}',
+                    'Deseja recalcular toda a rede desta CTO?',
+                    'Essa alteração não poderá ser revertida e afeta todas as caixas dessa PON',
+                    'POST'
+                )">
+                <i class="bi bi-arrow-repeat"></i>
+            </button>
+
+        </div>
     </div>
+
     <div class="container-fluid">
 
         <div class="row">
@@ -111,19 +126,16 @@
                                         {{-- AÇÕES --}}
                                         <td class="text-end">
                                             @can('ftth.delete')
-                                                <form method="POST" action="{{ route('cable.destroy', $cable->id) }}"
-                                                    onsubmit="return confirm('Tem certeza que deseja excluir este cabo?')">
-
-                                                    @csrf
-                                                    @method('DELETE')
-
-                                                    <button class="btn btn-sm btn-outline-danger">
-                                                        <i class="bi bi-trash"></i>
-                                                    </button>
-
-                                                </form>
+                                                <button class="btn btn-sm btn-outline-danger"
+                                                    onclick="openConfirmModal(
+                                                        '{{ route('cable.destroy', $cable->id) }}',
+                                                        'Tem certeza que deseja excluir este cabo?',
+                                                        'Essa alteração não poderá ser revertida.',
+                                                        'DELETE'
+                                                    )">
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
                                             @endcan
-
                                         </td>
 
                                     </tr>
@@ -240,14 +252,15 @@
                                         {{-- AÇÕES --}}
                                         <td class="text-end">
                                             @if ($fiber->status == 'unused')
-                                                <form method="POST" action="{{ route('fiber.destroy', $fiber->id) }}">
-                                                    @csrf @method('DELETE')
-
-                                                    <button class="btn btn-sm btn-outline-danger"
-                                                        onclick="return confirm('Tem certeza que deseja excluir esta fibra?')">
-                                                        <i class="bi bi-trash"></i>
-                                                    </button>
-                                                </form>
+                                                <button class="btn btn-sm btn-outline-danger"
+                                                    onclick="openConfirmModal(
+                                                        '{{ route('fiber.destroy', $fiber->id)  }}',
+                                                        'Tem certeza que deseja excluir esta fibra?',
+                                                        'Essa alteração não poderá ser revertida.',
+                                                        'DELETE'
+                                                    )">
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
                                             @endif
                                         </td>
 
@@ -344,19 +357,16 @@
                                         {{-- AÇÕES --}}
                                         <td class="text-end">
                                             @can('ftth.delete')
-                                                <form method="POST" action="{{ route('splinter.destroy', $spl->id) }}"
-                                                    onsubmit="return confirm('Tem certeza que deseja excluir este splinter?')">
-
-                                                    @csrf
-                                                    @method('DELETE')
-
-                                                    <button class="btn btn-sm btn-outline-danger">
-                                                        <i class="bi bi-trash"></i>
-                                                    </button>
-
-                                                </form>
+                                                <button class="btn btn-sm btn-outline-danger"
+                                                    onclick="openConfirmModal(
+                                                        '{{ route('splinter.destroy', $spl->id) }}',
+                                                        'Tem certeza que deseja excluir este splinter?',
+                                                        'Essa alteração não poderá ser revertida.',
+                                                        'DELETE'
+                                                    )">
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
                                             @endcan
-
                                         </td>
 
                                     </tr>
@@ -435,35 +445,26 @@
                                                 {{-- INFO (OLHO) --}}
                                                 @if ($fusion->info)
                                                     <i class="bi bi-eye-fill text-primary"
-                                                        style="cursor:pointer; font-size: 1.1rem;" data-bs-toggle="tooltip"
-                                                        data-bs-placement="top" title="{{ $fusion->info }}">
+                                                        style="cursor:pointer; font-size: 1.1rem;"
+                                                        data-bs-toggle="tooltip" data-bs-placement="top"
+                                                        title="{{ $fusion->info }}">
                                                     </i>
                                                 @endif
 
                                                 @can('ftth.delete')
-                                                    {{-- DELETE --}}
-                                                    <form method="POST" action="{{ route('fusion.destroy', $fusion->id) }}"
-                                                        class="m-0">
-
-                                                        @csrf
-                                                        @method('DELETE')
-
-                                                        <button class="btn btn-sm btn-outline-danger p-1 px-2"
-                                                            onclick="return confirm('Tem certeza que deseja excluir esta fusão?')">
-
-                                                            <i class="bi bi-trash"></i>
-
-                                                        </button>
-
-                                                    </form>
+                                                    <button class="btn btn-sm btn-outline-danger"
+                                                        onclick="openConfirmModal(
+                                                        '{{ route('fusion.destroy', $fusion->id)  }}',
+                                                        'Tem certeza que deseja excluir esta fusão?',
+                                                        'Essa alteração não poderá ser revertida.',
+                                                        'DELETE'
+                                                    )">
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
                                                 @endcan
-
                                             </div>
-
                                         </td>
-
                                     </tr>
-
                                 @empty
 
                                     <tr>
@@ -610,7 +611,7 @@
             let fiber1 = document.getElementById('fiber1');
             let fiber2 = document.getElementById('fiber2');
 
-            
+
             // -----------------------------
             // FIBER 1
             // -----------------------------

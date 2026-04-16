@@ -60,8 +60,7 @@
                     @can('towers.view')
                         <!-- gestao de torre -->
                         <li class="nav-item dropdown position-static" id="menutower">
-                            <a class="nav-link dropdown-toggle" href="#">REDE<i
-                                    class="bi bi-broadcast ms-2"></i></a>
+                            <a class="nav-link dropdown-toggle" href="#">REDE<i class="bi bi-broadcast ms-2"></i></a>
                             <div class="dropdown-menu mega-menu">
                                 <div class="row">
                                     <div class="col-md-1">
@@ -73,7 +72,8 @@
                                             <a href="{{ route('pon.index') }}"><i class="fa fa-cogs"></i>Rede Optica</a>
                                         @endcan
                                         @can('towers.maintenance')
-                                            <a href="{{ route('maintenance.index') }}"><i class="fa fa-cogs"></i>Manutenção de Torres</a>
+                                            <a href="{{ route('maintenance.index') }}"><i class="fa fa-cogs"></i>Manutenção de
+                                                Torres</a>
                                         @endcan
                                         @can('towers.manage')
                                             <a href="{{ route('tower.gallery.show') }}"><i class="fa fa-cogs"></i>Galeria</a>
@@ -276,10 +276,14 @@
         @yield('content')
     </main>
 
+    <x-confirm-modal />
+
     @stack('scripts')
     @extends('layouts.footer')
 
     <script type="text/javascript" src="/js/app.js"></script>
+    
+    <script type="text/javascript" src="/js/confirm-modal.js"></script>
 
     <!--bootstrap-->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
