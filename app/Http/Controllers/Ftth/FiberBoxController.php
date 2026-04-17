@@ -237,10 +237,16 @@ class FiberBoxController extends Controller
     {
         $visited = [];
 
-        // 🔥 pega fibras base (sem entrada de fusão nem splinter)
+        /*
+        |--------------------------------------------------------------------------
+        | FIBRAS ORIGEM (não derivadas)
+        |--------------------------------------------------------------------------
+        */
         $startFibers = FtthFiberCable::where('fiber_box_id', $boxId)
-            ->whereNull('splinter_id')
-            ->get();
+            ->get()
+            ->filter(function ($fiber) {
+                return !$this->isDerivedFiber($fiber);
+            });
 
         foreach ($startFibers as $fiber) {
 
@@ -253,9 +259,22 @@ class FiberBoxController extends Controller
         return back()->with('success', 'Rede recalculada com sucesso.');
     }
 
+    private function isDerivedFiber($fiber)
+    {
+        // saída de splinter
+        if ($fiber->splinter_out_id)
+            return true;
+
+        // destino de fusão
+        if (FtthFiberFusion::where('fiber_cables_id_2', $fiber->id)->exists()) {
+            return true;
+        }
+
+        return false;
+    }
+
     private function propagateFiber($fiberId, $power, &$visited = [])
     {
-        // 🔥 evita loop infinito
         if (in_array($fiberId, $visited))
             return;
 
@@ -267,13 +286,16 @@ class FiberBoxController extends Controller
 
         /*
         |--------------------------------------------------------------------------
-        | 1. ATUALIZA A PRÓPRIA FIBRA
+        | 1. ATUALIZA (NÃO SOBRESCREVE ORIGEM)
         |--------------------------------------------------------------------------
         */
-        if ($fiber->optical_power != $power) {
-            $fiber->update([
-                'optical_power' => $power
-            ]);
+        if ($this->isDerivedFiber($fiber)) {
+
+            if ($fiber->optical_power != $power) {
+                $fiber->update([
+                    'optical_power' => $power
+                ]);
+            }
         }
 
         /*
@@ -289,9 +311,9 @@ class FiberBoxController extends Controller
             if (!$destFiber)
                 continue;
 
-            $fusionLoss = $fusion->loss ?? 0;
+            $loss = $fusion->loss ?? 0;
 
-            $newPower = $power - $fusionLoss;
+            $newPower = $power - $loss;
 
             $this->propagateFiber($destFiber->id, $newPower, $visited);
         }
@@ -307,11 +329,8 @@ class FiberBoxController extends Controller
 
             $loss = $splinter->loss;
 
-            $outputs = FtthFiberCable::where(
-                'fiber_identification',
-                'LIKE',
-                $splinter->name . '-OUT-%'
-            )->get();
+            // 🔥 SEM LIKE — usando splinter_out_id
+            $outputs = FtthFiberCable::where('splinter_out_id', $splinter->id)->get();
 
             foreach ($outputs as $outFiber) {
 
@@ -320,7 +339,7 @@ class FiberBoxController extends Controller
 
                 if ($outNumber == 1) {
                     $lossValue = $loss->loss1 ?? 0;
-                } elseif ($outNumber == 2) {
+                } elseif ($outNumber == 2 & $loss->loss2 != null) {
                     $lossValue = $loss->loss2 ?? 0;
                 } else {
                     $lossValue = $loss->loss1 ?? 0;
@@ -334,27 +353,60 @@ class FiberBoxController extends Controller
                     ]);
                 }
 
-                // 🔥 ESSENCIAL → continua o fluxo
+                // 🔥 continua propagação
                 $this->propagateFiber($outFiber->id, $newPower, $visited);
             }
         }
 
         /*
-        |--------------------------------------------------------------------------
-        | 4. CABO (vai para outra CTO)
-        |--------------------------------------------------------------------------
-        */
-        $cable = FtthCableFiberBox::find($fiber->cable_fiber_box_id);
+ |--------------------------------------------------------------------------
+ | 4. CABO (USANDO FUSÃO DA CTO ORIGEM)
+ |--------------------------------------------------------------------------
+ */
 
-        if ($cable && $cable->output_fiber_box_id) {
+        // 🔥 pega cabos que SAEM da CTO atual
+        $cables = FtthCableFiberBox::where('input_fiber_box_id', $fiber->fiber_box_id)->get();
 
+        foreach ($cables as $cable) {
+
+            if (!$cable->output_fiber_box_id)
+                continue;
+
+            /*
+            |--------------------------------------------------------------------------
+            | 1. BUSCA FUSÃO NA CTO ATUAL
+            |--------------------------------------------------------------------------
+            */
+            $fusion = FtthFiberFusion::where('fiber_cables_id_2', $fiber->id)->first();
+
+            // se tiver fusão, usa a origem real
+            if ($fusion) {
+                $originFiber = FtthFiberCable::find($fusion->fiber_cables_id_1);
+            } else {
+                $originFiber = $fiber;
+            }
+
+            if (!$originFiber)
+                continue;
+
+            /*
+            |--------------------------------------------------------------------------
+            | 2. BUSCA FIBRA NA CTO DESTINO
+            |--------------------------------------------------------------------------
+            */
             $nextFiber = FtthFiberCable::where('fiber_box_id', $cable->output_fiber_box_id)
-                ->where('fiber_identification', $fiber->fiber_identification)
+                ->where('fiber_identification', $originFiber->fiber_identification)
                 ->first();
 
-            if ($nextFiber) {
-                $this->propagateFiber($nextFiber->id, $power, $visited);
-            }
+            if (!$nextFiber)
+                continue;
+
+            /*
+            |--------------------------------------------------------------------------
+            | 3. PROPAGA SINAL CORRETO
+            |--------------------------------------------------------------------------
+            */
+            $this->propagateFiber($nextFiber->id, $originFiber->optical_power, $visited);
         }
     }
 
