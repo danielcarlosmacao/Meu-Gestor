@@ -19,6 +19,7 @@ class FtthFiberCable extends Model
         'optical_power',
         'cable_fiber_box_id',
         'splinter_id',
+        'splinter_out_id',
         'cable_fiber_box_direction',
         'status'
     ];

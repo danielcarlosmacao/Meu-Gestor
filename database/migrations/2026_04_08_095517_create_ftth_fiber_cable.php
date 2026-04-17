@@ -19,7 +19,7 @@ return new class extends Migration {
             $table->string('fiber_identification');
 
             $table->foreignId('fiber_box_id')
-            ->constrained('ftth_fiber_boxes');
+                ->constrained('ftth_fiber_boxes');
 
             $table->decimal('optical_power', 8, 2)->nullable();
 
@@ -28,20 +28,21 @@ return new class extends Migration {
                 ->constrained('ftth_cable_fiber_boxes')
                 ->nullOnDelete();
 
-            $table->foreignId('splinter_id')
-                ->nullable();
+            $table->unsignedBigInteger('splinter_id')->nullable();
+            $table->unsignedBigInteger('splinter_out_id')->nullable();
 
-                $table->enum('cable_fiber_box_direction', [
-                    'input',
-                    'output'
-                ])->nullable();
-                
-                $table->enum('status', [
-                    'unused',
-                    'used'
-                ])->nullable();
-                
-                
+
+            $table->enum('cable_fiber_box_direction', [
+                'input',
+                'output'
+            ])->nullable();
+
+            $table->enum('status', [
+                'unused',
+                'used'
+            ])->nullable();
+
+
             $table->timestamps();
 
             $table->softDeletes();

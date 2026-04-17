@@ -27,6 +27,7 @@ Route::prefix('ftth')->group(function () {
         Route::post('/splinter', [SplinterController::class, 'store'])->name('splinter.store');
         Route::post('/fusion/store', [FusionController::class, 'store'])->name('fusion.store');
         Route::post('/fiber-box/{id}/recalculate-local', [FiberBoxController::class, 'recalculate'])->name('fiberbox.recalculate.local');
+        Route::put('/fiber/update/{id}', [FiberCableController::class, 'update'])->name('fiber.update');
     });
     Route::middleware(['auth', 'permission:ftth.delete'])->group(function () {
         Route::delete('/pons/{pon}', [PonController::class, 'destroy'])->name('pon.destroy');

@@ -66,4 +66,18 @@ class FiberCableController extends Controller
             ->with('success', 'Fibra removida');
     }
 
+    public function update(Request $request, $id)
+    {
+        $fiber = FtthFiberCable::findOrFail($id);
+
+        $request->validate([
+            'optical_power' => 'required|numeric'
+        ]);
+
+        $fiber->update([
+            'optical_power' => $request->optical_power
+        ]);
+
+        return back()->with('success', 'Sinal atualizado com sucesso');
+    }
 }

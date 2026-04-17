@@ -118,6 +118,8 @@ class SplinterController extends Controller
 
                     'splinter_id' => null,
 
+                    'splinter_out_id' => $splinter->id,
+
                     'cable_fiber_box_id' => null,
 
                     'cable_fiber_box_direction' => 'output',

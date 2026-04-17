@@ -251,17 +251,28 @@
 
                                         {{-- AÇÕES --}}
                                         <td class="text-end">
-                                            @if ($fiber->status == 'unused')
-                                                <button class="btn btn-sm btn-outline-danger"
-                                                    onclick="openConfirmModal(
-                                                        '{{ route('fiber.destroy', $fiber->id)  }}',
+                                            <div class="d-flex justify-content-end gap-1">
+                                                @if ($fiber->status == 'unused')
+                                                    <button class="btn btn-sm btn-outline-danger"
+                                                        onclick="openConfirmModal(
+                                                        '{{ route('fiber.destroy', $fiber->id) }}',
                                                         'Tem certeza que deseja excluir esta fibra?',
                                                         'Essa alteração não poderá ser revertida.',
                                                         'DELETE'
                                                     )">
-                                                    <i class="bi bi-trash"></i>
+                                                        <i class="bi bi-trash"></i>
+                                                    </button>
+                                                @endif
+                                                {{-- EDITAR SINAL --}}
+                                                <button type="button" class="btn btn-sm btn-warning"
+                                                    onclick="openEditFiberModal(
+                                                    {{ $fiber->id }},
+                                                    '{{ $fiber->fiber_identification }}',
+                                                    '{{ $fiber->optical_power }}'
+                                                )">
+                                                    <i class="bi bi-pencil"></i>
                                                 </button>
-                                            @endif
+                                            </div>
                                         </td>
 
                                     </tr>
@@ -345,6 +356,7 @@
                                             @php
                                                 $power = $spl->inputCable->optical_power ?? 0;
                                             @endphp
+                                            {{ $power }}
 
                                             @if ($spl->loss->splinter_type == 'balanced')
                                                 {{ $power - $spl->loss->loss1 }} dBm
@@ -454,13 +466,13 @@
                                                 @can('ftth.delete')
                                                     <button class="btn btn-sm btn-outline-danger"
                                                         onclick="openConfirmModal(
-                                                        '{{ route('fusion.destroy', $fusion->id)  }}',
+                                                        '{{ route('fusion.destroy', $fusion->id) }}',
                                                         'Tem certeza que deseja excluir esta fusão?',
                                                         'Essa alteração não poderá ser revertida.',
                                                         'DELETE'
                                                     )">
-                                                    <i class="bi bi-trash"></i>
-                                                </button>
+                                                        <i class="bi bi-trash"></i>
+                                                    </button>
                                                 @endcan
                                             </div>
                                         </td>
@@ -492,6 +504,7 @@
     @include('ftth.modals.fiber')
     @include('ftth.modals.splinter')
     @include('ftth.modals.fusion')
+    @include('ftth.modals.editfiber')
 
     <script>
         document.addEventListener("DOMContentLoaded", function() {
@@ -680,5 +693,22 @@
 
         // Valor inicial sincronizado
         colorHex.value = colorPicker.value;
+
+
+        // Modal editar sinal
+        function openEditFiberModal(id, name, power) {
+
+            let modal = new bootstrap.Modal(document.getElementById('modalEditFiber'));
+
+            document.getElementById('editFiberName').value = name;
+            document.getElementById('editFiberPower').value = power;
+
+            let url = "{{ route('fiber.update', ':id') }}";
+            url = url.replace(':id', id);
+
+            document.getElementById('formEditFiber').action = url;
+
+            modal.show();
+        }
     </script>
 @endsection
