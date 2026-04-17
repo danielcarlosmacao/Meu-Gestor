@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class TowerGallery extends Model
 {
-     use SoftDeletes;
+    use SoftDeletes;
 
     protected $table = 'tower_gallery';
 
@@ -16,4 +16,9 @@ class TowerGallery extends Model
         'path',
         'title'
     ];
+
+    public function tower()
+    {
+        return $this->belongsTo(Tower::class, 'tower_id');
+    }
 }

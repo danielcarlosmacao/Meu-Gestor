@@ -3,22 +3,37 @@
 
 @section('content')
 
-
     <div class="container mb-4 mt-4">
-        <h2 class="text-center">
+        <h2 class="text-center fw-bold">
             Galeria
         </h2>
     </div>
 
     <div class="container">
-        <div class="row g-3">
+        <div class="row g-4">
             @forelse($images as $image)
                 @php $url = route('tower.image.show', $image->id); @endphp
                 <div class="col-6 col-md-3 col-lg-2">
-                    <div class="card shadow-sm border-0" style="cursor:pointer;">
-                        <img src="{{ $url }}" class="img-fluid rounded" style="height:180px; object-fit:cover;"
-                            data-bs-toggle="modal" data-bs-target="#imageModal"
-                            onclick="showImage('{{ $url }}', {{ $image->id }}, {{ $image->trashed() ? 'true' : 'false' }})">
+                    <div class="card shadow-sm border-0 h-100 hover-card" style="cursor:pointer;">
+
+                        <div class="position-relative">
+                            <img src="{{ $url }}" class="img-fluid rounded-top"
+                                style="height:180px; object-fit:cover;" data-bs-toggle="modal" data-bs-target="#imageModal"
+                                onclick="showImage('{{ $url }}', {{ $image->id }}, {{ $image->trashed() ? 'true' : 'false' }})">
+
+                            @if ($image->trashed())
+                                <span class="badge bg-danger position-absolute top-0 end-0 m-2">
+                                    Excluída
+                                </span>
+                            @endif
+                        </div>
+
+                        <div class="card-body p-2 text-center">
+                            <small class="fw-semibold text-dark text-truncate d-block">
+                                {{ $image->tower?->name ?? 'Sem torre' }}
+                            </small>
+                        </div>
+
                     </div>
                 </div>
             @empty
@@ -27,8 +42,10 @@
                 </div>
             @endforelse
         </div>
+
         <div class="d-flex justify-content-center mt-4">
-            {{ $images->links() }}</div>
+            {{ $images->links() }}
+        </div>
     </div>
 
     <!-- Modal de visualização -->
@@ -46,6 +63,7 @@
                             @method('DELETE')
                             <button type="submit" class="btn btn-danger btn-lg shadow">Excluir</button>
                         </form>
+
                         @can('administrator.user')
                             <form id="restoreForm" method="POST" style="display:none;">
                                 @csrf
@@ -55,11 +73,15 @@
                             <form id="forceDeleteForm" method="POST" style="display:none;">
                                 @csrf
                                 @method('DELETE')
-                                <button type="submit" class="btn btn-danger btn-lg shadow">Excluir Permanentemente</button>
+                                <button type="submit" class="btn btn-danger btn-lg shadow">
+                                    Excluir Permanentemente
+                                </button>
                             </form>
                         @endcan
 
-                        <button id="resetZoomBtn" type="button" class="btn btn-secondary btn-lg shadow">Reset Zoom</button>
+                        <button id="resetZoomBtn" type="button" class="btn btn-secondary btn-lg shadow">
+                            Reset Zoom
+                        </button>
                     </div>
 
                     <button type="button" class="btn btn-light position-absolute top-0 end-0 m-3 shadow"
@@ -71,8 +93,6 @@
         </div>
     </div>
 
-
-
     <script>
         const modalImage = document.getElementById('modalImage');
         let currentScale = 1;
@@ -80,7 +100,6 @@
         const minScale = 0.5;
         const maxScale = 3;
 
-        // Zoom com scroll
         modalImage.addEventListener('wheel', function(event) {
             event.preventDefault();
             currentScale += (event.deltaY < 0 ? scaleStep : -scaleStep);
@@ -89,13 +108,11 @@
             modalImage.style.transform = `scale(${currentScale})`;
         });
 
-        // Reset zoom
         document.getElementById('resetZoomBtn').addEventListener('click', function() {
             currentScale = 1;
             modalImage.style.transform = 'scale(1)';
         });
 
-        // Abrir imagem no modal
         function showImage(src, id, trashed, forceDeleted = false) {
             currentScale = 1;
             modalImage.style.transform = 'scale(1)';
@@ -133,9 +150,21 @@
             opacity: 0.85;
         }
 
+        .card img {
+            transition: transform 0.3s ease;
+        }
+
         .card img:hover {
             transform: scale(1.05);
-            transition: transform 0.3s ease;
+        }
+
+        .hover-card {
+            transition: all 0.2s ease-in-out;
+        }
+
+        .hover-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
         }
 
         #modalButtons button {
