@@ -138,6 +138,7 @@ class TowerController extends Controller
             //---------------------------------------------------------------------
             // RETORNO
             //---------------------------------------------------------------------
+
             return [
                 'id' => $tower->id,
                 'name' => $tower->name,
@@ -149,6 +150,7 @@ class TowerController extends Controller
                 // bateria
                 'battery' => $battery?->name ?? 'Sem bateria',
                 'battery_percentage' => round($batteryPercentage, 2),
+                'battery_quant' => $battery?->batteryProductionsActive?->amount ?? 0,
 
                 // datas
                 'battery_install_date' => $installDateFormatted,
@@ -342,7 +344,7 @@ class TowerController extends Controller
     {
         // Carrega a torre com a galeria
         $images = TowerGallery::orderBy('tower_id', 'ASC')->paginate(24);
-        
+
 
         return view('tower.gallery.show', compact('images'));
     }

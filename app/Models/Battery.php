@@ -8,13 +8,18 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class Battery extends Model
 {
     use softDeletes;
-    
+
     protected $table = 'batterys';
 
-    protected $fillable = ['name', 'mark','type','voltage', 'amps'];
+    protected $fillable = ['name', 'mark', 'type', 'voltage', 'amps'];
 
     public function batteryProductions()
     {
         return $this->hasMany(BatteryProduction::class);
+    }
+    public function batteryProductionsActive()
+    {
+        return $this->hasOne(BatteryProduction::class)
+            ->where('active', 'yes');
     }
 }
