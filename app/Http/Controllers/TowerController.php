@@ -142,7 +142,6 @@ class TowerController extends Controller
             return [
                 'id' => $tower->id,
                 'name' => $tower->name,
-
                 'voltage' => $tower->voltage,
                 'equipments' => $equipQty,
                 'watts_equipments' => round($wattsEquipments, 2), // ✅ NOVO
@@ -150,8 +149,7 @@ class TowerController extends Controller
                 // bateria
                 'battery' => $battery?->name ?? 'Sem bateria',
                 'battery_percentage' => round($batteryPercentage, 2),
-                'battery_quant' => $battery?->batteryProductionsActive?->amount ?? 0,
-
+                'battery_quant' => $tower->activeBattery->amount ?? 0,
                 // datas
                 'battery_install_date' => $installDateFormatted,
                 'battery_install_ord' => $installDateOrd,
