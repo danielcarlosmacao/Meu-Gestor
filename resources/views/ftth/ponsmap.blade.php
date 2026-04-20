@@ -1,9 +1,9 @@
 @extends('layouts.header')
 
-@section('title', 'FTTH - PONs Maps')
+@section('title', 'FTTH - Mapa da OLT')
 
 @section('content')
-
+    <link rel="stylesheet" href="/css/ftthmaps.css" type='text/css'>
     <div class="container-fluid">
 
         <div class="container mb-1 mb-md-2 mt-1 mt-md-4">
@@ -20,6 +20,7 @@
         </div>
 
     </div>
+
     {{-- LEAFLET --}}
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -28,7 +29,11 @@
         let boxes = @json($boxes);
         let cables = @json($cables);
 
-        // fallback de centro do mapa
+        /*
+        |---------------------------------------
+        | CENTRO DO MAPA
+        |---------------------------------------
+        */
         let firstBox = boxes.find(b => b.coordinates);
 
         let defaultLat = -11.199777;
@@ -40,67 +45,92 @@
             defaultLng = parseFloat(coords[1]);
         }
 
-        let map = L.map('map').setView([defaultLat, defaultLng], 17);
+        /*
+        |---------------------------------------
+        | CAMADAS (SATÉLITE + MAPA)
+        |---------------------------------------
+        */
+        let satLayer = L.tileLayer(
+            'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+                attribution: 'Tiles © Esri',
+                maxZoom: 19
+            }
+        );
 
-        L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-            attribution: 'Tiles © Esri',
-            maxZoom: 19
+        let osmLayer = L.tileLayer(
+            'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap',
+                maxZoom: 19
+            }
+        );
+
+        /*
+        |---------------------------------------
+        | MAPA
+        |---------------------------------------
+        */
+        let map = L.map('map', {
+            center: [defaultLat, defaultLng],
+            zoom: 17,
+            layers: [satLayer]
+        });
+
+        /*
+        |---------------------------------------
+        | BOTÃO DE TROCA DE MAPA
+        |---------------------------------------
+        */
+        let baseMaps = {
+            "Satélite": satLayer,
+            "Mapa": osmLayer
+        };
+
+        L.control.layers(baseMaps, null, {
+            position: 'topright',
+            collapsed: false
         }).addTo(map);
 
-        function createGpsIcon(box, color = '#2563eb') {
-            return L.divIcon({
-                className: '',
-                html: `
-            <div style="display:flex; flex-direction:column; align-items:center;">
-                <div style="
-                    background:${color};
-                    color:#fff;
-                    padding:3px 8px;
-                    border-radius:6px;
-                    font-size:11px;
-                    font-weight:bold;
-                    margin-bottom:2px;
-                    white-space:nowrap;
-                    box-shadow:0 2px 6px rgba(0,0,0,0.3);
-                ">
-                   ${box.number} - ${box.info ?? ''}
-                </div>
-
-                <div style="
-                    width:18px;
-                    height:18px;
-                    background:${color};
-                    border-radius:50% 50% 50% 0;
-                    transform:rotate(-45deg);
-                    border:2px solid #fff;
-                    box-shadow:0 0 6px rgba(0,0,0,0.5);
-                "></div>
-            </div>
-        `,
-                iconSize: [30, 40],
-                iconAnchor: [15, 30]
-            });
-
-        }
-
-        // -------------------------
-        // BOXES
+        /*
+        |---------------------------------------
+        | BOXES (PONTOS SIMPLES)
+        |---------------------------------------
+        */
         boxes.forEach(box => {
 
             if (!box.coordinates) return;
 
             let [lat, lng] = box.coordinates.split(',');
 
-            // pegar cabo de entrada e saída
             let inputCable = cables.find(c => c.input_fiber_box?.id === box.id);
             let outputCable = cables.find(c => c.output_fiber_box?.id === box.id);
 
-            // cor do box baseada no cabo
             let boxColor = inputCable?.color ?? outputCable?.color ?? '#2563eb';
 
             let marker = L.marker([parseFloat(lat), parseFloat(lng)], {
-                icon: createGpsIcon(box, boxColor)
+                icon: L.divIcon({
+                    className: '',
+                    html: `
+            <div class="gps-pin" style="--color:${boxColor}">
+                <div class="gps-pin-inner"></div>
+            </div>
+        `,
+                    iconSize: [24, 24],
+                    iconAnchor: [12, 24]
+                })
             }).addTo(map);
+
+            /*
+            |---------------------------------------
+            | TOOLTIP (HOVER INFO)
+            |---------------------------------------
+            */
+            marker.bindTooltip(
+                `${box.number} - ${box.info ?? ''}`, {
+                    permanent: false,
+                    direction: 'top',
+                    sticky: true
+                }
+            );
 
             marker.on('click', function() {
                 window.location.href = '/ftth/fiber-box/' + box.id;
@@ -108,9 +138,11 @@
 
         });
 
-        // -------------------------
-        // CABOS
-        // -------------------------
+        /*
+        |---------------------------------------
+        | CABOS
+        |---------------------------------------
+        */
         cables.forEach(cable => {
 
             if (!cable.input_fiber_box || !cable.output_fiber_box) return;
@@ -139,65 +171,6 @@
             );
 
         });
-
-        // -------------------------
-        // CLICK MAPA (NOVA BOX)
-        // -------------------------
-        /*
-        map.on('click', function(e) {
-
-            document.getElementById('coordinates').value =
-                e.latlng.lat + ',' + e.latlng.lng;
-
-            let modal = new bootstrap.Modal(
-                document.getElementById('modalCreateBox')
-            );
-
-            modal.show();
-
-        });*/
     </script>
-
-    {{-- MODAL --}}
-    <div class="modal fade" id="modalCreateBox">
-        <div class="modal-dialog">
-            <form method="POST" action="{{ route('fiberbox.store') }}">
-                @csrf
-
-                <input type="hidden" name="olt" value="{{ $olt }}">
-
-                <div class="modal-content">
-
-                    <div class="modal-header">
-                        <h5>Nova CTO</h5>
-                    </div>
-
-                    <div class="modal-body">
-
-                        <div class="mb-2">
-                            <label>Número</label>
-                            <input name="number" class="form-control" required>
-                        </div>
-
-                        <div class="mb-2">
-                            <label>Info</label>
-                            <input name="info" class="form-control">
-                        </div>
-
-                        <div class="mb-2">
-                            <label>Coordenadas</label>
-                            <input id="coordinates" name="coordinates" class="form-control" readonly>
-                        </div>
-
-                    </div>
-
-                    <div class="modal-footer">
-                        <button class="btn btn-primary">Salvar</button>
-                    </div>
-
-                </div>
-            </form>
-        </div>
-    </div>
 
 @endsection
