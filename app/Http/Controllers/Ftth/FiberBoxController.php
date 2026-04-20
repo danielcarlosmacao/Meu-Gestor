@@ -149,6 +149,8 @@ class FiberBoxController extends Controller
             $box->pon_id
         )->get();
 
+        $boxesall = FtthFiberBox::orderBy('number')->get();
+
 
         $cables = FtthCableFiberBox::where(function ($q) use ($box) {
 
@@ -221,6 +223,7 @@ class FiberBoxController extends Controller
 
             'box',
             'boxesPon',
+            'boxesall',
             'cables',
             'colorCablePon',
             'fibers',
