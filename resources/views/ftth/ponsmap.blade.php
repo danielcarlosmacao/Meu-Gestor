@@ -96,7 +96,6 @@
         |---------------------------------------
         */
         boxes.forEach(box => {
-
             if (!box.coordinates) return;
 
             let [lat, lng] = box.coordinates.split(',');
@@ -125,7 +124,7 @@
             |---------------------------------------
             */
             marker.bindTooltip(
-                `${box.number} - ${box.info ?? ''}`, {
+                `${box.pon.info}   ${box.number}-${box.info ?? ''}`, {
                     permanent: false,
                     direction: 'top',
                     sticky: true
