@@ -116,17 +116,21 @@
                                         <td>
 
                                             @if ($cable->input_fiber_box_id == $box->id)
-                                                <a href="{{ route('fiberbox.show', $cable->output_fiber_box_id) }}">
+                                                @if ($cable->output_fiber_box_id)
+                                                    <a href="{{ route('fiberbox.show', $cable->output_fiber_box_id) }}">
                                                     <span class="badge bg-secondary">
                                                         {{ $cable->outputFiberBox->info ?? '' }}
                                                     </span>
-                                                </a>
+                                                    </a>
+                                                @endif
                                             @else
-                                                <a href="{{ route('fiberbox.show', $cable->input_fiber_box_id) }}">
+                                                @if ($cable->input_fiber_box_id)
+                                                    <a href="{{ route('fiberbox.show', $cable->input_fiber_box_id) }}">
                                                     <span class="badge bg-secondary">
                                                         {{ $cable->inputFiberBox->info ?? '' }}
                                                     </span>
-                                                </a>
+                                                    </a>
+                                                @endif
                                             @endif
                                         </td>
 
