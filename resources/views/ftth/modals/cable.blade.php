@@ -82,7 +82,7 @@
 
                                 @foreach ($boxesall as $b)
                                     <option value="{{ $b->id }}">
-                                        {{ $b->number }} - {{ $b->info }}
+                                        {{ $b->number }}  {{ $b->pon->info }}   {{ $b->info }}
                                     </option>
                                 @endforeach
                             </select>

@@ -1,6 +1,6 @@
 @extends('layouts.header')
 
-@section('title', 'FTTH - Boxes V2')
+@section('title', 'FTTH - Boxes Maps')
 
 @section('content')
 
