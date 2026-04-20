@@ -46,7 +46,7 @@
                 {{ $box->info }}
             </h2>
 
-            <a href="{{ route('fiberbox.index', ['pon' => $box->pon_id]) }}" class="btn dcm-btn-primary">
+            <a href="{{ route('fiberbox.index', ['pon' => $box->pon_id, 'map' => 'yes']) }}" class="btn dcm-btn-primary">
                 <i class="bi bi-house"></i>
             </a>
 

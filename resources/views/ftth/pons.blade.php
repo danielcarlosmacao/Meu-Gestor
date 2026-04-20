@@ -41,7 +41,7 @@
                                 </a>
                                 </td>
                                 <td>
-                                    <a href="{{ route('fiberbox.index', ['pon' => $pon->id]) }}"
+                                    <a href="{{ route('fiberbox.index', ['pon' => $pon->id, 'map' => 'yes']) }}"
                                         class="text-dark text-decoration-none fw-bold">{{ $pon->info }}
                                     </a>
                                 </td>
