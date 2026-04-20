@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Ftth;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 use App\Models\FtthPon;
 use App\Models\FtthFiberBox;
@@ -22,34 +23,26 @@ class FiberBoxController extends Controller
 
         $boxes = FtthFiberBox::where('pon_id', $pon->id)->get();
 
-        $lastnumber = FtthFiberBox::max('number');
+        $lastnumber = FtthFiberBox::query()->max('number');
         $nextnumbermax = $lastnumber ? $lastnumber + 1 : 1;
-        /*
-                $numbers = FtthFiberBox::orderBy('number')->pluck('number');
 
-                $nextnumber = 1;
-
-                foreach ($numbers as $num) {
-                    if ($num != $nextnumber) {
-                        break;
-                    }
-                    $nextnumber++;
-                }
-        */
-        $existsOne = \DB::table('ftth_fiber_boxes')->where('number', 1)->exists();
+        // verifica se existe número 1 (ignorando deletados)
+        $existsOne = FtthFiberBox::where('number', 1)->exists();
 
         if (!$existsOne) {
             $nextnumber = 1;
         } else {
             $result = \DB::selectOne("
-        SELECT MIN(t1.number + 1) AS next
-        FROM ftth_fiber_boxes t1
-        LEFT JOIN ftth_fiber_boxes t2
-            ON t2.number = t1.number + 1
-        WHERE t2.number IS NULL
-    ");
+                SELECT MIN(t1.number + 1) AS next
+                FROM ftth_fiber_boxes t1
+                LEFT JOIN ftth_fiber_boxes t2
+                    ON t2.number = t1.number + 1
+                    AND t2.deleted_at IS NULL
+                WHERE t1.deleted_at IS NULL
+                AND t2.number IS NULL
+            ");
 
-            $nextnumber = $result->next;
+            $nextnumber = $result->next ?? ($lastnumber + 1);
         }
 
         $boxIds = $boxes->pluck('id');
@@ -117,6 +110,20 @@ class FiberBoxController extends Controller
 
     public function store(Request $request)
     {
+        $request->validate([
+            'number' => [
+                'required',
+                'integer',
+                'min:1',
+                Rule::unique('ftth_fiber_boxes', 'number')
+                    ->whereNull('deleted_at')
+            ],
+            'info' => 'nullable|string',
+            'coordinates' => 'required|string',
+            'pon_id' => 'required|exists:ftth_pons,id',
+        ], [
+            'number.unique' => 'Esse número já está em uso.',
+        ]);
 
         FtthFiberBox::create([
             'number' => $request->number,
@@ -125,7 +132,7 @@ class FiberBoxController extends Controller
             'pon_id' => $request->pon_id
         ]);
 
-        return redirect()->back();
+        return redirect()->back()->with('success', 'Caixa criada');
     }
 
 

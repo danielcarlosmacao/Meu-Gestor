@@ -172,9 +172,9 @@
                     let lat = e.latlng.lat;
                     let lng = e.latlng.lng;
 
-                    document.getElementById('coordinates').value = lat + ',' + lng;
+                    document.querySelector('#modalBox input[name="coordinates"]').value = lat + ',' + lng;
 
-                    let modal = new bootstrap.Modal(document.getElementById('modalCreateBox'));
+                    let modal = new bootstrap.Modal(document.getElementById('modalBox'));
                     modal.show();
 
                 });
@@ -236,5 +236,5 @@
                 </form>
             </div>
         </div>
-
+        @include('ftth.modals.createbox')
     @endsection

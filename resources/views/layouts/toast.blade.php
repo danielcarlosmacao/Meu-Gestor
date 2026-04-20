@@ -6,7 +6,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
 
 <script>
-    $(function () {
+    $(function() {
         toastr.options = {
             "closeButton": true,
             "progressBar": true,
@@ -28,6 +28,9 @@
 
         @if (session('info'))
             toastr.info("{{ session('info') }}");
+        @endif
+        @if ($errors->has('number'))
+            toastr.warning("{{ $errors->first('number') }}");
         @endif
     });
 </script>
