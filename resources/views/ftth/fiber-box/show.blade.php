@@ -56,7 +56,8 @@
                     'Deseja recalcular toda a rede desta CTO?',
                     'Essa alteração não poderá ser revertida e afeta todas as caixas dessa PON',
                     'POST'
-                )" style="display: none;">
+                )"
+                style="display: none;">
                 <i class="bi bi-arrow-repeat"></i>
             </button>
 
@@ -104,7 +105,8 @@
 
                                         {{-- INFO --}}
                                         <td class="fw-semibold">
-                                            <span style="color: {{ $cable->color }}">
+                                            <span style="color: {{ $cable->color }}; cursor: pointer;"
+                                                onclick="copyColor('{{ $cable->color }}')">
                                                 .
                                             </span>
                                             {{ $cable->info }}
@@ -112,14 +114,19 @@
 
                                         {{-- CONEXÃO --}}
                                         <td>
+
                                             @if ($cable->input_fiber_box_id == $box->id)
-                                                <span class="badge bg-secondary">
-                                                    {{ $cable->outputFiberBox->info ?? '' }}
-                                                </span>
+                                                <a href="{{ route('fiberbox.show', $cable->output_fiber_box_id) }}">
+                                                    <span class="badge bg-secondary">
+                                                        {{ $cable->outputFiberBox->info ?? '' }}
+                                                    </span>
+                                                </a>
                                             @else
-                                                <span class="badge bg-secondary">
-                                                    {{ $cable->inputFiberBox->info ?? '' }}
-                                                </span>
+                                                <a href="{{ route('fiberbox.show', $cable->input_fiber_box_id) }}">
+                                                    <span class="badge bg-secondary">
+                                                        {{ $cable->inputFiberBox->info ?? '' }}
+                                                    </span>
+                                                </a>
                                             @endif
                                         </td>
 
@@ -269,7 +276,8 @@
                                                     {{ $fiber->id }},
                                                     '{{ $fiber->fiber_identification }}',
                                                     '{{ $fiber->optical_power }}'
-                                                )" style="display: none;">
+                                                )"
+                                                    style="display: none;">
                                                     <i class="bi bi-pencil"></i>
                                                 </button>
                                             </div>
@@ -709,6 +717,18 @@
             document.getElementById('formEditFiber').action = url;
 
             modal.show();
+        }
+
+        //Copiar cor do cabo
+
+        function copyColor(color) {
+
+            navigator.clipboard.writeText(color).then(() => {
+                toastr.success("Cor copiada: " + color);
+            }).catch(() => {
+                toastr.error("Erro ao copiar");
+            });
+
         }
     </script>
 @endsection
