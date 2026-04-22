@@ -105,6 +105,10 @@
 
             let boxColor = inputCable?.color ?? outputCable?.color ?? '#2563eb';
 
+            if (box.info && box.info.toLowerCase().includes('ceo')) {
+                boxColor = '#000000';
+            }
+
             let marker = L.marker([parseFloat(lat), parseFloat(lng)], {
                 icon: L.divIcon({
                     className: '',
