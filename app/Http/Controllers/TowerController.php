@@ -343,8 +343,10 @@ class TowerController extends Controller
         // Carrega a torre com a galeria
         $images = TowerGallery::orderBy('tower_id', 'ASC')->paginate(24);
 
+        $towes = Tower::orderBy('name','ASC')->get();
 
-        return view('tower.gallery.show', compact('images'));
+
+        return view('tower.gallery.show', compact('images','towes'));
     }
 
     public function showImage($id)

@@ -6,6 +6,12 @@
     <div class="container mb-4 mt-4">
         <h2 class="text-center fw-bold">
             Galeria
+
+            @can('towers.manage')
+                <button class="btn dcm-btn-primary" data-bs-toggle="modal" data-bs-target="#uploadModal">
+                    <i class="bi bi-plus-lg"></i>
+                </button>
+            @endcan
         </h2>
     </div>
 
@@ -30,7 +36,7 @@
 
                         <div class="card-body p-2 text-center">
                             <small class="fw-semibold text-dark text-truncate d-block">
-                                {{ $image->tower?->name ?? 'Sem torre' }}
+                                <a href="{{ route('tower.gallery.index',$image->tower?->id)}}" class="text-decoration-none text-black">{{ $image->tower?->name ?? 'Sem torre' }}</a>
                             </small>
                         </div>
 
@@ -92,7 +98,39 @@
             </div>
         </div>
     </div>
-
+    <!-- Modal de upload -->
+    <div class="modal fade" id="uploadModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <form action="{{ route('tower.image.store') }}" method="POST" enctype="multipart/form-data">
+                @csrf
+                <input type="hidden" name="tower_id" value="1">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Enviar imagem</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="edit_info" class="form-label">Torre</label>
+                            <select name="tower_id" id="tower_id" class="form-select mb-3 shadow-sm">
+                                @foreach ($towes as $towe)
+                                <option value="{{ $towe->id }}">{{ $towe->name }}</option>
+                        
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="edit_info" class="form-label">Imagem</label>
+                            <input type="file" name="images[]" class="form-control" multiple accept="image/*">
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-primary">Salvar</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
     <script>
         const modalImage = document.getElementById('modalImage');
         let currentScale = 1;
