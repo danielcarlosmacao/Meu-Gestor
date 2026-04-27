@@ -34,9 +34,42 @@
                 @php $url = route('tower.image.show', $image->id); @endphp
                 <div class="col-6 col-md-3 col-lg-2">
                     <div class="card shadow-sm border-0" style="cursor:pointer;">
-                        <img src="{{ $url }}" class="img-fluid rounded" style="height:180px; object-fit:cover;"
-                            data-bs-toggle="modal" data-bs-target="#imageModal"
-                            onclick="showImage('{{ $url }}', {{ $image->id }}, {{ $image->trashed() ? 'true' : 'false' }})">
+                        @php
+                            $isFile = $image->title && str_starts_with($image->title, 'file:');
+                            $fileName = $isFile ? explode('file:', $image->title)[1] : null;
+                        @endphp
+
+                        @if ($isFile)
+                            <div class="d-flex align-items-center justify-content-center bg-light rounded position-relative"
+                                style="height:180px;">
+
+                                <a href="{{ $url }}" download class="text-center text-decoration-none">
+                                    <i class="bi bi-file-earmark-arrow-down" style="font-size:40px;"></i>
+                                    <div class="small mt-2 px-2 text-truncate" style="max-width:100%;">
+                                        {{ $fileName }}
+                                    </div>
+                                </a>
+
+                                {{-- Botão excluir (somente arquivos) --}}
+                                @can('towers.manage')
+                                    @if (!$image->trashed())
+                                        <form action="/tower/image/{{ $image->id }}" method="POST"
+                                            class="position-absolute top-0 end-0 m-1">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="btn btn-danger btn-sm shadow">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </form>
+                                    @endif
+                                @endcan
+
+                            </div>
+                        @else
+                            <img src="{{ $url }}" class="img-fluid rounded" style="height:180px; object-fit:cover;"
+                                data-bs-toggle="modal" data-bs-target="#imageModal"
+                                onclick="showImage('{{ $url }}', {{ $image->id }}, {{ $image->trashed() ? 'true' : 'false' }})">
+                        @endif
                     </div>
                 </div>
             @empty
@@ -99,7 +132,7 @@
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
                     </div>
                     <div class="modal-body">
-                        <input type="file" name="images[]" class="form-control" multiple accept="image/*">
+                        <input type="file" name="images[]" class="form-control" multiple>
                     </div>
                     <div class="modal-footer">
                         <button class="btn btn-primary">Salvar</button>

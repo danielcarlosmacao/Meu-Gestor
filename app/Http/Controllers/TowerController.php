@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-
+use Illuminate\Support\Str;
 use App\Models\Tower;
 use App\Models\Battery;
 use App\Models\Equipment;
@@ -340,20 +340,21 @@ class TowerController extends Controller
     }
     public function galleryShow()
     {
-        // Carrega a torre com a galeria
-        $images = TowerGallery::orderBy('tower_id', 'ASC')->paginate(24);
+        $images = TowerGallery::where(function ($query) {
+            $query->whereNull('title')
+                ->orWhere('title', 'NOT LIKE', 'file:%');
+        })
+            ->orderBy('tower_id', 'ASC')
+            ->paginate(24);
 
-        $towes = Tower::orderBy('name','ASC')->get();
+        $towes = Tower::orderBy('name', 'ASC')->get();
 
-
-        return view('tower.gallery.show', compact('images','towes'));
+        return view('tower.gallery.show', compact('images', 'towes'));
     }
 
     public function showImage($id)
     {
-
         $image = TowerGallery::withTrashed()->findOrFail($id);
-
 
         $path = storage_path('app/public/' . $image->path);
 
@@ -361,15 +362,30 @@ class TowerController extends Controller
             abort(404);
         }
 
-        return response()->file($path);
-    }
+        $mime = mime_content_type($path);
 
+        // Se for imagem → exibe
+        if (Str::startsWith($mime, 'image/')) {
+            return response()->file($path);
+        }
+
+        // Se for arquivo → prepara nome personalizado
+        $fileName = basename($image->path);
+
+        if ($image->title && str_starts_with($image->title, 'file:')) {
+            $name = explode('file:', $image->title)[1];
+            $ext = pathinfo($image->path, PATHINFO_EXTENSION);
+            $fileName = $name . '.' . $ext;
+        }
+
+        return response()->download($path, $fileName);
+    }
     // UPLOAD DE IMAGEM
     public function storeImage(Request $request, ImageService $imageService)
     {
         $request->validate([
             'tower_id' => 'required|exists:towers,id',
-            'images.*' => 'required|image|max:2048'
+            'images.*' => 'required|file|max:2048'
         ]);
 
         if ($request->hasFile('images')) {
