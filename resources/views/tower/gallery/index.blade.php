@@ -26,7 +26,6 @@
                 @endif
             @endcan
     </div>
-    </div>
 
     <div class="container">
         <div class="row g-3">
@@ -86,35 +85,47 @@
             <div class="modal-content bg-transparent border-0">
                 <div class="modal-body d-flex flex-column align-items-center position-relative p-0">
 
-                    <img id="modalImage" class="img-fluid rounded shadow-lg mb-3"
-                        style="max-height:95vh; max-width:95vw; transition: all 0.3s ease;">
+                    <!-- BOTÕES NO TOPO -->
+                    <div class="position-absolute top-0 end-0 m-3 d-flex gap-2 z-3">
+                        <button id="resetZoomBtn" type="button" class="btn btn-secondary shadow">
+                            <i class="bi bi-zoom-out"></i>
+                        </button>
 
-                    <div id="modalButtons" class="d-flex gap-3 justify-content-center w-100 mb-3">
-                        <form id="deleteForm" method="POST" style="display:none;">
+                        <form id="deleteFormTop" method="POST" style="display:none;">
                             @csrf
                             @method('DELETE')
-                            <button type="submit" class="btn btn-danger btn-lg shadow">Excluir</button>
+                            <button type="submit" class="btn btn-danger shadow">
+                                <i class="bi bi-trash"></i>
+                            </button>
                         </form>
+
                         @can('administrator.user')
-                            <form id="restoreForm" method="POST" style="display:none;">
+                            <form id="restoreFormTop" method="POST" style="display:none;">
                                 @csrf
-                                <button type="submit" class="btn btn-success btn-lg shadow">Restaurar</button>
+                                <button type="submit" class="btn btn-success shadow">
+                                    <i class="bi bi-arrow-counterclockwise"></i>
+                                </button>
                             </form>
 
-                            <form id="forceDeleteForm" method="POST" style="display:none;">
+                            <form id="forceDeleteFormTop" method="POST" style="display:none;">
                                 @csrf
                                 @method('DELETE')
-                                <button type="submit" class="btn btn-danger btn-lg shadow">Excluir Permanentemente</button>
+                                <button type="submit" class="btn btn-danger shadow">
+                                    <i class="bi bi-x-octagon"></i>
+                                </button>
                             </form>
                         @endcan
 
-                        <button id="resetZoomBtn" type="button" class="btn btn-secondary btn-lg shadow">Reset Zoom</button>
+                        <button type="button" class="btn btn-light shadow" data-bs-dismiss="modal">
+                            <i class="bi bi-x-lg"></i>
+                        </button>
+
                     </div>
 
-                    <button type="button" class="btn btn-light position-absolute top-0 end-0 m-3 shadow"
-                        data-bs-dismiss="modal" aria-label="Fechar">
-                        <i class="bi bi-x-lg"></i>
-                    </button>
+                    <!-- IMAGEM -->
+                    <img id="modalImage" class="img-fluid rounded shadow-lg"
+                        style="max-height:95vh; max-width:95vw; cursor: zoom-in;">
+
                 </div>
             </div>
         </div>
@@ -125,15 +136,16 @@
         <div class="modal-dialog">
             <form action="{{ route('tower.image.store') }}" method="POST" enctype="multipart/form-data">
                 @csrf
-                <input type="hidden" name="tower_id" value="{{ $tower->id }}">
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title">Enviar imagem</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                     </div>
+
                     <div class="modal-body">
                         <input type="file" name="images[]" class="form-control" multiple>
                     </div>
+
                     <div class="modal-footer">
                         <button class="btn btn-primary">Salvar</button>
                     </div>
@@ -145,35 +157,51 @@
     <script>
         const modalImage = document.getElementById('modalImage');
         let currentScale = 1;
-        const scaleStep = 0.1;
+        let posX = 0,
+            posY = 0;
+        let isDragging = false;
+        const scaleStep = 0.15;
         const minScale = 0.5;
-        const maxScale = 3;
+        const maxScale = 4;
 
         // Zoom com scroll
         modalImage.addEventListener('wheel', function(event) {
             event.preventDefault();
+
+            const rect = modalImage.getBoundingClientRect();
+
+            const offsetX = ((event.clientX - rect.left) / rect.width) * 100;
+            const offsetY = ((event.clientY - rect.top) / rect.height) * 100;
+
+            modalImage.style.transformOrigin = `${offsetX}% ${offsetY}%`;
+
             currentScale += (event.deltaY < 0 ? scaleStep : -scaleStep);
+
             if (currentScale > maxScale) currentScale = maxScale;
             if (currentScale < minScale) currentScale = minScale;
+
             modalImage.style.transform = `scale(${currentScale})`;
         });
 
         // Reset zoom
         document.getElementById('resetZoomBtn').addEventListener('click', function() {
             currentScale = 1;
+            posX = 0;
+            posY = 0;
             modalImage.style.transform = 'scale(1)';
         });
 
-        // Abrir imagem no modal
+        // Função de abrir imagem no modal
         function showImage(src, id, trashed, forceDeleted = false) {
             currentScale = 1;
+            posX = 0;
+            posY = 0;
             modalImage.style.transform = 'scale(1)';
-
-            const deleteForm = document.getElementById('deleteForm');
-            const restoreForm = document.getElementById('restoreForm');
-            const forceDeleteForm = document.getElementById('forceDeleteForm');
-
             modalImage.src = src;
+
+            const deleteForm = document.getElementById('deleteFormTop');
+            const restoreForm = document.getElementById('restoreFormTop');
+            const forceDeleteForm = document.getElementById('forceDeleteFormTop');
 
             if (forceDeleted) {
                 deleteForm.style.display = 'none';
@@ -202,13 +230,18 @@
             opacity: 0.85;
         }
 
-        .card img:hover {
-            transform: scale(1.05);
-            transition: transform 0.3s ease;
+        #modalImage {
+            transition: transform 0.05s linear;
+            cursor: zoom-in;
         }
 
-        #modalButtons button {
-            min-width: 160px;
+        .hover-card {
+            transition: 0.2s;
+        }
+
+        .hover-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
         }
     </style>
 
