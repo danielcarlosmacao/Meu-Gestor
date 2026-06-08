@@ -20,8 +20,10 @@ class FiberBoxController extends Controller
     public function index(Request $request)
     {
         $pon = FtthPon::find($request->pon);
-
-        $boxes = FtthFiberBox::where('pon_id', $pon->id)->get();
+        $ponrede = FtthPon::Where('olt', 'REDE')->value('id');
+        
+        $boxes = FtthFiberBox::where('pon_id', $pon->id)
+                    ->orWhere('pon_id', $ponrede)->get();
 
         $lastnumber = FtthFiberBox::query()->max('number');
         $nextnumbermax = $lastnumber ? $lastnumber + 1 : 1;
@@ -82,7 +84,8 @@ class FiberBoxController extends Controller
         // Boxes de todas as PONs dessa OLT
         $boxes = FtthFiberBox::with('pon')
             ->whereHas('pon', function ($q) use ($olt) {
-                $q->where('olt', $olt);
+                $q->where('olt', $olt)
+                    ->orWhere('olt', 'REDE');
             })
             ->get();
 
@@ -163,7 +166,6 @@ class FiberBoxController extends Controller
 
             $q->where('input_fiber_box_id', $box->id)
                 ->orWhere('output_fiber_box_id', $box->id);
-
         })->get();
 
         $lastCableForBox = FtthCableFiberBox::where('output_fiber_box_id', $box->id)
@@ -202,7 +204,6 @@ class FiberBoxController extends Controller
 
 
                     ->orWhereIn('splinter_id', $splinters->pluck('id'));
-
             })
             ->orderBy('fiber_identification')
             ->get();
@@ -211,7 +212,6 @@ class FiberBoxController extends Controller
         $fibers = $fibers->filter(function ($fiber) {
 
             return $fiber->fusions2->isEmpty();
-
         });
 
         $allFibers = FtthFiberCable::whereIn(
@@ -419,5 +419,4 @@ class FiberBoxController extends Controller
             $this->propagateFiber($nextFiber->id, $originFiber->optical_power, $visited);
         }
     }
-
 }

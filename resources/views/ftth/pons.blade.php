@@ -99,13 +99,13 @@
                         <div class="mb-3">
                             <label class="form-label fw-semibold">OLT</label>
                             <input name="olt" class="form-control shadow-sm"
-                                placeholder="Ex: OLT-01 / Slot 1 / Porta 2">
+                                placeholder="Ex: OLT-01 / Slot 1 / Porta 2" required>
                         </div>
 
                         {{-- DESCRIÇÃO --}}
                         <div class="mb-3">
                             <label class="form-label fw-semibold">Descrição</label>
-                            <input name="info" class="form-control shadow-sm" placeholder="Ex: PON-01">
+                            <input name="info" class="form-control shadow-sm" placeholder="Ex: PON-01" required>
                         </div>
 
                         {{-- SINAL --}}
@@ -117,7 +117,7 @@
                         {{-- COORDENADAS --}}
                         <div class="mb-3">
                             <label class="form-label fw-semibold">Coordenadas</label>
-                            <input name="coordinates" class="form-control shadow-sm" placeholder="Ex: -10.12345, -62.12345">
+                            <input name="coordinates" class="form-control shadow-sm" placeholder="Ex: -10.12345, -62.12345" required>
                         </div>
 
                     </div>
