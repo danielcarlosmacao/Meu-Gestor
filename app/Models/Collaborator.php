@@ -5,7 +5,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 use Illuminate\Database\Eloquent\Model;
 
-class collaborator extends Model
+class Collaborator extends Model
 {
     use SoftDeletes;
 
