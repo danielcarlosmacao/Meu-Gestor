@@ -21,9 +21,9 @@ class FiberBoxController extends Controller
     {
         $pon = FtthPon::find($request->pon);
         $ponrede = FtthPon::Where('olt', 'REDE')->value('id');
-        
+
         $boxes = FtthFiberBox::where('pon_id', $pon->id)
-                    ->orWhere('pon_id', $ponrede)->get();
+            ->orWhere('pon_id', $ponrede)->get();
 
         $lastnumber = FtthFiberBox::query()->max('number');
         $nextnumbermax = $lastnumber ? $lastnumber + 1 : 1;
@@ -81,14 +81,17 @@ class FiberBoxController extends Controller
         $olt = $request->olt;
         $infoolt = FtthPon::where('olt', $olt)->get();
 
-        // Boxes de todas as PONs dessa OLT
-        $boxes = FtthFiberBox::with('pon')
-            ->whereHas('pon', function ($q) use ($olt) {
-                $q->where('olt', $olt)
-                    ->orWhere('olt', 'REDE');
-            })
-            ->get();
-
+        if ($olt == "REDE") {
+            $boxes = FtthFiberBox::with('pon')->get();
+        } else {
+            // Boxes de todas as PONs dessa OLT
+            $boxes = FtthFiberBox::with('pon')
+                ->whereHas('pon', function ($q) use ($olt) {
+                    $q->where('olt', $olt)
+                        ->orWhere('olt', 'REDE');
+                })
+                ->get();
+        }
         $boxIds = $boxes->pluck('id');
 
         $cables = FtthCableFiberBox::with([
