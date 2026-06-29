@@ -209,7 +209,6 @@ class TowerController extends Controller
             ->log('Torre Criada');
 
         return redirect(route('tower.index'));
-
     }
 
     public function update(Request $request, $id)
@@ -261,7 +260,6 @@ class TowerController extends Controller
             ->log('Torre Deletada');
 
         return redirect()->back()->with('success', 'Torre deletada com sucesso!');
-
     }
 
     public function show($id)
@@ -430,5 +428,4 @@ class TowerController extends Controller
 
         return back()->with('success', 'Imagem deletada permanentemente!');
     }
-
 }
