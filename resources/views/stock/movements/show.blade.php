@@ -11,6 +11,29 @@
         <p><strong>Descrição:</strong> {{ $movement->description ?? '-' }}</p>
         <p><strong>Itens extras:</strong> {{ $movement->extra_items ?? '-' }}</p>
 
+@if($movement->type == "movement")
+
+
+        <table class="table table-bordered">
+            <thead class="bgc-primary text-white">
+                <tr>
+                    <th>Item</th>
+                    <th>Quantidade</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach ($movement->items as $item)
+                    @php
+                        $subtotal = ($item->pivot->price ?? 0) * $item->pivot->quantity;
+                    @endphp
+                    <tr>
+                        <td>{{ $item->name ?? 'Item deletado' }}</td>
+                        <td>{{ $item->pivot->quantity }}</td>
+                    </tr>
+                @endforeach
+            </tbody>
+        </table>
+@else
         {{-- Calcula total --}}
         @php
             $total = 0;
@@ -69,4 +92,6 @@
         </div>
 
     </div>
+
+    @endif
 @endsection

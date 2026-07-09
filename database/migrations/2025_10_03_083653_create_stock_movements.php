@@ -12,7 +12,7 @@ return new class extends Migration {
     {
         Schema::create('stock_movements', function (Blueprint $table) {
             $table->id();
-            $table->enum('type', ['input', 'output']);  
+            $table->enum('type', ['input', 'output','movement']);  
             $table->string('description')->nullable();
             $table->longText('extra_items')->nullable();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');

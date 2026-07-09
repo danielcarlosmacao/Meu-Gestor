@@ -227,7 +227,7 @@ class TowerController extends Controller
             'voltage' => $request->voltage,
         ]);
 
-        // 🔥 RECALCULA CONSUMO (voltage pode ter mudado!)
+        //  RECALCULA CONSUMO (voltage pode ter mudado!)
         $tower->updateConsumptionAh();
 
         activity()

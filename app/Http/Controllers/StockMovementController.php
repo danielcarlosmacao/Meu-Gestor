@@ -23,117 +23,135 @@ class StockMovementController extends Controller
         return view('stock.movements.create', compact('items'));
     }
 
-public function store(Request $request)
-{
-    $validated = $request->validate([
-        'type' => 'required|in:input,output',
-        'description' => 'nullable|string',
-        'extra_items' => 'nullable|string',
-        'items' => 'nullable|array',
-        'items.*.id' => 'required_with:items|exists:stock_items,id',
-        'items.*.quantity' => 'required_with:items|integer|min:1',
-        'items.*.price' => 'nullable|numeric|min:0',
-    ]);
+    public function store(Request $request)
+    {
+        //dd($request->all());
+        $validated = $request->validate([
+            'type' => 'required|in:input,output,movement',
+            'description' => 'nullable|string',
+            'extra_items' => 'nullable|string',
+            'items' => 'nullable|array',
+            'items.*.id' => 'required_with:items|exists:stock_items,id',
+            'items.*.quantity' => 'required_with:items|integer|min:1',
+            'items.*.price' => 'nullable|numeric|min:0',
+            'items.*.movement_type' => 'required_if:type,movement|in:input,output',
+        ]);
 
-    // 1) Cria a movimentação
-    $movement = StockMovement::create([
-        'type' => $validated['type'],
-        'description' => $validated['description'] ?? null,
-        'extra_items' => $validated['extra_items'] ?? null,
-        'user_id' => auth()->id(),
-    ]);
+        // 1) Cria a movimentação
+        $movement = StockMovement::create([
+            'type' => $validated['type'],
+            'description' => $validated['description'] ?? null,
+            'extra_items' => $validated['extra_items'] ?? null,
+            'user_id' => auth()->id(),
+        ]);
 
-    // 2) Coleta estoque ANTES (old) — usa id e nome
-    $oldData = [];
-    if (!empty($validated['items'])) {
-        $ids = array_column($validated['items'], 'id');
-        $stockItems = StockItem::whereIn('id', $ids)->get()->keyBy('id');
+        // 2) Coleta estoque ANTES (old) — usa id e nome
+        $oldData = [];
+        if (!empty($validated['items'])) {
+            $ids = array_column($validated['items'], 'id');
+            $stockItems = StockItem::whereIn('id', $ids)->get()->keyBy('id');
 
-        foreach ($validated['items'] as $it) {
-            $si = $stockItems->get($it['id']);
-            if (!$si) continue;
-            $oldData[$si->id] = [
-                'name' => $si->name,
-                'stock' => $si->current_stock,
-            ];
+            foreach ($validated['items'] as $it) {
+                $si = $stockItems->get($it['id']);
+                if (!$si) continue;
+                $oldData[$si->id] = [
+                    'name' => $si->name,
+                    'stock' => $si->current_stock,
+                ];
+            }
         }
-    }
 
-    // 3) Processa os itens (incrementa/decrementa e grava pivot)
-    if (!empty($validated['items'])) {
+        // 3) Processa os itens (incrementa/decrementa e grava pivot)
+        
         foreach ($validated['items'] as $item) {
+
             $stockItem = StockItem::find($item['id']);
-            if (!$stockItem) continue;
+
+            if (!$stockItem) {
+                continue;
+            }
 
             $quantity = (int) $item['quantity'];
-            $price = isset($item['price']) && $item['price'] !== '' ? $item['price'] : null;
 
-            if ($validated['type'] === 'input') {
-                // Entrada
+            $price = isset($item['price']) && $item['price'] !== ''
+                ? $item['price']
+                : null;
+
+            // Descobre qual operação será realizada
+            if ($validated['type'] == 'movement') {
+                $operation = $item['movement_type'];
+            } else {
+                $operation = $validated['type'];
+            }
+
+            // Entrada
+            if ($operation == 'input') {
+
                 $stockItem->increment('current_stock', $quantity);
+
                 if ($price !== null) {
                     $stockItem->price = $price;
                     $stockItem->save();
                 }
-            } else {
-                // Saída
+            }
+            // Saída
+            else {
+
                 $stockItem->decrement('current_stock', $quantity);
-                // se price não informado, mantemos o preço atual do item
+
                 if ($price === null) {
                     $price = $stockItem->price;
                 }
             }
 
-            // Vincula no pivot (movement_items por exemplo)
             $movement->items()->attach($stockItem->id, [
                 'quantity' => $quantity,
                 'price' => $price,
             ]);
         }
-    }
 
-    // 4) Coleta estoque DEPOIS (new)
-    $newData = [];
-    if (!empty($validated['items'])) {
-        $ids = array_column($validated['items'], 'id');
-        // refetch para garantir valores atualizados
-        $stockItemsAfter = StockItem::whereIn('id', $ids)->get()->keyBy('id');
+        // 4) Coleta estoque DEPOIS (new)
+        $newData = [];
+        if (!empty($validated['items'])) {
+            $ids = array_column($validated['items'], 'id');
+            // refetch para garantir valores atualizados
+            $stockItemsAfter = StockItem::whereIn('id', $ids)->get()->keyBy('id');
 
-        foreach ($stockItemsAfter as $id => $si) {
-            $newData[$id] = [
-                'name' => $si->name,
-                'stock' => $si->current_stock,
-            ];
+            foreach ($stockItemsAfter as $id => $si) {
+                $newData[$id] = [
+                    'name' => $si->name,
+                    'stock' => $si->current_stock,
+                ];
+            }
         }
+
+        // 5) Monta old/new no formato desejado { "Item X": qty, ... }
+        $oldFormatted = [];
+        $newFormatted = [];
+
+        foreach ($oldData as $id => $row) {
+            $oldFormatted[$row['name']] = $row['stock'];
+        }
+        foreach ($newData as $id => $row) {
+            $newFormatted[$row['name']] = $row['stock'];
+        }
+
+        // 6) Registra 1 log único para a movimentação
+        activity()
+            ->causedBy(auth()->user())
+            ->performedOn($movement)
+            ->withProperties([
+                'movement_id' => $movement->id,
+                'user_id' => auth()->id(),
+                'type' => $validated['type'],
+                'old' => $oldFormatted,
+                'new' => $newFormatted,
+            ])
+            ->log('Movimentação de estoque');
+
+        return redirect()->route('stock.movements.index')
+            ->with('success', 'Movimentação registrada com sucesso!');
     }
-
-    // 5) Monta old/new no formato desejado { "Item X": qty, ... }
-    $oldFormatted = [];
-    $newFormatted = [];
-
-    foreach ($oldData as $id => $row) {
-        $oldFormatted[$row['name']] = $row['stock'];
-    }
-    foreach ($newData as $id => $row) {
-        $newFormatted[$row['name']] = $row['stock'];
-    }
-
-    // 6) Registra 1 log único para a movimentação
-    activity()
-        ->causedBy(auth()->user())
-        ->performedOn($movement)
-        ->withProperties([
-            'movement_id' => $movement->id,
-            'user_id' => auth()->id(),
-            'type' => $validated['type'],
-            'old' => $oldFormatted,
-            'new' => $newFormatted,
-        ])
-        ->log('Movimentação de estoque');
-
-    return redirect()->route('stock.movements.index')
-        ->with('success', 'Movimentação registrada com sucesso!');
-}
 
 
 
@@ -222,6 +240,4 @@ public function store(Request $request)
             'type' => $validated['type'],
         ]);
     }
-
-
 }
