@@ -5,20 +5,32 @@
 
     @php
         $fiberColors = [
-            1 => '#00a651',
-            2 => '#ffff00',
-            3 => '#ffffff',
-            4 => '#0000ff',
-            5 => '#ff0000',
-            6 => '#8A2BE2',
-            7 => '#8b4513',
-            8 => '#9400d3',
-            9 => '#00ffff',
-            10 => '#ffa500',
-            11 => '#ffc0cb',
-            12 => '#808080',
-        ];
+            1 => '#00a651', // Verde
+            2 => '#ffff00', // Amarelo
+            3 => '#ffffff', // Branco
+            4 => '#0000ff', // Azul
+            5 => '#ff0000', // Vermelho
+            6 => '#8A2BE2', // Violeta
+            7 => '#8b4513', // Marrom
+            8 => '#ffc0cb', // Rosa
+            9 => '#000000', // Preto
+            10 => '#808080', // Cinza
+            11 => '#ffa500', // Laranja
+            12 => '#00ffff', // Água (Aqua)
 
+            13 => '#00a651', // Verde
+            14 => '#ffff00', // Amarelo
+            15 => '#ffffff', // Branco
+            16 => '#0000ff', // Azul
+            17 => '#ff0000', // Vermelho
+            18 => '#8A2BE2', // Violeta
+            19 => '#8b4513', // Marrom
+            20 => '#ffc0cb', // Rosa
+            21 => '#000000', // Preto
+            22 => '#808080', // Cinza
+            23 => '#ffa500', // Laranja
+            24 => '#00ffff', // Água (Aqua)
+        ];
         function getFiberNumber($name)
         {
             if (preg_match('/(\d+)$/', $name, $matches)) {
@@ -515,7 +527,7 @@
     @include('ftth.modals.fiber')
     @include('ftth.modals.splinter')
     @include('ftth.modals.fusion')
-   {{-- @include('ftth.modals.editfiber')--}}
+    {{-- @include('ftth.modals.editfiber') --}}
     @include('ftth.modals.editSignal')
 
     <script>
@@ -761,8 +773,8 @@
                     console.log("ID:", id);
                     console.log("Fibra:", fiber);
                     console.log("Sinal:", signal);
-                    
-                    
+
+
                     document.getElementById('fiber_name').value = fiber;
                     document.getElementById('old_signal').value = signal;
 
