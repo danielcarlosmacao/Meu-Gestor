@@ -18,6 +18,7 @@ Route::prefix('ftth')->group(function () {
         Route::get('/ponsmap', [FiberBoxController::class, 'ponsmap'])->name('pon.ponsmap');
         Route::get('/fiber-box', [FiberBoxController::class, 'index'])->name('fiberbox.index');
         Route::get('/fiber-box/{box}', [FiberBoxController::class, 'show'])->name('fiberbox.show');
+        Route::get('/cable/{cableId}/route',[CableRouteController::class, 'edit'])->name('cable.route.edit');
     });
 
     Route::middleware(['auth', 'permission:ftth.create'])->group(function () {
@@ -30,6 +31,7 @@ Route::prefix('ftth')->group(function () {
         Route::put('/fiber-box/updatesignal/{id}', [FiberBoxController::class, 'updatesignal'])->name('fiberbox.updatesignal');
         Route::post('/fiber-box/{id}/recalculate-local', [FiberBoxController::class, 'recalculate'])->name('fiberbox.recalculate.local');
         Route::put('/fiber/update/{id}', [FiberCableController::class, 'update'])->name('fiber.update');
+        Route::put('/cable/{cableId}/route',[CableRouteController::class, 'update'])->name('cable.route.update');
     });
     Route::middleware(['auth', 'permission:ftth.delete'])->group(function () {
         Route::delete('/pons/{pon}', [PonController::class, 'destroy'])->name('pon.destroy');
@@ -41,22 +43,8 @@ Route::prefix('ftth')->group(function () {
         Route::delete('/cable/{id}', [CableFiberBoxController::class, 'destroy'])->name('cable.destroy');
         Route::delete('/splinter/{id}', [SplinterController::class, 'destroy'])->name('splinter.destroy');
         Route::delete('/fusion/{id}', [FusionController::class, 'destroy'])->name('fusion.destroy');
+        Route::delete('/cable/{cableId}/route',[CableRouteController::class, 'destroy'])->name('cable.route.destroy');
     });
 
 
-
-   Route::get(
-    '/cable/{cableId}/route',
-    [CableRouteController::class, 'edit']
-)->name('cable.route.edit');
-
-Route::put(
-    '/cable/{cableId}/route',
-    [CableRouteController::class, 'update']
-)->name('cable.route.update');
-
-Route::delete(
-    '/cable/{cableId}/route',
-    [CableRouteController::class, 'destroy']
-)->name('cable.route.destroy');
 });
