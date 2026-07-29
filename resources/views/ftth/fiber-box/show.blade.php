@@ -57,7 +57,7 @@
                     'Essa alteração não poderá ser revertida e afeta todas as caixas dessa PON',
                     'POST'
                 )"
-                style="display: none;">
+                style="display: ;">
                 <i class="bi bi-arrow-repeat"></i>
             </button>
 
@@ -118,17 +118,17 @@
                                             @if ($cable->input_fiber_box_id == $box->id)
                                                 @if ($cable->output_fiber_box_id)
                                                     <a href="{{ route('fiberbox.show', $cable->output_fiber_box_id) }}">
-                                                    <span class="badge bg-secondary">
-                                                        {{ $cable->outputFiberBox->info ?? '' }}
-                                                    </span>
+                                                        <span class="badge bg-secondary">
+                                                            {{ $cable->outputFiberBox->info ?? '' }}
+                                                        </span>
                                                     </a>
                                                 @endif
                                             @else
                                                 @if ($cable->input_fiber_box_id)
                                                     <a href="{{ route('fiberbox.show', $cable->input_fiber_box_id) }}">
-                                                    <span class="badge bg-secondary">
-                                                        {{ $cable->inputFiberBox->info ?? '' }}
-                                                    </span>
+                                                        <span class="badge bg-secondary">
+                                                            {{ $cable->inputFiberBox->info ?? '' }}
+                                                        </span>
                                                     </a>
                                                 @endif
                                             @endif
@@ -263,6 +263,8 @@
                                         {{-- AÇÕES --}}
                                         <td class="text-end">
                                             <div class="d-flex justify-content-end gap-1">
+
+                                                {{-- EXCLUIR FIBRA --}}
                                                 @if ($fiber->status == 'unused')
                                                     <button class="btn btn-sm btn-outline-danger"
                                                         onclick="openConfirmModal(
@@ -275,13 +277,10 @@
                                                     </button>
                                                 @endif
                                                 {{-- EDITAR SINAL --}}
-                                                <button type="button" class="btn btn-sm btn-warning"
-                                                    onclick="openEditFiberModal(
-                                                    {{ $fiber->id }},
-                                                    '{{ $fiber->fiber_identification }}',
-                                                    '{{ $fiber->optical_power }}'
-                                                )"
-                                                    style="display: none;">
+                                                <button type="button" class="btn btn-sm btn-warning btn-edit-signal"
+                                                    data-id="{{ $fiber->id }}"
+                                                    data-fiber="{{ $fiber->fiber_identification }}"
+                                                    data-signal="{{ $fiber->optical_power }}">
                                                     <i class="bi bi-pencil"></i>
                                                 </button>
                                             </div>
@@ -516,7 +515,8 @@
     @include('ftth.modals.fiber')
     @include('ftth.modals.splinter')
     @include('ftth.modals.fusion')
-    @include('ftth.modals.editfiber')
+   {{-- @include('ftth.modals.editfiber')--}}
+    @include('ftth.modals.editSignal')
 
     <script>
         document.addEventListener("DOMContentLoaded", function() {
@@ -734,5 +734,47 @@
             });
 
         }
+
+        //
+
+        document.addEventListener('DOMContentLoaded', function() {
+
+            const modalElement = document.getElementById('editSignalModal');
+
+            if (!modalElement) {
+                console.error('Modal editSignalModal não encontrado.');
+                return;
+            }
+
+            const modal = new bootstrap.Modal(modalElement);
+
+            document.querySelectorAll('.btn-edit-signal').forEach(function(btn) {
+
+                btn.addEventListener('click', function() {
+
+                    console.clear();
+
+                    const id = this.dataset.id;
+                    const fiber = this.dataset.fiber;
+                    const signal = this.dataset.signal ?? '';
+
+                    console.log("ID:", id);
+                    console.log("Fibra:", fiber);
+                    console.log("Sinal:", signal);
+                    
+                    
+                    document.getElementById('fiber_name').value = fiber;
+                    document.getElementById('old_signal').value = signal;
+
+                    document.getElementById('formEditSignal').action =
+                        "/ftth/fiber-box/updatesignal/" + id;
+
+                    modal.show();
+
+                });
+
+            });
+
+        });
     </script>
 @endsection

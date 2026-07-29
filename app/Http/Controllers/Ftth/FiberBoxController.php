@@ -14,52 +14,79 @@ use App\Models\FtthSplinter;
 use App\Models\FtthSplinterLoss;
 use App\Models\FtthFiberFusion;
 
+use App\Services\FtthSignalPropagationService;
+
 class FiberBoxController extends Controller
 {
 
     public function index(Request $request)
     {
-        $pon = FtthPon::find($request->pon);
-        $ponrede = FtthPon::Where('olt', 'REDE')->value('id');
+        $pon = FtthPon::findOrFail($request->pon);
 
-        $boxes = FtthFiberBox::where('pon_id', $pon->id)
-            ->orWhere('pon_id', $ponrede)->get();
+        $ponrede = FtthPon::where('olt', 'REDE')->value('id');
+
+        $boxes = FtthFiberBox::with('pon')
+            ->where(function ($query) use ($pon, $ponrede) {
+                $query->where('pon_id', $pon->id);
+
+                if ($ponrede) {
+                    $query->orWhere('pon_id', $ponrede);
+                }
+            })
+            ->get();
 
         $lastnumber = FtthFiberBox::query()->max('number');
-        $nextnumbermax = $lastnumber ? $lastnumber + 1 : 1;
 
-        // verifica se existe número 1 (ignorando deletados)
+        $nextnumbermax = $lastnumber
+            ? $lastnumber + 1
+            : 1;
+
+        /*
+    |--------------------------------------------------------------------------
+    | PRÓXIMO NÚMERO DISPONÍVEL
+    |--------------------------------------------------------------------------
+    */
+
         $existsOne = FtthFiberBox::where('number', 1)->exists();
 
         if (!$existsOne) {
             $nextnumber = 1;
         } else {
             $result = \DB::selectOne("
-                SELECT MIN(t1.number + 1) AS next
-                FROM ftth_fiber_boxes t1
-                LEFT JOIN ftth_fiber_boxes t2
-                    ON t2.number = t1.number + 1
-                    AND t2.deleted_at IS NULL
-                WHERE t1.deleted_at IS NULL
-                AND t2.number IS NULL
-            ");
+            SELECT MIN(t1.number + 1) AS next
+            FROM ftth_fiber_boxes t1
+
+            LEFT JOIN ftth_fiber_boxes t2
+                ON t2.number = t1.number + 1
+                AND t2.deleted_at IS NULL
+
+            WHERE t1.deleted_at IS NULL
+            AND t2.number IS NULL
+        ");
 
             $nextnumber = $result->next ?? ($lastnumber + 1);
         }
+
+        /*
+    |--------------------------------------------------------------------------
+    | CABOS DAS BOXES
+    |--------------------------------------------------------------------------
+    */
 
         $boxIds = $boxes->pluck('id');
 
         $cables = FtthCableFiberBox::with([
             'inputFiberBox',
-            'outputFiberBox'
+            'outputFiberBox',
+            'routePoints',
         ])
-            ->where(function ($q) use ($boxIds) {
-                $q->whereIn('input_fiber_box_id', $boxIds)
+            ->where(function ($query) use ($boxIds) {
+                $query->whereIn('input_fiber_box_id', $boxIds)
                     ->orWhereIn('output_fiber_box_id', $boxIds);
             })
             ->get();
 
-        if ($request->map == "yes") {
+        if ($request->map === 'yes') {
             return view('ftth.fiber-box.map', compact(
                 'boxes',
                 'pon',
@@ -67,39 +94,42 @@ class FiberBoxController extends Controller
                 'nextnumbermax',
                 'cables'
             ));
-        } else {
-            return view('ftth.fiber-box.index', compact(
-                'boxes',
-                'nextnumber',
-                'nextnumbermax',
-                'pon'
-            ));
         }
+
+        return view('ftth.fiber-box.index', compact(
+            'boxes',
+            'nextnumber',
+            'nextnumbermax',
+            'pon'
+        ));
     }
+
     public function ponsmap(Request $request)
     {
         $olt = $request->olt;
+
         $infoolt = FtthPon::where('olt', $olt)->get();
 
-        if ($olt == "REDE") {
+        if ($olt === 'REDE') {
             $boxes = FtthFiberBox::with('pon')->get();
         } else {
-            // Boxes de todas as PONs dessa OLT
             $boxes = FtthFiberBox::with('pon')
-                ->whereHas('pon', function ($q) use ($olt) {
-                    $q->where('olt', $olt)
+                ->whereHas('pon', function ($query) use ($olt) {
+                    $query->where('olt', $olt)
                         ->orWhere('olt', 'REDE');
                 })
                 ->get();
         }
+
         $boxIds = $boxes->pluck('id');
 
         $cables = FtthCableFiberBox::with([
             'inputFiberBox',
-            'outputFiberBox'
+            'outputFiberBox',
+            'routePoints',
         ])
-            ->where(function ($q) use ($boxIds) {
-                $q->whereIn('input_fiber_box_id', $boxIds)
+            ->where(function ($query) use ($boxIds) {
+                $query->whereIn('input_fiber_box_id', $boxIds)
                     ->orWhereIn('output_fiber_box_id', $boxIds);
             })
             ->get();
@@ -111,7 +141,6 @@ class FiberBoxController extends Controller
             'infoolt'
         ));
     }
-
 
 
     public function store(Request $request)
@@ -245,181 +274,40 @@ class FiberBoxController extends Controller
         ));
     }
 
-
-    public function recalculate($boxId)
+    public function updatesignal(Request $request, $id)
     {
-        $visited = [];
+        $request->validate([
+            'optical_power' => 'required|numeric',
+        ]);
 
-        /*
-        |--------------------------------------------------------------------------
-        | FIBRAS ORIGEM (não derivadas)
-        |--------------------------------------------------------------------------
-        */
-        $startFibers = FtthFiberCable::where('fiber_box_id', $boxId)
-            ->get()
-            ->filter(function ($fiber) {
-                return !$this->isDerivedFiber($fiber);
-            });
+        $fiber = FtthFiberCable::findOrFail($id);
+        $fiber->optical_power = $request->optical_power;
+        $fiber->save();
 
-        foreach ($startFibers as $fiber) {
-
-            if ($fiber->optical_power === null)
-                continue;
-
-            $this->propagateFiber($fiber->id, $fiber->optical_power, $visited);
-        }
-
-        return back()->with('success', 'Rede recalculada com sucesso.');
+        return redirect()->back()->with('success', 'Sinal atualizado com sucesso.');
     }
 
-    private function isDerivedFiber($fiber)
-    {
-        // saída de splinter
-        if ($fiber->splinter_out_id)
-            return true;
 
-        // destino de fusão
-        if (FtthFiberFusion::where('fiber_cables_id_2', $fiber->id)->exists()) {
-            return true;
-        }
 
-        return false;
-    }
+    public function recalculate(
+        int $boxId,
+        FtthSignalPropagationService $signalService
+    ) {
+        try {
+            $processed = $signalService->recalculateBox($boxId);
 
-    private function propagateFiber($fiberId, $power, &$visited = [])
-    {
-        if (in_array($fiberId, $visited))
-            return;
+            return back()->with(
+                'success',
+                "Rede recalculada com sucesso. {$processed} fibras processadas."
+            );
+        } catch (\Throwable $exception) {
+            report($exception);
 
-        $visited[] = $fiberId;
-
-        $fiber = FtthFiberCable::find($fiberId);
-        if (!$fiber)
-            return;
-
-        /*
-        |--------------------------------------------------------------------------
-        | 1. ATUALIZA (NÃO SOBRESCREVE ORIGEM)
-        |--------------------------------------------------------------------------
-        */
-        if ($this->isDerivedFiber($fiber)) {
-
-            if ($fiber->optical_power != $power) {
-                $fiber->update([
-                    'optical_power' => $power
-                ]);
-            }
-        }
-
-        /*
-        |--------------------------------------------------------------------------
-        | 2. FUSÃO (fiber1 → fiber2)
-        |--------------------------------------------------------------------------
-        */
-        $fusions = FtthFiberFusion::where('fiber_cables_id_1', $fiberId)->get();
-
-        foreach ($fusions as $fusion) {
-
-            $destFiber = FtthFiberCable::find($fusion->fiber_cables_id_2);
-            if (!$destFiber)
-                continue;
-
-            $loss = $fusion->loss ?? 0;
-
-            $newPower = $power - $loss;
-
-            $this->propagateFiber($destFiber->id, $newPower, $visited);
-        }
-
-        /*
-        |--------------------------------------------------------------------------
-        | 3. SPLINTER (entrada → OUTs)
-        |--------------------------------------------------------------------------
-        */
-        $splinters = FtthSplinter::where('splinter_input', $fiberId)->get();
-
-        foreach ($splinters as $splinter) {
-
-            $loss = $splinter->loss;
-
-            // 🔥 SEM LIKE — usando splinter_out_id
-            $outputs = FtthFiberCable::where('splinter_out_id', $splinter->id)->get();
-
-            foreach ($outputs as $outFiber) {
-
-                preg_match('/OUT-(\d+)$/', $outFiber->fiber_identification, $match);
-                $outNumber = isset($match[1]) ? (int) $match[1] : 1;
-
-                if ($outNumber == 1) {
-                    $lossValue = $loss->loss1 ?? 0;
-                } elseif ($outNumber == 2 & $loss->loss2 != null) {
-                    $lossValue = $loss->loss2 ?? 0;
-                } else {
-                    $lossValue = $loss->loss1 ?? 0;
-                }
-
-                $newPower = $power - $lossValue;
-
-                if ($outFiber->optical_power != $newPower) {
-                    $outFiber->update([
-                        'optical_power' => $newPower
-                    ]);
-                }
-
-                // 🔥 continua propagação
-                $this->propagateFiber($outFiber->id, $newPower, $visited);
-            }
-        }
-
-        /*
- |--------------------------------------------------------------------------
- | 4. CABO (USANDO FUSÃO DA CTO ORIGEM)
- |--------------------------------------------------------------------------
- */
-
-        // 🔥 pega cabos que SAEM da CTO atual
-        $cables = FtthCableFiberBox::where('input_fiber_box_id', $fiber->fiber_box_id)->get();
-
-        foreach ($cables as $cable) {
-
-            if (!$cable->output_fiber_box_id)
-                continue;
-
-            /*
-            |--------------------------------------------------------------------------
-            | 1. BUSCA FUSÃO NA CTO ATUAL
-            |--------------------------------------------------------------------------
-            */
-            $fusion = FtthFiberFusion::where('fiber_cables_id_2', $fiber->id)->first();
-
-            // se tiver fusão, usa a origem real
-            if ($fusion) {
-                $originFiber = FtthFiberCable::find($fusion->fiber_cables_id_1);
-            } else {
-                $originFiber = $fiber;
-            }
-
-            if (!$originFiber)
-                continue;
-
-            /*
-            |--------------------------------------------------------------------------
-            | 2. BUSCA FIBRA NA CTO DESTINO
-            |--------------------------------------------------------------------------
-            */
-            $nextFiber = FtthFiberCable::where('fiber_box_id', $cable->output_fiber_box_id)
-                ->where('fiber_identification', $originFiber->fiber_identification)
-                ->first();
-
-            if (!$nextFiber)
-                continue;
-
-            /*
-            |--------------------------------------------------------------------------
-            | 3. PROPAGA SINAL CORRETO
-            |--------------------------------------------------------------------------
-            */
-            $this->propagateFiber($nextFiber->id, $originFiber->optical_power, $visited);
+            return back()->with(
+                'error',
+                'Não foi possível recalcular a rede: '
+                    . $exception->getMessage()
+            );
         }
     }
 }

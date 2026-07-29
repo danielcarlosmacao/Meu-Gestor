@@ -30,4 +30,11 @@ class FtthCableFiberBox extends Model
     {
         return $this->belongsTo(FtthFiberBox::class, 'input_fiber_box_id');
     }
+    public function routePoints()
+    {
+        return $this->hasMany(
+            FtthCableRoutePoint::class,
+            'cable_fiber_box_id'
+        )->orderBy('position');
+    }
 }

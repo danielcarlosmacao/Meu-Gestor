@@ -8,6 +8,7 @@ use App\Http\Controllers\Ftth\CableFiberBoxController;
 use App\Http\Controllers\Ftth\FiberCableController;
 use App\Http\Controllers\Ftth\SplinterController;
 use App\Http\Controllers\Ftth\FusionController;
+use App\Http\Controllers\Ftth\CableRouteController;
 
 Route::prefix('ftth')->group(function () {
 
@@ -26,6 +27,7 @@ Route::prefix('ftth')->group(function () {
         Route::post('/fiber', [FiberCableController::class, 'store'])->name('fiber.store');
         Route::post('/splinter', [SplinterController::class, 'store'])->name('splinter.store');
         Route::post('/fusion/store', [FusionController::class, 'store'])->name('fusion.store');
+        Route::put('/fiber-box/updatesignal/{id}', [FiberBoxController::class, 'updatesignal'])->name('fiberbox.updatesignal');
         Route::post('/fiber-box/{id}/recalculate-local', [FiberBoxController::class, 'recalculate'])->name('fiberbox.recalculate.local');
         Route::put('/fiber/update/{id}', [FiberCableController::class, 'update'])->name('fiber.update');
     });
@@ -43,7 +45,18 @@ Route::prefix('ftth')->group(function () {
 
 
 
+   Route::get(
+    '/cable/{cableId}/route',
+    [CableRouteController::class, 'edit']
+)->name('cable.route.edit');
 
+Route::put(
+    '/cable/{cableId}/route',
+    [CableRouteController::class, 'update']
+)->name('cable.route.update');
 
-
+Route::delete(
+    '/cable/{cableId}/route',
+    [CableRouteController::class, 'destroy']
+)->name('cable.route.destroy');
 });
