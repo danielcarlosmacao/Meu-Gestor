@@ -291,7 +291,7 @@
                             <span class="d-none d-sm-inline">Mapa</span>
                         </a>
 
-                        @can('ftth.update')
+                        @can('ftth.create')
                             <button type="button"
                                 class="btn btn-outline-warning"
                                 onclick="openConfirmModal(
@@ -865,7 +865,7 @@
 
                                                     @endif
 
-                                                    @can('ftth.update')
+                                                    @can('ftth.create')
                                                         <button type="button"
                                                             class="btn btn-sm btn-outline-warning
                                                                 ftth-action-button btn-edit-signal"
