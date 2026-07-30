@@ -32,6 +32,7 @@ Route::prefix('ftth')->group(function () {
         Route::post('/fiber-box/{id}/recalculate-local', [FiberBoxController::class, 'recalculate'])->name('fiberbox.recalculate.local');
         Route::put('/fiber/update/{id}', [FiberCableController::class, 'update'])->name('fiber.update');
         Route::put('/cable/{cableId}/route',[CableRouteController::class, 'update'])->name('cable.route.update');
+        Route::put('/fiber-box/{fiberbox}', [FiberBoxController::class, 'updatefiberbox'])->name('fiberbox.update');
     });
     Route::middleware(['auth', 'permission:ftth.delete'])->group(function () {
         Route::delete('/pons/{pon}', [PonController::class, 'destroy'])->name('pon.destroy');

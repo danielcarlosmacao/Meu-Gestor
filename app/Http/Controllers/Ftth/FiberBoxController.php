@@ -25,6 +25,22 @@ class FiberBoxController extends Controller
 
         $ponrede = FtthPon::where('olt', 'REDE')->value('id');
 
+        /*
+    |--------------------------------------------------------------------------
+    | PONS DISPONÍVEIS PARA EDIÇÃO
+    |--------------------------------------------------------------------------
+    */
+
+        $pons = FtthPon::query()
+            ->orderBy('info')
+            ->get();
+
+        /*
+    |--------------------------------------------------------------------------
+    | BOXES
+    |--------------------------------------------------------------------------
+    */
+
         $boxes = FtthFiberBox::with('pon')
             ->where(function ($query) use ($pon, $ponrede) {
                 $query->where('pon_id', $pon->id);
@@ -33,6 +49,7 @@ class FiberBoxController extends Controller
                     $query->orWhere('pon_id', $ponrede);
                 }
             })
+            ->orderBy('number')
             ->get();
 
         $lastnumber = FtthFiberBox::query()->max('number');
@@ -86,18 +103,32 @@ class FiberBoxController extends Controller
             })
             ->get();
 
+        /*
+    |--------------------------------------------------------------------------
+    | MAPA
+    |--------------------------------------------------------------------------
+    */
+
         if ($request->map === 'yes') {
             return view('ftth.fiber-box.map', compact(
                 'boxes',
                 'pon',
+                'pons',
                 'nextnumber',
                 'nextnumbermax',
                 'cables'
             ));
         }
 
+        /*
+    |--------------------------------------------------------------------------
+    | LISTAGEM
+    |--------------------------------------------------------------------------F
+    */
+
         return view('ftth.fiber-box.index', compact(
             'boxes',
+            'pons',
             'nextnumber',
             'nextnumbermax',
             'pon'
@@ -272,6 +303,57 @@ class FiberBoxController extends Controller
             'fusions'
 
         ));
+    }
+
+    public function updatefiberbox(Request $request, FtthFiberBox $fiberbox)
+    {
+        $validated = $request->validate([
+            'pon_id' => [
+                'required',
+                'integer',
+                'exists:ftth_pons,id',
+            ],
+
+            'number' => [
+                'required',
+                'regex:/^[0-9]+$/',
+                Rule::unique('ftth_fiber_boxes', 'number')->ignore($fiberbox->id),
+            ],
+
+            'info' => [
+                'nullable',
+                'string',
+                'max:255',
+            ],
+
+            'coordinates' => [
+                'nullable',
+                'string',
+                'max:255',
+            ],
+        ], [
+            'pon_id.required' => 'Selecione uma PON.',
+            'pon_id.exists' => 'A PON selecionada não existe.',
+
+            'number.required' => 'Informe o número da caixa.',
+            'number.integer' => 'O número da caixa deve ser inteiro.',
+            'number.min' => 'O número da caixa deve ser maior que zero.',
+            'number.unique' => 'Este número já está sendo utilizado por outra caixa.',
+
+            'info.max' => 'A descrição deve possuir no máximo 255 caracteres.',
+            'coordinates.max' => 'As coordenadas devem possuir no máximo 255 caracteres.',
+        ]);
+
+        $fiberbox->update([
+            'pon_id' => $validated['pon_id'],
+            'number' => $validated['number'],
+            'info' => $validated['info'] ?? null,
+            'coordinates' => $validated['coordinates'] ?? null,
+        ]);
+
+        return redirect()
+            ->route('fiberbox.index', ['pon' => $validated['pon_id']])
+            ->with('success', 'Caixa atualizada com sucesso.');
     }
 
     public function updatesignal(Request $request, $id)
