@@ -1,0 +1,709 @@
+/*
+|--------------------------------------------------------------------------
+| PÁGINA
+|--------------------------------------------------------------------------
+*/
+
+.tower-page {
+    max-width: 1800px;
+    margin: 0 auto;
+}
+
+.tower-page-header {
+    padding: 0.4rem 0;
+}
+
+.tower-page-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    margin-bottom: 0.5rem;
+    color: var(--color-primary);
+    font-size: 0.78rem;
+    font-weight: 750;
+    letter-spacing: 0.06rem;
+    text-transform: uppercase;
+}
+
+.tower-page-title {
+    margin: 0;
+    color: #1f2937;
+    font-size: clamp(1.75rem, 3vw, 2.35rem);
+    font-weight: 750;
+    letter-spacing: -0.04em;
+}
+
+.tower-page-description {
+    max-width: 680px;
+    margin: 0.55rem 0 0;
+    color: #64748b;
+    font-size: 0.94rem;
+    line-height: 1.65;
+}
+
+.tower-add-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    min-height: 45px;
+    padding-right: 1.15rem;
+    padding-left: 1.15rem;
+    border-radius: 12px;
+    font-weight: 650;
+}
+
+/*
+|--------------------------------------------------------------------------
+| CARDS DE RESUMO
+|--------------------------------------------------------------------------
+*/
+
+.tower-summary-card {
+    border: 1px solid rgba(15, 23, 42, 0.06);
+    border-radius: 16px;
+    box-shadow: 0 8px 25px rgba(15, 23, 42, 0.06);
+}
+
+.tower-summary-card .card-body {
+    padding: 1rem 1.15rem;
+}
+
+.tower-summary-content {
+    display: flex;
+    align-items: center;
+    gap: 0.9rem;
+}
+
+.tower-summary-icon {
+    width: 46px;
+    height: 46px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    border-radius: 13px;
+    background:
+        color-mix(in srgb,
+            var(--color-primary) 11%,
+            white);
+    color: var(--color-primary);
+    font-size: 1.15rem;
+}
+
+.tower-summary-label,
+.tower-summary-value {
+    display: block;
+}
+
+.tower-summary-label {
+    margin-bottom: 0.15rem;
+    color: #64748b;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.tower-summary-value {
+    color: #1f2937;
+    font-size: 1.15rem;
+    font-weight: 750;
+}
+
+/*
+|--------------------------------------------------------------------------
+| CARD DA TABELA
+|--------------------------------------------------------------------------
+*/
+
+.tower-table-card {
+    overflow: hidden;
+    border: 1px solid rgba(15, 23, 42, 0.07);
+    border-radius: 18px;
+    box-shadow: 0 12px 35px rgba(15, 23, 42, 0.07);
+}
+
+.tower-table-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.25rem;
+    padding: 1.15rem 1.4rem;
+    border-bottom: 1px solid #e9eeeb;
+    background: #fff;
+}
+
+.tower-table-title {
+    margin: 0;
+    color: #1f2937;
+    font-size: 1.05rem;
+    font-weight: 750;
+}
+
+.tower-table-subtitle {
+    margin: 0.22rem 0 0;
+    color: #64748b;
+    font-size: 0.78rem;
+}
+
+.tower-table-tools {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+}
+
+.tower-search-box {
+    position: relative;
+    width: min(320px, 35vw);
+}
+
+.tower-search-box>i {
+    position: absolute;
+    top: 50%;
+    left: 0.95rem;
+    z-index: 2;
+    transform: translateY(-50%);
+    color: #8b9790;
+    pointer-events: none;
+}
+
+.tower-search-box .form-control {
+    min-height: 42px;
+    padding-left: 2.65rem;
+    border-color: #dfe6e2;
+    border-radius: 11px;
+    background: #f9fbfa;
+    font-size: 0.84rem;
+}
+
+.tower-search-box .form-control:focus,
+.tower-per-page:focus {
+    border-color: var(--color-primary);
+    background: #fff;
+    box-shadow:
+        0 0 0 4px color-mix(in srgb,
+            var(--color-primary) 12%,
+            transparent);
+}
+
+.tower-per-page {
+    min-width: 145px;
+    min-height: 42px;
+    border-color: #dfe6e2;
+    border-radius: 11px;
+    background-color: #f9fbfa;
+    font-size: 0.8rem;
+}
+
+/*
+|--------------------------------------------------------------------------
+| TABELA
+|--------------------------------------------------------------------------
+*/
+
+.tower-table {
+    min-width: 1450px;
+    color: #334155;
+    font-size: 0.83rem;
+}
+
+.tower-table thead th {
+    padding: 0.9rem 0.75rem;
+    border: 0;
+    background: linear-gradient(135deg,
+            var(--color-primary),
+            var(--color-hover));
+    color: #fff;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.025rem;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+.tower-table thead th:first-child {
+    border-top-left-radius: 0;
+}
+
+.tower-table thead th:last-child {
+    border-top-right-radius: 0;
+}
+
+.tower-table tbody td {
+    padding: 0.85rem 0.75rem;
+    border-color: #e9eeeb;
+    background: #fff;
+    vertical-align: middle;
+}
+
+.tower-table tbody tr {
+    transition:
+        background-color 0.15s ease,
+        box-shadow 0.15s ease;
+}
+
+.tower-table tbody tr:hover td {
+    background:
+        color-mix(in srgb,
+            var(--color-primary) 3.5%,
+            white);
+}
+
+.sortable-column {
+    cursor: pointer;
+    user-select: none;
+}
+
+.sortable-column>span {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+}
+
+.sort-icon {
+    opacity: 0.45;
+    font-size: 0.7rem;
+}
+
+.sortable-column[data-sort="asc"] .sort-icon::before {
+    content: "\f145";
+}
+
+.sortable-column[data-sort="desc"] .sort-icon::before {
+    content: "\f124";
+}
+
+.sortable-column[data-sort] .sort-icon {
+    opacity: 1;
+}
+
+/*
+|--------------------------------------------------------------------------
+| CONTEÚDO DAS CÉLULAS
+|--------------------------------------------------------------------------
+*/
+
+.tower-name-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.7rem;
+    color: #24352c;
+    text-decoration: none;
+}
+
+.tower-name-link:hover {
+    color: var(--color-primary);
+}
+
+.tower-name-link strong,
+.tower-name-link small {
+    display: block;
+}
+
+.tower-name-link strong {
+    font-size: 0.88rem;
+    font-weight: 700;
+}
+
+.tower-name-link small {
+    margin-top: 0.12rem;
+    color: #809087;
+    font-size: 0.69rem;
+}
+
+.tower-name-icon {
+    width: 38px;
+    height: 38px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    border-radius: 11px;
+    background:
+        color-mix(in srgb,
+            var(--color-primary) 10%,
+            white);
+    color: var(--color-primary);
+}
+
+.tower-value-badge {
+    display: inline-flex;
+    align-items: center;
+    min-width: 54px;
+    justify-content: center;
+    padding: 0.35rem 0.55rem;
+    border: 1px solid #dce5e0;
+    border-radius: 8px;
+    background: #f7faf8;
+    font-weight: 650;
+}
+
+.tower-count,
+.tower-battery,
+.tower-date,
+.tower-production-time {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.tower-count i,
+.tower-battery i,
+.tower-date i,
+.tower-production-time i {
+    color: var(--color-primary);
+}
+
+.tower-solar-value strong,
+.tower-solar-value small {
+    display: block;
+}
+
+.tower-solar-value strong {
+    font-size: 0.83rem;
+}
+
+.tower-solar-value small {
+    margin-top: 0.08rem;
+    color: #75837b;
+    font-size: 0.7rem;
+}
+
+.tower-empty-value {
+    color: #98a39d;
+    font-size: 0.76rem;
+}
+
+/*
+|--------------------------------------------------------------------------
+| BARRAS DE PROGRESSO
+|--------------------------------------------------------------------------
+*/
+
+.tower-progress {
+    min-width: 100px;
+}
+
+.tower-progress-label {
+    display: inline-block;
+    margin-bottom: 0.32rem;
+    font-size: 0.75rem;
+    font-weight: 700;
+}
+
+.tower-progress .progress {
+    height: 6px;
+    overflow: hidden;
+    border-radius: 20px;
+    background: #e8eeeb;
+}
+
+.tower-progress .progress-bar {
+    border-radius: 20px;
+}
+
+/*
+|--------------------------------------------------------------------------
+| BOTÕES DE AÇÃO
+|--------------------------------------------------------------------------
+*/
+
+.tower-action-button {
+    width: 34px;
+    height: 34px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    border: 1px solid #dfe6e2;
+    border-radius: 9px;
+    background: #fff;
+    color: #56645d;
+}
+
+.tower-action-button:hover,
+.tower-action-button:focus {
+    border-color:
+        color-mix(in srgb,
+            var(--color-primary) 35%,
+            transparent);
+    background:
+        color-mix(in srgb,
+            var(--color-primary) 8%,
+            white);
+    color: var(--color-primary);
+}
+
+.tower-action-danger {
+    color: #dc3545;
+}
+
+.tower-action-danger:hover,
+.tower-action-danger:focus {
+    border-color: #f1b5ba;
+    background: #fff1f2;
+    color: #b02a37;
+}
+
+/*
+|--------------------------------------------------------------------------
+| ESTADO VAZIO
+|--------------------------------------------------------------------------
+*/
+
+.tower-empty-state {
+    padding: 4rem 1rem !important;
+    text-align: center;
+}
+
+.tower-empty-icon {
+    width: 58px;
+    height: 58px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1rem;
+    border-radius: 17px;
+    background:
+        color-mix(in srgb,
+            var(--color-primary) 10%,
+            white);
+    color: var(--color-primary);
+    font-size: 1.5rem;
+}
+
+.tower-empty-state h3 {
+    margin-bottom: 0.35rem;
+    color: #26332c;
+    font-size: 1rem;
+    font-weight: 700;
+}
+
+.tower-empty-state p {
+    max-width: 420px;
+    margin: 0 auto 1rem;
+    color: #78857e;
+    font-size: 0.82rem;
+}
+
+/*
+|--------------------------------------------------------------------------
+| PAGINAÇÃO
+|--------------------------------------------------------------------------
+*/
+
+.tower-pagination {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 1rem 1.4rem;
+    border-top: 1px solid #e9eeeb;
+    background: #fff;
+}
+
+.tower-pagination-info {
+    color: #75837b;
+    font-size: 0.78rem;
+}
+
+.tower-pagination .pagination {
+    margin-bottom: 0;
+}
+
+/*
+|--------------------------------------------------------------------------
+| MODAL
+|--------------------------------------------------------------------------
+*/
+
+.tower-modal {
+    overflow: hidden;
+    border: 0;
+    border-radius: 18px;
+    box-shadow: 0 25px 70px rgba(15, 23, 42, 0.22);
+}
+
+.tower-modal-header {
+    padding: 1.25rem 1.4rem;
+    border-bottom: 1px solid #e9eeeb;
+    background: #fff;
+}
+
+.tower-modal-header .modal-title {
+    margin: 0;
+    color: #24352c;
+    font-size: 1.05rem;
+    font-weight: 750;
+}
+
+.tower-modal-header p {
+    margin: 0.18rem 0 0;
+    color: #74817a;
+    font-size: 0.76rem;
+}
+
+.tower-modal-icon {
+    width: 43px;
+    height: 43px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    border-radius: 13px;
+    background:
+        color-mix(in srgb,
+            var(--color-primary) 11%,
+            white);
+    color: var(--color-primary);
+    font-size: 1.1rem;
+}
+
+.tower-modal .form-label {
+    margin-bottom: 0.45rem;
+    color: #34423a;
+    font-size: 0.82rem;
+    font-weight: 650;
+}
+
+.tower-input-group {
+    position: relative;
+}
+
+.tower-input-group>i {
+    position: absolute;
+    top: 50%;
+    left: 0.95rem;
+    z-index: 2;
+    transform: translateY(-50%);
+    color: #87948d;
+    pointer-events: none;
+}
+
+.tower-input-group .form-control {
+    min-height: 49px;
+    padding-left: 2.65rem;
+    border-color: #dfe6e2;
+    border-radius: 12px;
+    background: #fafcfb;
+}
+
+.tower-input-group .form-control:focus {
+    border-color: var(--color-primary);
+    background: #fff;
+    box-shadow:
+        0 0 0 4px color-mix(in srgb,
+            var(--color-primary) 12%,
+            transparent);
+}
+
+.tower-input-group .form-control:has(+ .tower-input-suffix) {
+    padding-right: 3.2rem;
+}
+
+.tower-input-suffix {
+    position: absolute;
+    top: 50%;
+    right: 1rem;
+    transform: translateY(-50%);
+    color: #67766e;
+    font-size: 0.82rem;
+    font-weight: 650;
+}
+
+.tower-modal-footer {
+    padding: 1rem 1.4rem;
+    border-top: 1px solid #e9eeeb;
+    background: #fafcfb;
+}
+
+.tower-modal-footer .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.45rem;
+    min-height: 42px;
+    padding-right: 1rem;
+    padding-left: 1rem;
+    border-radius: 10px;
+    font-size: 0.82rem;
+    font-weight: 650;
+}
+
+.tower-modal-cancel {
+    border: 1px solid #dfe6e2;
+}
+
+/*
+|--------------------------------------------------------------------------
+| RESPONSIVO
+|--------------------------------------------------------------------------
+*/
+
+@media (max-width: 991.98px) {
+    .tower-table-header {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .tower-table-tools {
+        width: 100%;
+    }
+
+    .tower-search-box {
+        width: 100%;
+        flex: 1;
+    }
+
+    .tower-pagination {
+        align-items: stretch;
+        flex-direction: column;
+    }
+}
+
+@media (max-width: 575.98px) {
+    .tower-page {
+        padding-right: 0.75rem !important;
+        padding-left: 0.75rem !important;
+    }
+
+    .tower-page-header {
+        padding-top: 0;
+    }
+
+    .tower-add-button {
+        width: 100%;
+    }
+
+    .tower-summary-card .card-body {
+        padding: 0.85rem;
+    }
+
+    .tower-summary-icon {
+        width: 40px;
+        height: 40px;
+    }
+
+    .tower-summary-value {
+        font-size: 1rem;
+    }
+
+    .tower-table-header {
+        padding: 1rem;
+    }
+
+    .tower-table-tools {
+        flex-direction: column;
+    }
+
+    .tower-per-page {
+        width: 100%;
+    }
+
+    .tower-modal-footer {
+        flex-direction: column-reverse;
+    }
+
+    .tower-modal-footer .btn {
+        width: 100%;
+    }
+}
