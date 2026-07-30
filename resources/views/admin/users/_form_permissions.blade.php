@@ -21,7 +21,7 @@
     <div class="row">
         @php
             $grupos = [
-                'Gestor de Torres' => fn($p) => str_contains($p->name, 'towers'),
+                'Gestor de Torres' => fn($p) => str_contains($p->name, 'towers') || str_contains($p->name, 'ftth'),
                 'Gestor de Frota' => fn($p) => str_contains($p->name, 'fleets'),
                 'Gestor de Serviços' => fn($p) => str_contains($p->name, 'service'),
                 'RH' => fn($p) => str_contains($p->name, 'vacations') || str_contains($p->name, 'vacation_manager') || str_contains($p->name, 'collaborators'),
