@@ -3,327 +3,1086 @@
 
 <head>
     <meta charset="utf-8">
+
     <meta name="viewport" content="width=device-width, initial-scale=1">
+
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>@yield('title')</title>
+    <title>
+        @hasSection('title')
+            @yield('title') - {{ config('app.name') }}
+        @else
+            {{ config('app.name') }}
+        @endif
+    </title>
 
-
-    <!--bootstrap-->
+    {{-- Bootstrap --}}
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
 
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    {{-- Bootstrap Icons --}}
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
 
+    {{-- Fonte --}}
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-    <!-- Flatpickr CSS -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" />
+    {{-- Flatpickr --}}
+    <link href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" rel="stylesheet">
 
-    <!-- Flatpickr JS -->
-    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    {{-- CSS geral --}}
+    <link href="{{ asset('css/style.css') }}" rel="stylesheet">
 
-    <!-- Flatpickr Português BR -->
-    <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/pt.js"></script>
+    {{-- CSS do cabeçalho --}}
+    <link href="{{ asset('css/header.css') }}" rel="stylesheet">
 
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script src="{{ asset('js/confirm-action.js') }}"></script>
-
-
-
-
-
-    <link rel="stylesheet" href="/css/style.css" type='text/css'>
-
+    {{-- Cores configuráveis --}}
     <style>
         :root {
-            --color-primary: {{ $appOptions['color-primary'] ?? '#24b153' }};
-            --color-secondary: {{ $appOptions['color-secondary'] ?? '#6fbe89' }};
-            --color-text: {{ $appOptions['color-text'] ?? '#0a6428' }};
-            --color-hover: {{ $appOptions['color-hover'] ?? '#186d34' }};
+            --color-primary:
+                {{ $appOptions['color-primary'] ?? '#24b153' }};
+
+            --color-secondary:
+                {{ $appOptions['color-secondary'] ?? '#6fbe89' }};
+
+            --color-text:
+                {{ $appOptions['color-text'] ?? '#0a6428' }};
+
+            --color-hover:
+                {{ $appOptions['color-hover'] ?? '#186d34' }};
         }
     </style>
+
+    {{-- CSS específico das páginas --}}
+    @stack('styles')
 </head>
 
 <body class="d-flex flex-column min-vh-100">
-    <nav class="navbar navbar-expand-lg navbar-dark bgc-primary w-100">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="{{ route('welcome') }}">
-                @if (!empty($appOptions['logo']) && file_exists(public_path($appOptions['logo'])))
-                    <img src="{{ asset($appOptions['logo']) }}" alt="Logo do Sistema" style="height: 50px;">
-                @else
-                    <strong>{{ config('app.name') }}</strong>
-                @endif &nbsp;&nbsp;&nbsp;
-            </a>
-            <div class="collapse navbar-collapse show">
-                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                    @can('towers.view')
-                        <!-- gestao de torre -->
-                        <li class="nav-item dropdown position-static" id="menutower">
-                            <a class="nav-link dropdown-toggle" href="#">REDE<i class="bi bi-broadcast ms-2"></i></a>
-                            <div class="dropdown-menu mega-menu">
-                                <div class="row">
-                                    <div class="col-md-1">
-                                    </div>
-                                    <div class="col-md-6">
-                                        <h6>Gestão da Rede</h6>
-                                        <a href="{{ route('tower.index') }}">Torres</a>
-                                        @can('ftth.view')
-                                            <a href="{{ route('pon.index') }}"><i class="fa fa-cogs"></i>Rede Optica</a>
-                                        @endcan
-                                        @can('towers.maintenance')
-                                            <a href="{{ route('maintenance.index') }}"><i class="fa fa-cogs"></i>Manutenção de
-                                                Torres</a>
-                                        @endcan
-                                        @can('towers.manage')
-                                            <a href="{{ route('tower.gallery.show') }}"><i class="fa fa-cogs"></i>Galeria</a>
-                                        @endcan
-                                    </div>
-                                    <div class="col-md-5">
-                                        <h6>Adicionais</h6>
 
+    {{-- ================================================================
+        CABEÇALHO SUPERIOR
+    ================================================================= --}}
 
-                                        <a href="{{ route('battery.index') }}">Baterias</a>
-                                        <a href="{{ route('equipment.index') }}">Equipamentos</a>
-                                        <a href="{{ route('plate.index') }}">Placas solar</a>
-                                    </div>
+    <header class="app-header sticky-top">
 
-                                </div>
-                            </div>
-                        </li>
-                    @endcan
-                    @can('fleets.view')
-                        <!-- gestao de frota -->
-                        <li class="nav-item dropdown position-static" id="menuFrota">
-                            <a class="nav-link dropdown-toggle" href="#">FROTA <i class="bi bi-truck ms-2"></i></a>
-                            <div class="dropdown-menu mega-menu">
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <h6>Gestão da frota</h6>
-                                        <a href="{{ route('fleet.vehicles.index') }}">Veiculos</a>
-                                        <a href="{{ route('fleet.vehicle_maintenances.index') }}">Manutencao</a>
-                                        <a href="{{ route('fleet.vehicle_services.index') }}">Tipos de servicos</a>
-                                        <a href="{{ route('fleet.vehicle_workshop.index') }}">Oficinas</a>
-                                        <!--<a href="#">Abastecimentos</a>-->
-                                    </div>
-                                    <div class="col-md-6">
-                                        <h6>Outros</h6>
-                                        <a href="{{ route('vehicle-maintenance.report.form') }}">Relatorio de
-                                            Manutenções</a>
-                                    </div>
-                                </div>
-                            </div>
-                        </li>
-                    @endcan
-                    @can('service.view')
-                        <!-- gestao de serviço -->
-                        <li class="nav-item dropdown position-static" id="menuServico">
-                            <a class="nav-link dropdown-toggle" href="#">SERVIÇOS <i class="bi bi-tools ms-2"></i></a>
-                            <div class="dropdown-menu mega-menu">
-                                <div class="row">
-                                    <div class="col-md-1">
-                                    </div>
-                                    <div class="col-md-6">
-                                        <h6>Gestão dos seviços</h6>
-                                        <a href="{{ route('service.clients.index') }}">Clientes</a>
-                                        <a href="{{ route('service.equipment_maintenances.index') }}">Manutencao de
-                                            equipamentos</a>
-                                        <a href="{{ route('service.maintenances.index') }}">Visitas tecnicas</a>
-                                        <!--<a href="#">Abastecimentos</a>-->
-                                    </div>
-                                </div>
-                            </div>
-                        </li>
-                    @endcan
-                    <!-- Ferias  -->
-                    @can('vacations.view')
-                        <li class="nav-item dropdown position-static" id="menuFerias">
-                            <a class="nav-link dropdown-toggle" href="#">RH
-                                <i class="bi bi-people"></i>
-                            </a>
-                            <div class="dropdown-menu mega-menu">
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <h6>Equipe</h6>
-                                        @can('collaborators.view')
-                                            <a href="{{ route('vacation_manager.collaborators.index') }}">Colaboradores</a>
-                                        @endcan
-                                        @can('collaborators.courses.view')
-                                            <a
-                                                href="{{ route('vacation_manager.collaborator.courses.index') }}">Certificados</a>
-                                        @endcan
-                                    </div>
-                                    <div class="col-md-6">
-                                        <h6>Ferias</h6>
-                                        @can('vacations.edit')
-                                            <a href="{{ route('vacation_manager.vacations.index') }}">Registro de ferias</a>
-                                        @endcan
-                                        @can('vacation_manager.calendar')
-                                            <a href="{{ route('vacation_manager.calendar') }}">Calendario</a>
-                                        @endcan
+        <nav class="navbar navbar-expand-xl app-navbar">
 
-                                    </div>
-                                </div>
-                            </div>
-                        </li>
-                    @endcan
-                    <!-- extra -->
-                    @can('extra.view')
-                        <li class="nav-item dropdown position-static" id="menuExtra">
-                            <a class="nav-link dropdown-toggle" href="#">
-                                EXTRAS
-                                <i class="bi bi-puzzle"></i>
-                            </a>
-                            <div class="dropdown-menu mega-menu">
-                                <div class="row">
-                                    @can('stock.view')
-                                        <div class="col-md-4">
-                                            <h6>Estoque</h6>
-                                            <a href="{{ route('stock.items.index') }}"><i class="fa fa-cogs"></i>
-                                                Inventario</a>
-                                            <a href="{{ route('stock.movements.index') }}"><i
-                                                    class="fa fa-cogs"></i>Movimentação</a>
-                                            <a href="{{ route('stock.items.showProduction') }}"><i
-                                                    class="fa fa-cogs"></i>Estoque Vs Produção</a>
+            <div class="container-fluid px-3 px-xl-4">
+
+                {{-- LOGO --}}
+                <a class="navbar-brand app-brand" href="{{ route('welcome') }}">
+
+                    @if (!empty($appOptions['logo']) && file_exists(public_path($appOptions['logo'])))
+                        <img src="{{ asset($appOptions['logo']) }}" alt="Logo {{ config('app.name') }}"
+                            class="app-logo">
+                    @else
+                        <span class="app-brand-icon">
+                            <i class="bi bi-grid-1x2-fill"></i>
+                        </span>
+
+                        <span class="app-brand-name">
+                            {{ config('app.name') }}
+                        </span>
+                    @endif
+
+                </a>
+
+                {{-- BOTÃO MOBILE --}}
+                <button class="navbar-toggler app-navbar-toggler" type="button" data-bs-toggle="collapse"
+                    data-bs-target="#mainNavbar" aria-controls="mainNavbar" aria-expanded="false"
+                    aria-label="Abrir menu">
+
+                    <i class="bi bi-list"></i>
+                </button>
+
+                {{-- MENU --}}
+                <div class="collapse navbar-collapse" id="mainNavbar">
+
+                    <ul class="navbar-nav align-items-xl-center me-auto">
+
+                        {{-- ====================================================
+                            REDE
+                        ===================================================== --}}
+
+                        @can('towers.view')
+
+                            <li
+                                class="nav-item dropdown app-menu-item
+                                    {{ request()->routeIs('tower.*', 'pon.*', 'fiberbox.*', 'maintenance.*', 'battery.*', 'equipment.*', 'plate.*')
+                                        ? 'active'
+                                        : '' }}">
+
+                                <a class="nav-link dropdown-toggle" href="#" id="networkMenu" role="button"
+                                    data-bs-toggle="dropdown" aria-expanded="false">
+
+                                    <i class="bi bi-broadcast-pin"></i>
+
+                                    <span>Rede</span>
+                                </a>
+
+                                <div class="dropdown-menu app-mega-menu" aria-labelledby="networkMenu">
+
+                                    <div class="app-mega-header">
+
+                                        <div>
+                                            <div class="app-mega-title">
+                                                Gestão da rede
+                                            </div>
+
+                                            <div class="app-mega-description">
+                                                Torres, rede óptica e equipamentos
+                                            </div>
                                         </div>
-                                    @endcan
-                                    <div class="col-md-4">
-                                        <h6>Notificaçoes</h6>
-                                        @can('recipients.view')
-                                            <a href="{{ route('admin.recipients.index') }}">Notificaçoes do sistema</a>
-                                        @endcan
-                                        @can('notification.view')
-                                            <a href="{{ route('admin.notification.index') }}">Lembretes via whatsapp</a>
-                                        @endcan
-                                    </div>
-                                    <div class="col-md-4">
-                                        <h6>API</h6>
-                                        @can('api.nfe')
-                                            <a href="{{ route('api.mk.nfe') }}">NFE Mk-Auth</a>
-                                        @endcan
-                                        @if (config('services.wireguard.url') && config('services.wireguard.password'))
-                                            @can('administrator.vpn')
-                                                <a href="{{ route('api.vpn.index') }}">VPN WF</a>
-                                            @endcan
-                                        @endif
-                                    </div>
-                                </div>
-                            </div>
-                        </li>
-                    @endcan
-                    <!-- administrador -->
-                    @can('administrator.user')
-                        <li class="nav-item dropdown position-static" id="menuAdmin">
-                            <a class="nav-link dropdown-toggle" href="#">ADMINISTRADOR
-                                <i class="bi bi-person-gear ms-2"></i></a>
-                            <div class="dropdown-menu mega-menu">
-                                <div class="row">
-                                    <div class="col-md-1">
-                                    </div>
-                                    <div class="col-md-5">
-                                        <h6>Gestão de recursos</h6>
-                                        <a href="{{ route('options.colors.edit') }}">Estilos e logo do sistema</a>
-                                        <a href="{{ route('options.resource.edit') }}">Recursos do sistema</a>
-                                        <a href="{{ route('admin.systempanel') }}">Painel de informativo do sistema</a>
-                                        <a href="{{ route('options.systemresource.edit') }}">Recursos do administrador</a>
-                                        <a href="{{ route('activitylogs.index') }}">Logs</a>
-                                    </div>
-                                    <div class="col-md-5">
-                                        <h6>usuarios</h6>
-                                        <a href="{{ route('admin.usuarios.index') }}">Usuarios</a>
-                                        <a href="{{ route('admin.roles.index') }}">Perfil de usuario</a>
-                                        <a href="{{ route('admin.users.sessions') }}">Sessões ativas</a>
-                                    </div>
-                                </div>
-                            </div>
-                        </li>
-                    @endcan
-                    <!-- Verifica se o usuário está logado -->
-                    @auth
-                        <li class="nav-item dropdown position-static" id="menuUser">
-                            <a class="nav-link dropdown-toggle" href="#"> <i
-                                    class="bi bi-person-fill me-1"></i>{{ Auth::user()->name }}</a>
-                            <div class="dropdown-menu mega-menu">
-                                <div class="row">
-                                    <div class="col-md-1">
-                                    </div>
-                                    <div class="col-md-6">
-                                        <a class="dropdown-item" href="{{ route('profile.edit') }}">Editar Perfil</a>
 
-                                        <form id="logout-form" method="POST" action="{{ route('logout') }}"
-                                            style="display: none;">
-                                            @csrf
-                                        </form>
-                                        <a href="#"
-                                            onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-                                            Sair
-                                        </a>
+                                        <span class="app-mega-icon">
+                                            <i class="bi bi-broadcast"></i>
+                                        </span>
+
                                     </div>
+
+                                    <div class="row g-4">
+
+                                        <div class="col-12 col-md-6">
+
+                                            <div class="app-menu-group-title">
+                                                Infraestrutura
+                                            </div>
+
+                                            <a class="app-menu-link
+                                                    {{ request()->routeIs('tower.*') ? 'active' : '' }}"
+                                                href="{{ route('tower.index') }}">
+
+                                                <span class="app-menu-link-icon">
+                                                    <i class="bi bi-broadcast"></i>
+                                                </span>
+
+                                                <span>
+                                                    <strong>Torres</strong>
+                                                    <small>Gerenciar POPs e torres</small>
+                                                </span>
+                                            </a>
+
+                                            @can('ftth.view')
+                                                <a class="app-menu-link
+                                                        {{ request()->routeIs('pon.*', 'fiberbox.*') ? 'active' : '' }}"
+                                                    href="{{ route('pon.index') }}">
+
+                                                    <span class="app-menu-link-icon">
+                                                        <i class="bi bi-diagram-3"></i>
+                                                    </span>
+
+                                                    <span>
+                                                        <strong>Rede óptica</strong>
+                                                        <small>PONs, CTOs, fibras e cabos</small>
+                                                    </span>
+                                                </a>
+                                            @endcan
+
+                                            @can('towers.maintenance')
+                                                <a class="app-menu-link
+                                                        {{ request()->routeIs('maintenance.*') ? 'active' : '' }}"
+                                                    href="{{ route('maintenance.index') }}">
+
+                                                    <span class="app-menu-link-icon">
+                                                        <i class="bi bi-tools"></i>
+                                                    </span>
+
+                                                    <span>
+                                                        <strong>Manutenção</strong>
+                                                        <small>Manutenções das torres</small>
+                                                    </span>
+                                                </a>
+                                            @endcan
+
+                                            @can('towers.manage')
+                                                <a class="app-menu-link
+                                                        {{ request()->routeIs('tower.gallery.*') ? 'active' : '' }}"
+                                                    href="{{ route('tower.gallery.show') }}">
+
+                                                    <span class="app-menu-link-icon">
+                                                        <i class="bi bi-images"></i>
+                                                    </span>
+
+                                                    <span>
+                                                        <strong>Galeria</strong>
+                                                        <small>Fotos e registros</small>
+                                                    </span>
+                                                </a>
+                                            @endcan
+
+                                        </div>
+
+                                        <div class="col-12 col-md-6">
+
+                                            <div class="app-menu-group-title">
+                                                Equipamentos
+                                            </div>
+
+                                            <a class="app-menu-link
+                                                    {{ request()->routeIs('battery.*') ? 'active' : '' }}"
+                                                href="{{ route('battery.index') }}">
+
+                                                <span class="app-menu-link-icon">
+                                                    <i class="bi bi-battery-charging"></i>
+                                                </span>
+
+                                                <span>
+                                                    <strong>Baterias</strong>
+                                                    <small>Controle das baterias</small>
+                                                </span>
+                                            </a>
+
+                                            <a class="app-menu-link
+                                                    {{ request()->routeIs('equipment.*') ? 'active' : '' }}"
+                                                href="{{ route('equipment.index') }}">
+
+                                                <span class="app-menu-link-icon">
+                                                    <i class="bi bi-router"></i>
+                                                </span>
+
+                                                <span>
+                                                    <strong>Equipamentos</strong>
+                                                    <small>Ativos da rede</small>
+                                                </span>
+                                            </a>
+
+                                            <a class="app-menu-link
+                                                    {{ request()->routeIs('plate.*') ? 'active' : '' }}"
+                                                href="{{ route('plate.index') }}">
+
+                                                <span class="app-menu-link-icon">
+                                                    <i class="bi bi-sun"></i>
+                                                </span>
+
+                                                <span>
+                                                    <strong>Placas solares</strong>
+                                                    <small>Energia e produção solar</small>
+                                                </span>
+                                            </a>
+
+                                        </div>
+
+                                    </div>
+
                                 </div>
-                            </div>
-                        </li>
+
+                            </li>
+
+                        @endcan
+
+                        {{-- ====================================================
+                            FROTA
+                        ===================================================== --}}
+
+                        @can('fleets.view')
+                            <li
+                                class="nav-item dropdown app-menu-item
+                                    {{ request()->routeIs('fleet.*', 'vehicle-maintenance.*') ? 'active' : '' }}">
+
+                                <a class="nav-link dropdown-toggle" href="#" id="fleetMenu" role="button"
+                                    data-bs-toggle="dropdown" aria-expanded="false">
+
+                                    <i class="bi bi-truck"></i>
+
+                                    <span>Frota</span>
+                                </a>
+
+                                <div class="dropdown-menu app-mega-menu" aria-labelledby="fleetMenu">
+
+                                    <div class="app-mega-header">
+
+                                        <div>
+                                            <div class="app-mega-title">
+                                                Gestão da frota
+                                            </div>
+
+                                            <div class="app-mega-description">
+                                                Veículos, oficinas e manutenções
+                                            </div>
+                                        </div>
+
+                                        <span class="app-mega-icon">
+                                            <i class="bi bi-truck"></i>
+                                        </span>
+
+                                    </div>
+
+                                    <div class="row g-4">
+
+                                        <div class="col-12 col-md-7">
+
+                                            <div class="app-menu-group-title">
+                                                Cadastros
+                                            </div>
+
+                                            <a class="app-menu-link" href="{{ route('fleet.vehicles.index') }}">
+
+                                                <span class="app-menu-link-icon">
+                                                    <i class="bi bi-car-front"></i>
+                                                </span>
+
+                                                <span>
+                                                    <strong>Veículos</strong>
+                                                    <small>Cadastro da frota</small>
+                                                </span>
+                                            </a>
+
+                                            <a class="app-menu-link"
+                                                href="{{ route('fleet.vehicle_maintenances.index') }}">
+
+                                                <span class="app-menu-link-icon">
+                                                    <i class="bi bi-wrench-adjustable"></i>
+                                                </span>
+
+                                                <span>
+                                                    <strong>Manutenções</strong>
+                                                    <small>Histórico e serviços</small>
+                                                </span>
+                                            </a>
+
+                                            <a class="app-menu-link" href="{{ route('fleet.vehicle_services.index') }}">
+
+                                                <span class="app-menu-link-icon">
+                                                    <i class="bi bi-list-check"></i>
+                                                </span>
+
+                                                <span>
+                                                    <strong>Tipos de serviços</strong>
+                                                    <small>Serviços disponíveis</small>
+                                                </span>
+                                            </a>
+
+                                            <a class="app-menu-link" href="{{ route('fleet.vehicle_workshop.index') }}">
+
+                                                <span class="app-menu-link-icon">
+                                                    <i class="bi bi-building-gear"></i>
+                                                </span>
+
+                                                <span>
+                                                    <strong>Oficinas</strong>
+                                                    <small>Prestadores cadastrados</small>
+                                                </span>
+                                            </a>
+
+                                        </div>
+
+                                        <div class="col-12 col-md-5">
+
+                                            <div class="app-menu-group-title">
+                                                Relatórios
+                                            </div>
+
+                                            <a class="app-menu-link"
+                                                href="{{ route('vehicle-maintenance.report.form') }}">
+
+                                                <span class="app-menu-link-icon">
+                                                    <i class="bi bi-file-earmark-bar-graph"></i>
+                                                </span>
+
+                                                <span>
+                                                    <strong>Manutenções</strong>
+                                                    <small>Relatório da frota</small>
+                                                </span>
+                                            </a>
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                            </li>
+                        @endcan
+
+                        {{-- ====================================================
+                            SERVIÇOS
+                        ===================================================== --}}
+
+                        @can('service.view')
+                            <li
+                                class="nav-item dropdown app-menu-item
+                                    {{ request()->routeIs('service.*') ? 'active' : '' }}">
+
+                                <a class="nav-link dropdown-toggle" href="#" id="servicesMenu" role="button"
+                                    data-bs-toggle="dropdown" aria-expanded="false">
+
+                                    <i class="bi bi-tools"></i>
+
+                                    <span>Serviços</span>
+                                </a>
+
+                                <div class="dropdown-menu app-mega-menu" aria-labelledby="servicesMenu">
+
+                                    <div class="app-mega-header">
+
+                                        <div>
+                                            <div class="app-mega-title">
+                                                Gestão de serviços
+                                            </div>
+
+                                            <div class="app-mega-description">
+                                                Clientes, visitas e equipamentos
+                                            </div>
+                                        </div>
+
+                                        <span class="app-mega-icon">
+                                            <i class="bi bi-tools"></i>
+                                        </span>
+
+                                    </div>
+
+                                    <div class="row g-3">
+
+                                        <div class="col-12 col-md-6">
+
+                                            <a class="app-menu-link" href="{{ route('service.clients.index') }}">
+
+                                                <span class="app-menu-link-icon">
+                                                    <i class="bi bi-people"></i>
+                                                </span>
+
+                                                <span>
+                                                    <strong>Clientes</strong>
+                                                    <small>Clientes dos serviços</small>
+                                                </span>
+                                            </a>
+
+                                        </div>
+
+                                        <div class="col-12 col-md-6">
+
+                                            <a class="app-menu-link"
+                                                href="{{ route('service.equipment_maintenances.index') }}">
+
+                                                <span class="app-menu-link-icon">
+                                                    <i class="bi bi-router"></i>
+                                                </span>
+
+                                                <span>
+                                                    <strong>Equipamentos</strong>
+                                                    <small>Manutenção de equipamentos</small>
+                                                </span>
+                                            </a>
+
+                                        </div>
+
+                                        <div class="col-12 col-md-6">
+
+                                            <a class="app-menu-link" href="{{ route('service.maintenances.index') }}">
+
+                                                <span class="app-menu-link-icon">
+                                                    <i class="bi bi-geo-alt"></i>
+                                                </span>
+
+                                                <span>
+                                                    <strong>Visitas técnicas</strong>
+                                                    <small>Controle de atendimentos</small>
+                                                </span>
+                                            </a>
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                            </li>
+                        @endcan
+
+                        {{-- ====================================================
+                            RH
+                        ===================================================== --}}
+
+                        @can('vacations.view')
+
+                            <li
+                                class="nav-item dropdown app-menu-item
+                                    {{ request()->routeIs('vacation_manager.*') ? 'active' : '' }}">
+
+                                <a class="nav-link dropdown-toggle" href="#" id="humanResourcesMenu"
+                                    role="button" data-bs-toggle="dropdown" aria-expanded="false">
+
+                                    <i class="bi bi-people"></i>
+
+                                    <span>RH</span>
+                                </a>
+
+                                <div class="dropdown-menu app-mega-menu" aria-labelledby="humanResourcesMenu">
+
+                                    <div class="app-mega-header">
+
+                                        <div>
+                                            <div class="app-mega-title">
+                                                Recursos humanos
+                                            </div>
+
+                                            <div class="app-mega-description">
+                                                Equipe, certificados e férias
+                                            </div>
+                                        </div>
+
+                                        <span class="app-mega-icon">
+                                            <i class="bi bi-people"></i>
+                                        </span>
+
+                                    </div>
+
+                                    <div class="row g-4">
+
+                                        <div class="col-12 col-md-6">
+
+                                            <div class="app-menu-group-title">
+                                                Equipe
+                                            </div>
+
+                                            @can('collaborators.view')
+                                                <a class="app-menu-link"
+                                                    href="{{ route('vacation_manager.collaborators.index') }}">
+
+                                                    <span class="app-menu-link-icon">
+                                                        <i class="bi bi-person-vcard"></i>
+                                                    </span>
+
+                                                    <span>
+                                                        <strong>Colaboradores</strong>
+                                                        <small>Cadastro da equipe</small>
+                                                    </span>
+                                                </a>
+                                            @endcan
+
+                                            @can('collaborators.courses.view')
+                                                <a class="app-menu-link"
+                                                    href="{{ route('vacation_manager.collaborator.courses.index') }}">
+
+                                                    <span class="app-menu-link-icon">
+                                                        <i class="bi bi-patch-check"></i>
+                                                    </span>
+
+                                                    <span>
+                                                        <strong>Certificados</strong>
+                                                        <small>Cursos e qualificações</small>
+                                                    </span>
+                                                </a>
+                                            @endcan
+
+                                        </div>
+
+                                        <div class="col-12 col-md-6">
+
+                                            <div class="app-menu-group-title">
+                                                Férias
+                                            </div>
+
+                                            @can('vacations.edit')
+                                                <a class="app-menu-link"
+                                                    href="{{ route('vacation_manager.vacations.index') }}">
+
+                                                    <span class="app-menu-link-icon">
+                                                        <i class="bi bi-airplane"></i>
+                                                    </span>
+
+                                                    <span>
+                                                        <strong>Registro de férias</strong>
+                                                        <small>Períodos e solicitações</small>
+                                                    </span>
+                                                </a>
+                                            @endcan
+
+                                            @can('vacation_manager.calendar')
+                                                <a class="app-menu-link" href="{{ route('vacation_manager.calendar') }}">
+
+                                                    <span class="app-menu-link-icon">
+                                                        <i class="bi bi-calendar3"></i>
+                                                    </span>
+
+                                                    <span>
+                                                        <strong>Calendário</strong>
+                                                        <small>Visualizar períodos</small>
+                                                    </span>
+                                                </a>
+                                            @endcan
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                            </li>
+
+                        @endcan
+
+                        {{-- ====================================================
+                            EXTRAS
+                        ===================================================== --}}
+
+                        @can('extra.view')
+
+                            <li
+                                class="nav-item dropdown app-menu-item
+                                    {{ request()->routeIs('stock.*', 'admin.recipients.*', 'admin.notification.*', 'api.*') ? 'active' : '' }}">
+
+                                <a class="nav-link dropdown-toggle" href="#" id="extrasMenu" role="button"
+                                    data-bs-toggle="dropdown" aria-expanded="false">
+
+                                    <i class="bi bi-grid"></i>
+
+                                    <span>Extras</span>
+                                </a>
+
+                                <div class="dropdown-menu app-mega-menu app-mega-menu-wide" aria-labelledby="extrasMenu">
+
+                                    <div class="app-mega-header">
+
+                                        <div>
+                                            <div class="app-mega-title">
+                                                Recursos adicionais
+                                            </div>
+
+                                            <div class="app-mega-description">
+                                                Estoque, notificações e integrações
+                                            </div>
+                                        </div>
+
+                                        <span class="app-mega-icon">
+                                            <i class="bi bi-grid"></i>
+                                        </span>
+
+                                    </div>
+
+                                    <div class="row g-4">
+
+                                        @can('stock.view')
+                                            <div class="col-12 col-md-4">
+
+                                                <div class="app-menu-group-title">
+                                                    Estoque
+                                                </div>
+
+                                                <a class="app-menu-link" href="{{ route('stock.items.index') }}">
+
+                                                    <span class="app-menu-link-icon">
+                                                        <i class="bi bi-box-seam"></i>
+                                                    </span>
+
+                                                    <span>
+                                                        <strong>Inventário</strong>
+                                                        <small>Itens e quantidades</small>
+                                                    </span>
+                                                </a>
+
+                                                <a class="app-menu-link" href="{{ route('stock.movements.index') }}">
+
+                                                    <span class="app-menu-link-icon">
+                                                        <i class="bi bi-arrow-left-right"></i>
+                                                    </span>
+
+                                                    <span>
+                                                        <strong>Movimentações</strong>
+                                                        <small>Entradas e saídas</small>
+                                                    </span>
+                                                </a>
+
+                                                <a class="app-menu-link" href="{{ route('stock.items.showProduction') }}">
+
+                                                    <span class="app-menu-link-icon">
+                                                        <i class="bi bi-bar-chart"></i>
+                                                    </span>
+
+                                                    <span>
+                                                        <strong>Estoque x produção</strong>
+                                                        <small>Comparativo operacional</small>
+                                                    </span>
+                                                </a>
+
+                                            </div>
+                                        @endcan
+
+                                        <div class="col-12 col-md-4">
+
+                                            <div class="app-menu-group-title">
+                                                Notificações
+                                            </div>
+
+                                            @can('recipients.view')
+                                                <a class="app-menu-link" href="{{ route('admin.recipients.index') }}">
+
+                                                    <span class="app-menu-link-icon">
+                                                        <i class="bi bi-bell"></i>
+                                                    </span>
+
+                                                    <span>
+                                                        <strong>Sistema</strong>
+                                                        <small>Destinatários e alertas</small>
+                                                    </span>
+                                                </a>
+                                            @endcan
+
+                                            @can('notification.view')
+                                                <a class="app-menu-link" href="{{ route('admin.notification.index') }}">
+
+                                                    <span class="app-menu-link-icon">
+                                                        <i class="bi bi-whatsapp"></i>
+                                                    </span>
+
+                                                    <span>
+                                                        <strong>WhatsApp</strong>
+                                                        <small>Lembretes automáticos</small>
+                                                    </span>
+                                                </a>
+                                            @endcan
+
+                                        </div>
+
+                                        <div class="col-12 col-md-4">
+
+                                            <div class="app-menu-group-title">
+                                                Integrações
+                                            </div>
+
+                                            @can('api.nfe')
+                                                <a class="app-menu-link" href="{{ route('api.mk.nfe') }}">
+
+                                                    <span class="app-menu-link-icon">
+                                                        <i class="bi bi-receipt"></i>
+                                                    </span>
+
+                                                    <span>
+                                                        <strong>NFE MK-Auth</strong>
+                                                        <small>Integração fiscal</small>
+                                                    </span>
+                                                </a>
+                                            @endcan
+
+                                            @if (config('services.wireguard.url') && config('services.wireguard.password'))
+                                                @can('administrator.vpn')
+                                                    <a class="app-menu-link" href="{{ route('api.vpn.index') }}">
+
+                                                        <span class="app-menu-link-icon">
+                                                            <i class="bi bi-shield-lock"></i>
+                                                        </span>
+
+                                                        <span>
+                                                            <strong>VPN WF</strong>
+                                                            <small>Acesso WireGuard</small>
+                                                        </span>
+                                                    </a>
+                                                @endcan
+                                            @endif
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                            </li>
+
+                        @endcan
+
+                        {{-- ====================================================
+                            ADMINISTRADOR
+                        ===================================================== --}}
+
+                        @can('administrator.user')
+                            <li
+                                class="nav-item dropdown app-menu-item
+                                    {{ request()->routeIs('options.*', 'admin.*', 'activitylogs.*') ? 'active' : '' }}">
+
+                                <a class="nav-link dropdown-toggle" href="#" id="administratorMenu" role="button"
+                                    data-bs-toggle="dropdown" aria-expanded="false">
+
+                                    <i class="bi bi-gear"></i>
+
+                                    <span>Administrador</span>
+                                </a>
+
+                                <div class="dropdown-menu app-mega-menu app-mega-menu-wide"
+                                    aria-labelledby="administratorMenu">
+
+                                    <div class="app-mega-header">
+
+                                        <div>
+                                            <div class="app-mega-title">
+                                                Administração
+                                            </div>
+
+                                            <div class="app-mega-description">
+                                                Sistema, usuários e segurança
+                                            </div>
+                                        </div>
+
+                                        <span class="app-mega-icon">
+                                            <i class="bi bi-gear"></i>
+                                        </span>
+
+                                    </div>
+
+                                    <div class="row g-4">
+
+                                        <div class="col-12 col-md-7">
+
+                                            <div class="app-menu-group-title">
+                                                Sistema
+                                            </div>
+
+                                            <a class="app-menu-link" href="{{ route('options.colors.edit') }}">
+
+                                                <span class="app-menu-link-icon">
+                                                    <i class="bi bi-palette"></i>
+                                                </span>
+
+                                                <span>
+                                                    <strong>Estilos e logo</strong>
+                                                    <small>Aparência do sistema</small>
+                                                </span>
+                                            </a>
+
+                                            <a class="app-menu-link" href="{{ route('options.resource.edit') }}">
+
+                                                <span class="app-menu-link-icon">
+                                                    <i class="bi bi-toggles"></i>
+                                                </span>
+
+                                                <span>
+                                                    <strong>Recursos do sistema</strong>
+                                                    <small>Ativar e configurar módulos</small>
+                                                </span>
+                                            </a>
+
+                                            <a class="app-menu-link" href="{{ route('admin.systempanel') }}">
+
+                                                <span class="app-menu-link-icon">
+                                                    <i class="bi bi-speedometer2"></i>
+                                                </span>
+
+                                                <span>
+                                                    <strong>Painel do sistema</strong>
+                                                    <small>Informações operacionais</small>
+                                                </span>
+                                            </a>
+
+                                            <a class="app-menu-link" href="{{ route('options.systemresource.edit') }}">
+
+                                                <span class="app-menu-link-icon">
+                                                    <i class="bi bi-sliders"></i>
+                                                </span>
+
+                                                <span>
+                                                    <strong>Recursos administrativos</strong>
+                                                    <small>Configurações avançadas</small>
+                                                </span>
+                                            </a>
+
+                                            <a class="app-menu-link" href="{{ route('activitylogs.index') }}">
+
+                                                <span class="app-menu-link-icon">
+                                                    <i class="bi bi-clock-history"></i>
+                                                </span>
+
+                                                <span>
+                                                    <strong>Logs</strong>
+                                                    <small>Histórico de atividades</small>
+                                                </span>
+                                            </a>
+
+                                        </div>
+
+                                        <div class="col-12 col-md-5">
+
+                                            <div class="app-menu-group-title">
+                                                Acessos
+                                            </div>
+
+                                            <a class="app-menu-link" href="{{ route('admin.usuarios.index') }}">
+
+                                                <span class="app-menu-link-icon">
+                                                    <i class="bi bi-people"></i>
+                                                </span>
+
+                                                <span>
+                                                    <strong>Usuários</strong>
+                                                    <small>Contas do sistema</small>
+                                                </span>
+                                            </a>
+
+                                            <a class="app-menu-link" href="{{ route('admin.roles.index') }}">
+
+                                                <span class="app-menu-link-icon">
+                                                    <i class="bi bi-person-badge"></i>
+                                                </span>
+
+                                                <span>
+                                                    <strong>Perfis de usuário</strong>
+                                                    <small>Grupos e permissões</small>
+                                                </span>
+                                            </a>
+
+                                            <a class="app-menu-link" href="{{ route('admin.users.sessions') }}">
+
+                                                <span class="app-menu-link-icon">
+                                                    <i class="bi bi-display"></i>
+                                                </span>
+
+                                                <span>
+                                                    <strong>Sessões ativas</strong>
+                                                    <small>Acessos conectados</small>
+                                                </span>
+                                            </a>
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                            </li>
+                        @endcan
+
+                    </ul>
+
+                    {{-- ========================================================
+                        USUÁRIO
+                    ========================================================= --}}
+
+                    @auth
+
+                        <div class="dropdown app-user-menu">
+
+                            <button class="btn app-user-button dropdown-toggle" type="button" id="userMenu"
+                                data-bs-toggle="dropdown" aria-expanded="false">
+
+                                <span class="app-user-avatar">
+                                    {{ mb_strtoupper(mb_substr(Auth::user()->name, 0, 1)) }}
+                                </span>
+
+                                <span class="app-user-information">
+
+                                    <strong>
+                                        {{ Auth::user()->name }}
+                                    </strong>
+
+                                    <small>
+                                        Minha conta
+                                    </small>
+
+                                </span>
+
+                            </button>
+
+                            <ul class="dropdown-menu dropdown-menu-end app-user-dropdown" aria-labelledby="userMenu">
+
+                                <li class="app-user-dropdown-header">
+
+                                    <span class="app-user-avatar app-user-avatar-large">
+                                        {{ mb_strtoupper(mb_substr(Auth::user()->name, 0, 1)) }}
+                                    </span>
+
+                                    <div>
+
+                                        <strong>
+                                            {{ Auth::user()->name }}
+                                        </strong>
+
+                                        @if (Auth::user()->email)
+                                            <small>
+                                                {{ Auth::user()->email }}
+                                            </small>
+                                        @endif
+
+                                    </div>
+
+                                </li>
+
+                                <li>
+                                    <hr class="dropdown-divider">
+                                </li>
+
+                                <li>
+
+                                    <a class="dropdown-item" href="{{ route('profile.edit') }}">
+
+                                        <i class="bi bi-person"></i>
+                                        Editar perfil
+                                    </a>
+
+                                </li>
+
+                                <li>
+                                    <hr class="dropdown-divider">
+                                </li>
+
+                                <li>
+
+                                    <form method="POST" action="{{ route('logout') }}">
+
+                                        @csrf
+
+                                        <button type="submit" class="dropdown-item app-logout-button">
+
+                                            <i class="bi bi-box-arrow-right"></i>
+                                            Sair
+                                        </button>
+
+                                    </form>
+
+                                </li>
+
+                            </ul>
+
+                        </div>
+
                     @endauth
 
+                </div>
 
-                </ul>
             </div>
-        </div>
-    </nav>
 
+        </nav>
 
+    </header>
 
-    <main class="flex-grow-1">
+    {{-- CONTEÚDO --}}
+    <main class="flex-grow-1 app-main">
         @yield('content')
     </main>
 
+    {{-- MODAL DE CONFIRMAÇÃO --}}
     <x-confirm-modal />
 
-    @stack('scripts')
-    @extends('layouts.footer')
+    {{-- RODAPÉ --}}
+    @include('layouts.footer')
 
-    <script type="text/javascript" src="/js/app.js"></script>
-    
-    <script type="text/javascript" src="/js/confirm-modal.js"></script>
+    {{-- ================================================================
+        SCRIPTS
+    ================================================================= --}}
 
-    <!--bootstrap-->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    {{-- jQuery, caso alguma tela ainda utilize --}}
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 
-    {{--}}
-    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
-    {{--}}
-
-    <!-- Bootstrap JS (necessário para modal funcionar) -->
+    {{-- Bootstrap --}}
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
+    {{-- Flatpickr --}}
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/pt.js"></script>
 
-    <!-- Hover script -->
-    <script>
-        const hoverMenus = ['menutower', 'menuFrota', 'menuServico', 'menuFerias', 'menuExtra', 'menuAdmin', 'menuUser'];
+    {{-- SweetAlert --}}
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-        hoverMenus.forEach(id => {
-            const menu = document.getElementById(id);
-            if (!menu) return; // <-- ignora se o menu não existir para o usuário
+    {{-- Scripts do sistema --}}
+    <script src="{{ asset('js/app.js') }}"></script>
 
-            let timeout;
+    <script src="{{ asset('js/confirm-action.js') }}"></script>
 
-            menu.addEventListener('mouseenter', () => {
-                clearTimeout(timeout);
-                menu.classList.add('show');
-            });
+    <script src="{{ asset('js/confirm-modal.js') }}"></script>
 
-            menu.addEventListener('mouseleave', () => {
-                timeout = setTimeout(() => {
-                    menu.classList.remove('show');
-                }, 200);
-            });
-        });
-    </script>
+    <script src="{{ asset('js/header.js') }}"></script>
 
-    <!-- alert tipo toast no sistema -->
+    {{-- Scripts específicos das páginas --}}
+    @stack('scripts')
+
+    {{-- Toast --}}
     @include('layouts.toast')
-
 
 </body>
 

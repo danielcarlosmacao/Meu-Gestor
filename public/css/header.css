@@ -1,0 +1,772 @@
+/*
+|--------------------------------------------------------------------------
+| VARIÁVEIS DO CABEÇALHO
+|--------------------------------------------------------------------------
+*/
+
+:root {
+    --header-height: 72px;
+    --header-background: rgba(255, 255, 255, 0.97);
+    --header-border: rgba(15, 23, 42, 0.08);
+    --header-text: #334155;
+    --header-muted: #64748b;
+    --header-surface: #ffffff;
+    --header-page-background: #f5f7f8;
+    --header-radius: 14px;
+    --header-shadow: 0 4px 20px rgba(15, 23, 42, 0.06);
+    --mega-menu-shadow: 0 25px 65px rgba(15, 23, 42, 0.16);
+}
+
+/*
+|--------------------------------------------------------------------------
+| ESTRUTURA GERAL
+|--------------------------------------------------------------------------
+*/
+
+html,
+body {
+    min-height: 100%;
+}
+
+body {
+    margin: 0;
+    overflow-x: hidden;
+    background-color: var(--header-page-background);
+    color: #26332c;
+    font-family:
+        "Inter",
+        system-ui,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        sans-serif;
+}
+
+.app-main {
+    min-width: 0;
+    width: 100%;
+}
+
+/*
+|--------------------------------------------------------------------------
+| CABEÇALHO
+|--------------------------------------------------------------------------
+*/
+
+.app-header {
+    position: sticky;
+    top: 0;
+    z-index: 1040;
+    width: 100%;
+}
+
+.app-navbar {
+    position: relative;
+    min-height: var(--header-height);
+    padding: 0.55rem 0;
+    background: var(--header-background);
+    border-bottom: 1px solid var(--header-border);
+    box-shadow: var(--header-shadow);
+    backdrop-filter: blur(14px);
+}
+
+/*
+|--------------------------------------------------------------------------
+| IMPORTANTE PARA O MEGA MENU OCUPAR TODA A LARGURA
+|--------------------------------------------------------------------------
+*/
+
+.app-navbar>.container-fluid {
+    position: static;
+}
+
+.app-navbar .navbar-collapse {
+    position: static;
+}
+
+.app-navbar .navbar-nav {
+    position: static;
+}
+
+/*
+|--------------------------------------------------------------------------
+| LOGO
+|--------------------------------------------------------------------------
+*/
+
+.app-brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.7rem;
+    max-width: 235px;
+    margin-right: 1.35rem;
+    color: var(--color-text);
+    text-decoration: none;
+}
+
+.app-brand:hover,
+.app-brand:focus {
+    color: var(--color-hover);
+}
+
+.app-logo {
+    width: auto;
+    max-width: 210px;
+    height: 45px;
+    object-fit: contain;
+}
+
+.app-brand-icon {
+    width: 42px;
+    height: 42px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    border-radius: 12px;
+    background: linear-gradient(135deg,
+            var(--color-primary),
+            var(--color-secondary));
+    color: #fff;
+    box-shadow:
+        0 8px 18px color-mix(in srgb,
+            var(--color-primary) 25%,
+            transparent);
+}
+
+.app-brand-name {
+    overflow: hidden;
+    color: #14265d;
+    font-size: 1.05rem;
+    font-weight: 750;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/*
+|--------------------------------------------------------------------------
+| BOTÃO DO MENU MOBILE
+|--------------------------------------------------------------------------
+*/
+
+.app-navbar-toggler {
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    border: 1px solid var(--header-border);
+    border-radius: 12px;
+    color: var(--header-text);
+    background: #fff;
+    font-size: 1.65rem;
+    box-shadow: none !important;
+}
+
+.app-navbar-toggler:hover,
+.app-navbar-toggler:focus {
+    color: var(--color-primary);
+    background:
+        color-mix(in srgb,
+            var(--color-primary) 8%,
+            transparent);
+}
+
+/*
+|--------------------------------------------------------------------------
+| ITENS DO MENU PRINCIPAL
+|--------------------------------------------------------------------------
+*/
+
+.app-menu-item {
+    position: static;
+}
+
+.app-menu-item>.nav-link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.45rem;
+    min-height: 46px;
+    margin: 0 0.06rem;
+    padding: 0.7rem 0.78rem !important;
+    border-radius: 11px;
+    color: var(--header-text);
+    font-size: 0.79rem;
+    font-weight: 700;
+    letter-spacing: 0.01rem;
+    text-transform: uppercase;
+    white-space: nowrap;
+    transition:
+        color 0.18s ease,
+        background-color 0.18s ease,
+        box-shadow 0.18s ease,
+        transform 0.18s ease;
+}
+
+.app-menu-item>.nav-link i {
+    font-size: 1rem;
+}
+
+.app-menu-item>.nav-link:hover,
+.app-menu-item>.nav-link:focus,
+.app-menu-item.show>.nav-link {
+    color: var(--color-primary);
+    background:
+        color-mix(in srgb,
+            var(--color-primary) 9%,
+            transparent);
+}
+
+.app-menu-item>.nav-link.show {
+    color: var(--color-primary);
+    background:
+        color-mix(in srgb,
+            var(--color-primary) 10%,
+            transparent);
+    box-shadow:
+        inset 0 0 0 2px color-mix(in srgb,
+            var(--color-primary) 22%,
+            transparent);
+}
+
+.app-menu-item.active>.nav-link {
+    color: #fff;
+    background: linear-gradient(135deg,
+            var(--color-primary),
+            var(--color-secondary));
+    box-shadow:
+        0 7px 15px color-mix(in srgb,
+            var(--color-primary) 22%,
+            transparent);
+}
+
+.app-menu-item.active>.nav-link::after {
+    border-top-color: #fff;
+}
+
+.app-menu-item>.nav-link::after {
+    margin-left: 0.25rem;
+    vertical-align: middle;
+}
+
+/*
+|--------------------------------------------------------------------------
+| MEGA MENU EM LARGURA COMPLETA
+|--------------------------------------------------------------------------
+*/
+
+.app-mega-menu,
+.app-mega-menu-wide {
+    position: absolute !important;
+
+    /*
+    | Sempre começa no lado esquerdo da janela e termina no lado direito.
+    */
+    top: 100% !important;
+    left: 0 !important;
+    right: 0 !important;
+
+    width: 100% !important;
+    max-width: none !important;
+
+    /*
+    | Remove centralização e abertura lateral.
+    */
+    margin: 0 !important;
+    transform: none !important;
+
+    padding:
+        1.35rem clamp(1.25rem, 4vw, 4.5rem) 1.5rem;
+
+    border: 0;
+    border-top: 1px solid rgba(15, 23, 42, 0.07);
+    border-radius: 0 0 20px 20px;
+
+    background: rgba(255, 255, 255, 0.99);
+    box-shadow: var(--mega-menu-shadow);
+
+    /*
+    | Garante que fique acima do conteúdo da página.
+    */
+    z-index: 1050;
+}
+
+/*
+|--------------------------------------------------------------------------
+| PONTE INVISÍVEL ENTRE O BOTÃO E O MEGA MENU
+|--------------------------------------------------------------------------
+|
+| Impede que o dropdown feche durante o pequeno movimento do mouse entre
+| o botão superior e o conteúdo do menu.
+|
+*/
+
+.app-mega-menu::before {
+    content: "";
+    position: absolute;
+    top: -12px;
+    left: 0;
+    right: 0;
+    height: 12px;
+    background: transparent;
+}
+
+/*
+|--------------------------------------------------------------------------
+| CABEÇALHO INTERNO DO MEGA MENU
+|--------------------------------------------------------------------------
+*/
+
+.app-mega-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1.15rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid #edf0ee;
+}
+
+.app-mega-title {
+    color: #1f2937;
+    font-size: 1.05rem;
+    font-weight: 750;
+}
+
+.app-mega-description {
+    margin-top: 0.2rem;
+    color: var(--header-muted);
+    font-size: 0.83rem;
+}
+
+.app-mega-icon {
+    width: 43px;
+    height: 43px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    border-radius: 13px;
+    background:
+        color-mix(in srgb,
+            var(--color-primary) 11%,
+            white);
+    color: var(--color-primary);
+    font-size: 1.2rem;
+}
+
+/*
+|--------------------------------------------------------------------------
+| GRUPOS DO MEGA MENU
+|--------------------------------------------------------------------------
+*/
+
+.app-menu-group-title {
+    margin-bottom: 0.55rem;
+    color: var(--header-muted);
+    font-size: 0.72rem;
+    font-weight: 750;
+    letter-spacing: 0.06rem;
+    text-transform: uppercase;
+}
+
+.app-menu-link {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    min-height: 58px;
+    margin-bottom: 0.25rem;
+    padding: 0.65rem;
+    border-radius: 12px;
+    color: #334155;
+    text-decoration: none;
+    transition:
+        color 0.18s ease,
+        background-color 0.18s ease,
+        transform 0.18s ease,
+        box-shadow 0.18s ease;
+}
+
+.app-menu-link:hover,
+.app-menu-link:focus,
+.app-menu-link.active {
+    color: var(--color-primary);
+    background:
+        color-mix(in srgb,
+            var(--color-primary) 8%,
+            transparent);
+    box-shadow:
+        inset 3px 0 0 color-mix(in srgb,
+            var(--color-primary) 65%,
+            transparent);
+    transform: translateX(2px);
+}
+
+.app-menu-link-icon {
+    width: 39px;
+    height: 39px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    border-radius: 11px;
+    background: #f1f5f3;
+    color: var(--color-primary);
+    font-size: 1rem;
+    transition:
+        background-color 0.18s ease,
+        color 0.18s ease;
+}
+
+.app-menu-link:hover .app-menu-link-icon,
+.app-menu-link.active .app-menu-link-icon {
+    background:
+        color-mix(in srgb,
+            var(--color-primary) 12%,
+            white);
+}
+
+.app-menu-link span:last-child {
+    min-width: 0;
+}
+
+.app-menu-link strong {
+    display: block;
+    color: inherit;
+    font-size: 0.88rem;
+    font-weight: 680;
+}
+
+.app-menu-link small {
+    display: block;
+    overflow: hidden;
+    margin-top: 0.08rem;
+    color: var(--header-muted);
+    font-size: 0.73rem;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/*
+|--------------------------------------------------------------------------
+| MENU DO USUÁRIO
+|--------------------------------------------------------------------------
+*/
+
+.app-user-menu {
+    position: relative;
+    margin-left: 0.75rem;
+}
+
+.app-user-button {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    min-width: 160px;
+    padding: 0.42rem 0.65rem;
+    border: 1px solid var(--header-border);
+    border-radius: 13px;
+    background: #fff;
+    color: var(--header-text);
+    text-align: left;
+    transition:
+        border-color 0.18s ease,
+        background-color 0.18s ease,
+        box-shadow 0.18s ease;
+}
+
+.app-user-button:hover,
+.app-user-button:focus,
+.app-user-button.show {
+    color: var(--header-text);
+    border-color:
+        color-mix(in srgb,
+            var(--color-primary) 35%,
+            transparent);
+    background:
+        color-mix(in srgb,
+            var(--color-primary) 5%,
+            white);
+    box-shadow:
+        0 6px 16px rgba(15, 23, 42, 0.08);
+}
+
+.app-user-avatar {
+    width: 37px;
+    height: 37px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    border-radius: 11px;
+    background: linear-gradient(135deg,
+            var(--color-primary),
+            var(--color-secondary));
+    color: #fff;
+    font-size: 0.95rem;
+    font-weight: 750;
+}
+
+.app-user-avatar-large {
+    width: 45px;
+    height: 45px;
+    border-radius: 13px;
+    font-size: 1.1rem;
+}
+
+.app-user-information {
+    display: flex;
+    min-width: 0;
+    flex: 1;
+    flex-direction: column;
+}
+
+.app-user-information strong {
+    overflow: hidden;
+    max-width: 115px;
+    font-size: 0.82rem;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.app-user-information small {
+    color: var(--header-muted);
+    font-size: 0.68rem;
+}
+
+.app-user-dropdown {
+    min-width: 250px;
+    margin-top: 0.7rem !important;
+    padding: 0.65rem;
+    border: 1px solid var(--header-border);
+    border-radius: 15px;
+    box-shadow:
+        0 20px 50px rgba(15, 23, 42, 0.14);
+}
+
+.app-user-dropdown-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.55rem;
+}
+
+.app-user-dropdown-header strong,
+.app-user-dropdown-header small {
+    display: block;
+}
+
+.app-user-dropdown-header strong {
+    overflow: hidden;
+    max-width: 160px;
+    font-size: 0.88rem;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.app-user-dropdown-header small {
+    overflow: hidden;
+    max-width: 160px;
+    color: var(--header-muted);
+    font-size: 0.7rem;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.app-user-dropdown .dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    padding: 0.7rem 0.75rem;
+    border-radius: 10px;
+    font-size: 0.84rem;
+}
+
+.app-user-dropdown .dropdown-item:hover,
+.app-user-dropdown .dropdown-item:focus {
+    color: var(--color-primary);
+    background:
+        color-mix(in srgb,
+            var(--color-primary) 8%,
+            transparent);
+}
+
+.app-logout-button {
+    width: 100%;
+    border: 0;
+    background: transparent;
+    color: #dc3545;
+}
+
+.app-logout-button:hover,
+.app-logout-button:focus {
+    color: #b02a37 !important;
+    background: #fff1f2 !important;
+}
+
+/*
+|--------------------------------------------------------------------------
+| COMPORTAMENTO NO DESKTOP
+|--------------------------------------------------------------------------
+*/
+
+@media (min-width: 1200px) {
+
+    /*
+    | O dropdown abre ocupando toda a largura.
+    */
+    .app-menu-item:hover>.app-mega-menu {
+        display: block;
+    }
+
+    /*
+    | Evita animações do Bootstrap deslocando o painel.
+    */
+    .app-mega-menu[data-bs-popper] {
+        top: 100% !important;
+        left: 0 !important;
+        right: 0 !important;
+        margin: 0 !important;
+        transform: none !important;
+    }
+
+    /*
+    | Mantém o item superior destacado enquanto o mouse está sobre o painel.
+    */
+    .app-menu-item:hover>.nav-link {
+        color: var(--color-primary);
+        background:
+            color-mix(in srgb,
+                var(--color-primary) 9%,
+                transparent);
+    }
+
+    /*
+    | Remove a animação padrão que pode criar um pequeno espaço.
+    */
+    .app-mega-menu {
+        animation: none;
+    }
+}
+
+/*
+|--------------------------------------------------------------------------
+| TABLETS E CELULARES
+|--------------------------------------------------------------------------
+*/
+
+@media (max-width: 1199.98px) {
+
+    .app-navbar {
+        padding: 0.6rem 0;
+    }
+
+    .app-navbar .navbar-collapse {
+        position: relative;
+        max-height: calc(100vh - 88px);
+        margin-top: 0.75rem;
+        padding: 0.75rem;
+        overflow-x: hidden;
+        overflow-y: auto;
+        border: 1px solid var(--header-border);
+        border-radius: 16px;
+        background: #fff;
+        box-shadow:
+            0 16px 40px rgba(15, 23, 42, 0.12);
+    }
+
+    .app-menu-item {
+        position: relative;
+    }
+
+    .app-menu-item>.nav-link {
+        justify-content: flex-start;
+        width: 100%;
+        margin-bottom: 0.15rem;
+        padding: 0.8rem !important;
+    }
+
+    /*
+    | No celular o mega menu volta a ficar dentro do menu recolhível.
+    */
+    .app-mega-menu,
+    .app-mega-menu-wide,
+    .app-mega-menu[data-bs-popper] {
+        position: static !important;
+        top: auto !important;
+        left: auto !important;
+        right: auto !important;
+        width: 100% !important;
+        max-width: none !important;
+        margin-top: 0.25rem !important;
+        padding: 0.85rem !important;
+        transform: none !important;
+        border: 0;
+        border-radius: 13px;
+        background: #f8faf9;
+        box-shadow: none;
+    }
+
+    .app-mega-menu::before {
+        display: none;
+    }
+
+    .app-mega-header {
+        display: none;
+    }
+
+    .app-menu-link {
+        min-height: 54px;
+    }
+
+    .app-user-menu {
+        width: 100%;
+        margin-top: 0.65rem;
+        margin-left: 0;
+        padding-top: 0.75rem;
+        border-top: 1px solid var(--header-border);
+    }
+
+    .app-user-button {
+        width: 100%;
+    }
+
+    .app-user-dropdown {
+        width: 100%;
+    }
+}
+
+/*
+|--------------------------------------------------------------------------
+| CELULARES PEQUENOS
+|--------------------------------------------------------------------------
+*/
+
+@media (max-width: 575.98px) {
+
+    .app-logo {
+        max-width: 160px;
+        height: 40px;
+    }
+
+    .app-brand {
+        max-width: 190px;
+        margin-right: 0.5rem;
+    }
+
+    .app-brand-name {
+        max-width: 140px;
+    }
+
+    .app-navbar-toggler {
+        width: 42px;
+        height: 42px;
+    }
+
+    .app-menu-link small {
+        white-space: normal;
+    }
+
+    .app-user-information strong {
+        max-width: 180px;
+    }
+}
