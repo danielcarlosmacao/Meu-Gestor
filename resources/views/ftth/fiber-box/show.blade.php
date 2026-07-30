@@ -1,9 +1,16 @@
 @extends('layouts.header')
+
 @section('title', 'FTTH - BOX')
 
 @section('content')
 
     @php
+        /*
+        |--------------------------------------------------------------------------
+        | CORES DAS FIBRAS
+        |--------------------------------------------------------------------------
+        */
+
         $fiberColors = [
             1 => '#00a651', // Verde
             2 => '#ffff00', // Amarelo
@@ -16,7 +23,7 @@
             9 => '#000000', // Preto
             10 => '#808080', // Cinza
             11 => '#ffa500', // Laranja
-            12 => '#00ffff', // Água (Aqua)
+            12 => '#00ffff', // Água
 
             13 => '#00a651', // Verde
             14 => '#ffff00', // Amarelo
@@ -29,491 +36,1086 @@
             21 => '#000000', // Preto
             22 => '#808080', // Cinza
             23 => '#ffa500', // Laranja
-            24 => '#00ffff', // Água (Aqua)
+            24 => '#00ffff', // Água
         ];
-        function getFiberNumber($name)
-        {
-            if (preg_match('/(\d+)$/', $name, $matches)) {
+
+        /*
+        |--------------------------------------------------------------------------
+        | FUNÇÕES AUXILIARES
+        |--------------------------------------------------------------------------
+        |
+        | Foram utilizadas closures para evitar erro de função já declarada.
+        |
+        */
+
+        $getFiberNumber = function ($name) {
+            if (preg_match('/(\d+)$/', (string) $name, $matches)) {
                 return (int) $matches[1];
             }
-            return null;
-        }
 
-        function getTextColor($bg)
-        {
-            return in_array($bg, ['#000000', '#0000ff', '#8b4513', '#9400d3']) ? '#fff' : '#000';
-        }
+            return null;
+        };
+
+        $getTextColor = function ($background) {
+            $darkColors = ['#000000', '#0000ff', '#8b4513', '#8a2be2', '#808080'];
+
+            return in_array(strtolower((string) $background), $darkColors) ? '#ffffff' : '#000000';
+        };
+
+        $getStatusClass = function ($status) {
+            return match ($status) {
+                'unused' => 'secondary',
+                'used' => 'success',
+                'fusion' => 'primary',
+                'fused' => 'primary',
+                'splinter' => 'warning',
+                'active' => 'success',
+                'inactive' => 'danger',
+                default => 'secondary',
+            };
+        };
+
+        $getSignalClass = function ($signal) {
+            if ($signal === null || $signal === '') {
+                return 'secondary';
+            }
+
+            $value = (float) $signal;
+
+            return match (true) {
+                $value >= -15 => 'success',
+                $value >= -23 => 'warning',
+                default => 'danger',
+            };
+        };
     @endphp
 
-    <style>
-        .fiber-row:hover {
-            filter: brightness(0.95);
-        }
-    </style>
+    @push('styles')
+        <link rel="stylesheet" href="{{ asset('css/ftthbox.css') }}">
+    @endpush
 
-    <div class="container mb-1 mb-md-4 mt-1 mt-md-4">
-        <div class="d-flex justify-content-center align-items-center gap-2 flex-wrap">
 
-            <h2 class="mb-0">
-                {{ $box->info }}
-            </h2>
+    <div class="container-fluid ftth-page">
 
-            <a href="{{ route('fiberbox.index', ['pon' => $box->pon_id, 'map' => 'yes']) }}" class="btn dcm-btn-primary">
-                <i class="bi bi-house"></i>
-            </a>
+        {{-- CABEÇALHO DA BOX --}}
+        <div class="card ftth-header-card shadow-sm mb-3 mt-2 mt-md-4">
 
-            <button type="button" class="btn dcm-btn-primary"
-                onclick="openConfirmModal(
-                    '{{ route('fiberbox.recalculate.local', $box->id) }}',
-                    'Deseja recalcular toda a rede desta CTO?',
-                    'Essa alteração não poderá ser revertida e afeta todas as caixas dessa PON',
-                    'POST'
-                )"
-                style="display: ;">
-                <i class="bi bi-arrow-repeat"></i>
-            </button>
+            <div class="card-body">
+
+                <div
+                    class="d-flex flex-column flex-lg-row
+                            justify-content-between align-items-lg-center gap-3">
+
+                    <div>
+
+                        <div class="d-flex align-items-center gap-2 flex-wrap">
+
+                            <div class="rounded-circle bg-primary-subtle text-primary
+                                        d-flex align-items-center justify-content-center"
+                                style="width: 45px; height: 45px;">
+
+                                <i class="bi bi-box-seam fs-5"></i>
+                            </div>
+
+                            <div>
+                                <h2 class="fw-bold mb-1">
+                                    {{ $box->info ?: 'Caixa sem descrição' }}
+                                </h2>
+
+                                <div class="d-flex flex-wrap gap-2 text-muted small">
+
+                                    <span>
+                                        <i class="bi bi-hash"></i>
+                                        Caixa {{ $box->number }}
+                                    </span>
+
+                                    @if ($box->pon)
+                                        <span>
+                                            <i class="bi bi-diagram-3"></i>
+                                            {{ $box->pon->info }}
+                                        </span>
+                                    @endif
+
+                                    @if ($box->coordinates)
+                                        <span>
+                                            <i class="bi bi-geo-alt"></i>
+                                            {{ $box->coordinates }}
+                                        </span>
+                                    @endif
+
+                                </div>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <div class="d-flex align-items-center gap-2 flex-wrap">
+
+                        <a href="{{ route('fiberbox.index', [
+                            'pon' => $box->pon_id,
+                            'map' => 'yes',
+                        ]) }}"
+                            class="btn dcm-btn-primary" title="Voltar ao mapa" aria-label="Voltar ao mapa">
+
+                            <i class="bi bi-map me-1"></i>
+                            <span class="d-none d-sm-inline">Mapa</span>
+                        </a>
+
+                        @can('ftth.update')
+                            <button type="button" class="btn btn-outline-warning"
+                                onclick="openConfirmModal(
+                                    '{{ route('fiberbox.recalculate.local', $box->id) }}',
+                                    'Deseja recalcular toda a rede desta CTO?',
+                                    'Essa alteração afeta esta caixa e todas as caixas conectadas a ela.',
+                                    'POST'
+                                )"
+                                title="Recalcular sinais da rede" aria-label="Recalcular sinais da rede">
+
+                                <i class="bi bi-arrow-repeat me-1"></i>
+                                <span class="d-none d-sm-inline">Recalcular</span>
+                            </button>
+                        @endcan
+
+                    </div>
+
+                </div>
+
+            </div>
 
         </div>
-    </div>
 
-    <div class="container-fluid">
+        {{-- RESUMO --}}
+        <div class="row g-2 mb-3">
 
-        <div class="row">
+            <div class="col-6 col-md-3">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body py-3">
 
-            {{-- ESQUERDA --}}
-            <div class="col-md-3">
+                        <div class="d-flex align-items-center gap-3">
 
-                {{-- Cabos --}}
+                            <div class="rounded-circle bg-primary-subtle text-primary
+                                        d-flex align-items-center justify-content-center"
+                                style="width: 42px; height: 42px;">
 
-                <div class="card mb-3 shadow-sm border-0">
+                                <i class="bi bi-bezier2"></i>
+                            </div>
 
-                    <div class="card-header d-flex justify-content-between align-items-center bgc-primary">
+                            <div>
+                                <div class="small text-muted">Cabos</div>
+                                <div class="fw-bold fs-5">{{ $cables->count() }}</div>
+                            </div>
+
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-6 col-md-3">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body py-3">
+
+                        <div class="d-flex align-items-center gap-3">
+
+                            <div class="rounded-circle bg-success-subtle text-success
+                                        d-flex align-items-center justify-content-center"
+                                style="width: 42px; height: 42px;">
+
+                                <i class="bi bi-list-ul"></i>
+                            </div>
+
+                            <div>
+                                <div class="small text-muted">Fibras</div>
+                                <div class="fw-bold fs-5">{{ $fibers->count() }}</div>
+                            </div>
+
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-6 col-md-3">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body py-3">
+
+                        <div class="d-flex align-items-center gap-3">
+
+                            <div class="rounded-circle bg-warning-subtle text-warning
+                                        d-flex align-items-center justify-content-center"
+                                style="width: 42px; height: 42px;">
+
+                                <i class="bi bi-diagram-3"></i>
+                            </div>
+
+                            <div>
+                                <div class="small text-muted">Splitters</div>
+                                <div class="fw-bold fs-5">{{ $splinters->count() }}</div>
+                            </div>
+
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-6 col-md-3">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body py-3">
+
+                        <div class="d-flex align-items-center gap-3">
+
+                            <div class="rounded-circle bg-info-subtle text-info
+                                        d-flex align-items-center justify-content-center"
+                                style="width: 42px; height: 42px;">
+
+                                <i class="bi bi-link-45deg"></i>
+                            </div>
+
+                            <div>
+                                <div class="small text-muted">Fusões</div>
+                                <div class="fw-bold fs-5">{{ $fusions->count() }}</div>
+                            </div>
+
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="row g-3">
+
+            {{-- ================================================================
+                COLUNA ESQUERDA — CABOS
+            ================================================================= --}}
+
+            <div class="col-12 col-xl-3 ftth-column">
+
+                <div class="card ftth-card shadow-sm mb-3">
+
+                    <div
+                        class="card-header bgc-primary text-white
+                                d-flex justify-content-between align-items-center">
+
                         <div class="fw-bold">
+                            <i class="bi bi-bezier2 me-1"></i>
                             Cabos
+
+                            <span class="badge bg-light text-dark ms-1">
+                                {{ $cables->count() }}
+                            </span>
                         </div>
+
                         @can('ftth.create')
-                            <button class="btn btn-sm dcm-btn-primary" data-bs-toggle="modal" data-bs-target="#modalCable">
+                            <button type="button" class="btn btn-sm btn-light ftth-action-button" data-bs-toggle="modal"
+                                data-bs-target="#modalCable" title="Cadastrar cabo" aria-label="Cadastrar cabo">
+
                                 <i class="bi bi-plus-lg"></i>
                             </button>
                         @endcan
+
                     </div>
 
                     <div class="card-body p-0">
 
-                        <table class="table table-hover table-sm align-middle mb-0">
+                        <div class="table-responsive">
 
-                            <thead class="table-light">
-                                <tr>
-                                    <th>Descrição</th>
-                                    <th>Conexão</th>
-                                    <th width="60" class="text-end"></th>
-                                </tr>
-                            </thead>
+                            <table class="table table-hover table-sm align-middle mb-0">
 
-                            <tbody>
-
-                                @forelse ($cables as $cable)
-                                    <tr style="border-left: 4px solid {{ $cable->color }}">
-
-                                        {{-- INFO --}}
-                                        <td class="fw-semibold">
-                                            <span style="color: {{ $cable->color }}; cursor: pointer;"
-                                                onclick="copyColor('{{ $cable->color }}')">
-                                                .
-                                            </span>
-                                            {{ $cable->info }}
-                                        </td>
-
-                                        {{-- CONEXÃO --}}
-                                        <td>
-
-                                            @if ($cable->input_fiber_box_id == $box->id)
-                                                @if ($cable->output_fiber_box_id)
-                                                    <a href="{{ route('fiberbox.show', $cable->output_fiber_box_id) }}">
-                                                        <span class="badge bg-secondary">
-                                                            {{ $cable->outputFiberBox->info ?? '' }}
-                                                        </span>
-                                                    </a>
-                                                @endif
-                                            @else
-                                                @if ($cable->input_fiber_box_id)
-                                                    <a href="{{ route('fiberbox.show', $cable->input_fiber_box_id) }}">
-                                                        <span class="badge bg-secondary">
-                                                            {{ $cable->inputFiberBox->info ?? '' }}
-                                                        </span>
-                                                    </a>
-                                                @endif
-                                            @endif
-                                        </td>
-
-                                        {{-- AÇÕES --}}
-                                        <td class="text-end">
-                                            @can('ftth.delete')
-                                                <button class="btn btn-sm btn-outline-danger"
-                                                    onclick="openConfirmModal(
-                                                        '{{ route('cable.destroy', $cable->id) }}',
-                                                        'Tem certeza que deseja excluir este cabo?',
-                                                        'Essa alteração não poderá ser revertida.',
-                                                        'DELETE'
-                                                    )">
-                                                    <i class="bi bi-trash"></i>
-                                                </button>
-                                            @endcan
-                                        </td>
-
-                                    </tr>
-                                @empty
-
+                                <thead class="table-light">
                                     <tr>
-                                        <td colspan="3" class="text-center text-muted py-3">
-                                            Nenhum cabo cadastrado
-                                        </td>
+                                        <th class="ps-3">Descrição</th>
+                                        <th>Conexão</th>
+                                        <th width="55" class="text-end pe-3">
+                                            Ações
+                                        </th>
                                     </tr>
-                                @endforelse
+                                </thead>
 
-                            </tbody>
+                                <tbody>
 
-                        </table>
+                                    @forelse ($cables as $cable)
 
-                    </div>
-                </div>
+                                        <tr style="border-left: 5px solid {{ $cable->color ?: '#6c757d' }}">
 
+                                            {{-- DESCRIÇÃO --}}
+                                            <td class="ps-3">
 
+                                                <div class="d-flex align-items-center gap-2">
 
-            </div>
+                                                    <span class="cable-color-indicator"
+                                                        style="background-color: {{ $cable->color ?: '#6c757d' }}"
+                                                        onclick="copyColor('{{ $cable->color ?: '#6c757d' }}')"
+                                                        title="Copiar cor {{ $cable->color }}">
+                                                    </span>
 
-            {{-- FIBRAS --}}
-            <div class="col-md-5">
+                                                    <div>
 
-                <div class="card">
-                    <div class="card-header d-flex justify-content-between align-items-center bgc-primary">
-                        Bandeja de fibra
-                        <button class="btn btn-sm dcm-btn-primary" data-bs-toggle="modal" data-bs-target="#modalFiber">
-                            <i class="bi bi-plus-lg"></i>
-                        </button>
-                    </div>
+                                                        <div class="fw-semibold">
+                                                            {{ $cable->info ?: 'Cabo sem descrição' }}
+                                                        </div>
 
-                    <div class="card-body p-0">
+                                                        @if ($cable->number_fiber)
+                                                            <div class="small text-muted">
+                                                                {{ $cable->number_fiber }} fibras
+                                                            </div>
+                                                        @endif
 
-                        <table class="table table-sm table-hover align-middle mb-0">
-
-                            <thead class="table-light">
-                                <tr>
-                                    <th>Fibra</th>
-                                    <th>Fusão</th>
-                                    <th>Status</th>
-                                    <th>Sinal</th>
-                                    <th class="text-end"></th>
-                                </tr>
-                            </thead>
-
-                            <tbody>
-
-                                @foreach ($fibers as $fiber)
-                                    @php
-                                        $num = getFiberNumber($fiber->fiber_identification);
-                                        $bg = $fiberColors[$num] ?? '#f8f9fa';
-                                        $text = getTextColor($bg);
-                                    @endphp
-
-                                    <tr class="fiber-row">
-
-                                        {{-- FIBRA --}}
-                                        <td
-                                            style="background:{{ $bg }}; color:{{ $text }}; font-weight:600;">
-                                            {{ $fiber->fiber_identification }}
-                                        </td>
-
-                                        {{-- FUSÃO --}}
-                                        <td style="padding:0;">
-
-                                            {{-- SPLITTER --}}
-                                            @if ($fiber->splinter)
-                                                <div class="p-2 border-bottom small">
-                                                    <i class="bi bi-diagram-3"></i>
-                                                    {{ $fiber->splinter->name }}
-                                                    ({{ $fiber->splinter->loss->type }})
-                                                </div>
-                                            @endif
-
-                                            {{-- FUSÕES --}}
-                                            @foreach ($fiber->fusions1 as $fusion)
-                                                @php
-                                                    $numFusion = getFiberNumber($fusion->fiber2->fiber_identification);
-                                                    $bgFusion = $fiberColors[$numFusion] ?? '#f8f9fa';
-                                                    $textFusion = getTextColor($bgFusion);
-                                                @endphp
-
-                                                <div class="d-flex align-items-center justify-content-between"
-                                                    style="
-                                                            background: {{ $bgFusion }};
-                                                            color: {{ $textFusion }};
-                                                            width: 100%;
-                                                            padding: 8px 10px;
-                                                            border-left: 4px solid rgba(0,0,0,0.15);
-                                                        ">
-
-                                                    {{ $fusion->fiber2->fiber_identification }}
+                                                    </div>
 
                                                 </div>
-                                            @endforeach
 
-                                        </td>
+                                            </td>
 
-                                        {{-- STATUS --}}
-                                        <td>
-                                            <span class="badge bg-secondary">
-                                                {{ __('status.' . $fiber->status) }}
-                                            </span>
-                                        </td>
+                                            {{-- CONEXÃO --}}
+                                            <td>
 
-                                        {{-- SINAL --}}
-                                        <td>
-                                            {{ $fiber->optical_power }} dBm
-                                        </td>
+                                                @if ($cable->input_fiber_box_id == $box->id)
+                                                    @if ($cable->output_fiber_box_id)
+                                                        <a href="{{ route('fiberbox.show', $cable->output_fiber_box_id) }}"
+                                                            class="text-decoration-none"
+                                                            title="{{ $cable->outputFiberBox->info ?? 'Abrir caixa' }}">
 
-                                        {{-- AÇÕES --}}
-                                        <td class="text-end">
-                                            <div class="d-flex justify-content-end gap-1">
+                                                            <span class="badge bg-secondary connection-badge">
+                                                                <i class="bi bi-box-arrow-right me-1"></i>
+                                                                {{ $cable->outputFiberBox->info ?? 'Caixa não encontrada' }}
+                                                            </span>
+                                                        </a>
+                                                    @else
+                                                        <span class="badge bg-light text-muted border">
+                                                            <i class="bi bi-dash-circle me-1"></i>
+                                                            Sem destino
+                                                        </span>
+                                                    @endif
+                                                @else
+                                                    @if ($cable->input_fiber_box_id)
+                                                        <a href="{{ route('fiberbox.show', $cable->input_fiber_box_id) }}"
+                                                            class="text-decoration-none"
+                                                            title="{{ $cable->inputFiberBox->info ?? 'Abrir caixa' }}">
 
-                                                {{-- EXCLUIR FIBRA --}}
-                                                @if ($fiber->status == 'unused')
-                                                    <button class="btn btn-sm btn-outline-danger"
-                                                        onclick="openConfirmModal(
-                                                        '{{ route('fiber.destroy', $fiber->id) }}',
-                                                        'Tem certeza que deseja excluir esta fibra?',
-                                                        'Essa alteração não poderá ser revertida.',
-                                                        'DELETE'
-                                                    )">
-                                                        <i class="bi bi-trash"></i>
-                                                    </button>
+                                                            <span class="badge bg-secondary connection-badge">
+                                                                <i class="bi bi-box-arrow-in-right me-1"></i>
+                                                                {{ $cable->inputFiberBox->info ?? 'Caixa não encontrada' }}
+                                                            </span>
+                                                        </a>
+                                                    @else
+                                                        <span class="badge bg-light text-muted border">
+                                                            <i class="bi bi-dash-circle me-1"></i>
+                                                            Sem origem
+                                                        </span>
+                                                    @endif
                                                 @endif
-                                                {{-- EDITAR SINAL --}}
-                                                <button type="button" class="btn btn-sm btn-warning btn-edit-signal"
-                                                    data-id="{{ $fiber->id }}"
-                                                    data-fiber="{{ $fiber->fiber_identification }}"
-                                                    data-signal="{{ $fiber->optical_power }}">
-                                                    <i class="bi bi-pencil"></i>
-                                                </button>
-                                            </div>
-                                        </td>
 
-                                    </tr>
-                                @endforeach
+                                            </td>
 
-                            </tbody>
-
-                        </table>
-
-                    </div>
-                </div>
-
-            </div>
-
-
-            <div class="col-md-4">
-
-
-                {{-- Splineters --}}
-                <div class="card mb-3 shadow-sm border-0">
-
-                    <div class="card-header d-flex justify-content-between align-items-center bgc-primary">
-                        <div class="fw-bold">
-                            Splinters
-                        </div>
-                        @can('ftth.create')
-                            <button class="btn btn-sm dcm-btn-primary" data-bs-toggle="modal" data-bs-target="#modalSplinter">
-                                <i class="bi bi-plus-lg"></i>
-                            </button>
-                        @endcan
-                    </div>
-
-                    <div class="card-body p-0">
-
-                        <table class="table table-hover table-sm align-middle mb-0">
-
-                            <thead class="table-light">
-                                <tr>
-                                    <th>Nome</th>
-                                    <th>Tipo</th>
-                                    <th>Fibra</th>
-                                    <th>Splinter</th>
-                                    <th>Sinal</th>
-                                    <th width="60" class="text-end"></th>
-                                </tr>
-                            </thead>
-
-                            <tbody>
-
-                                @forelse ($splinters as $spl)
-                                    <tr>
-
-                                        {{-- NOME --}}
-                                        <td class="fw-semibold">
-                                            {{ $spl->name }}
-                                        </td>
-
-                                        {{-- TIPO --}}
-                                        <td>
-                                            <span class="badge bg-secondary">
-                                                {{ __('fiber.' . $spl->type) }}
-                                            </span>
-                                        </td>
-
-                                        {{-- FIBRA --}}
-                                        <td>
-                                            <small class="text-muted">
-                                                {{ $spl->inputCable->fiber_identification ?? '-' }}
-                                            </small>
-                                        </td>
-
-                                        {{-- LOSS --}}
-                                        <td>
-                                            <span class="badge bg-dark">
-                                                {{ $spl->loss->type }}
-                                            </span>
-                                        </td>
-
-                                        {{-- SINAL --}}
-                                        <td>
-                                            @php
-                                                $power = $spl->inputCable->optical_power ?? 0;
-                                            @endphp
-                                            {{ $power }}
-
-                                            @if ($spl->loss->splinter_type == 'balanced')
-                                                {{ $power - $spl->loss->loss1 }} dBm
-                                            @else
-                                                {{ $power - $spl->loss->loss1 }} dBm
-                                                {{ $power - $spl->loss->loss2 }} dBm
-                                            @endif
-                                        </td>
-
-                                        {{-- AÇÕES --}}
-                                        <td class="text-end">
-                                            @can('ftth.delete')
-                                                <button class="btn btn-sm btn-outline-danger"
-                                                    onclick="openConfirmModal(
-                                                        '{{ route('splinter.destroy', $spl->id) }}',
-                                                        'Tem certeza que deseja excluir este splinter?',
-                                                        'Essa alteração não poderá ser revertida.',
-                                                        'DELETE'
-                                                    )">
-                                                    <i class="bi bi-trash"></i>
-                                                </button>
-                                            @endcan
-                                        </td>
-
-                                    </tr>
-
-                                @empty
-
-                                    <tr>
-                                        <td colspan="6" class="text-center text-muted py-3">
-                                            Nenhum splinter cadastrado
-                                        </td>
-                                    </tr>
-                                @endforelse
-
-                            </tbody>
-
-                        </table>
-
-                    </div>
-                </div>
-
-                {{-- FUSÕES --}}
-                <div class="card">
-                    <div class="card-header d-flex justify-content-between align-items-center bgc-primary">
-                        Fusões
-                        @can('ftth.create')
-                            <button class="btn btn-sm dcm-btn-primary" data-bs-toggle="modal" data-bs-target="#modalFusion">
-                                <i class="bi bi-plus-lg"></i>
-                            </button>
-                        @endcan
-                    </div>
-
-                    <div class="card-body p-0">
-
-                        <table class="table table-sm table-hover align-middle mb-0">
-
-                            <thead class="table-light">
-                                <tr>
-                                    <th>Fibra 1</th>
-                                    <th>Fibra 2</th>
-                                    <th class="text-end" style="width: 90px;"></th>
-                                </tr>
-                            </thead>
-
-                            <tbody>
-
-                                @forelse ($fusions as $fusion)
-                                    @php
-                                        $num1 = getFiberNumber($fusion->fiber1->fiber_identification);
-                                        $bg1 = $fiberColors[$num1] ?? '#f8f9fa';
-                                        $text1 = getTextColor($bg1);
-
-                                        $num2 = getFiberNumber($fusion->fiber2->fiber_identification);
-                                        $bg2 = $fiberColors[$num2] ?? '#f8f9fa';
-                                        $text2 = getTextColor($bg2);
-                                    @endphp
-
-                                    <tr>
-
-                                        {{-- FIBRA 1 --}}
-                                        <td
-                                            style="background:{{ $bg1 }}; color:{{ $text1 }}; font-weight:600;">
-                                            {{ $fusion->fiber1->fiber_identification }}
-                                        </td>
-
-                                        {{-- FIBRA 2 --}}
-                                        <td
-                                            style="background:{{ $bg2 }}; color:{{ $text2 }}; font-weight:600;">
-                                            {{ $fusion->fiber2->fiber_identification }}
-                                        </td>
-
-                                        {{-- AÇÕES --}}
-                                        <td class="text-end">
-
-                                            <div class="d-inline-flex align-items-center gap-2">
-
-                                                {{-- INFO (OLHO) --}}
-                                                @if ($fusion->info)
-                                                    <i class="bi bi-eye-fill text-primary"
-                                                        style="cursor:pointer; font-size: 1.1rem;"
-                                                        data-bs-toggle="tooltip" data-bs-placement="top"
-                                                        title="{{ $fusion->info }}">
-                                                    </i>
-                                                @endif
+                                            {{-- AÇÕES --}}
+                                            <td class="text-end pe-3">
 
                                                 @can('ftth.delete')
-                                                    <button class="btn btn-sm btn-outline-danger"
+                                                    <button type="button"
+                                                        class="btn btn-sm btn-outline-danger ftth-action-button"
                                                         onclick="openConfirmModal(
-                                                        '{{ route('fusion.destroy', $fusion->id) }}',
-                                                        'Tem certeza que deseja excluir esta fusão?',
-                                                        'Essa alteração não poderá ser revertida.',
-                                                        'DELETE'
-                                                    )">
+                                                            '{{ route('cable.destroy', $cable->id) }}',
+                                                            'Tem certeza que deseja excluir este cabo?',
+                                                            'Essa alteração não poderá ser revertida.',
+                                                            'DELETE'
+                                                        )"
+                                                        title="Excluir cabo" aria-label="Excluir cabo">
+
                                                         <i class="bi bi-trash"></i>
                                                     </button>
                                                 @endcan
-                                            </div>
-                                        </td>
-                                    </tr>
-                                @empty
 
-                                    <tr>
-                                        <td colspan="3" class="text-center text-muted py-3">
-                                            Nenhuma fusão cadastrada
-                                        </td>
-                                    </tr>
-                                @endforelse
+                                            </td>
 
-                            </tbody>
+                                        </tr>
 
-                        </table>
+                                    @empty
+
+                                        <tr>
+                                            <td colspan="3" class="empty-state text-center text-muted">
+
+                                                <i class="bi bi-bezier2 d-block mb-2"></i>
+
+                                                <div class="fw-semibold">
+                                                    Nenhum cabo cadastrado
+                                                </div>
+
+                                                <div class="small">
+                                                    Use o botão + para cadastrar.
+                                                </div>
+
+                                            </td>
+                                        </tr>
+
+                                    @endforelse
+
+                                </tbody>
+
+                            </table>
+
+                        </div>
 
                     </div>
+
+                </div>
+
+            </div>
+
+            {{-- ================================================================
+                COLUNA CENTRAL — FIBRAS
+            ================================================================= --}}
+
+            <div class="col-12 col-xl-5 ftth-column">
+
+                <div class="card ftth-card shadow-sm mb-3">
+
+                    <div
+                        class="card-header bgc-primary text-white
+                                d-flex justify-content-between align-items-center">
+
+                        <div class="fw-bold">
+                            <i class="bi bi-list-ul me-1"></i>
+                            Bandeja de fibras
+
+                            <span class="badge bg-light text-dark ms-1">
+                                {{ $fibers->count() }}
+                            </span>
+                        </div>
+
+                        @can('ftth.create')
+                            <button type="button" class="btn btn-sm btn-light ftth-action-button" data-bs-toggle="modal"
+                                data-bs-target="#modalFiber" title="Cadastrar fibras" aria-label="Cadastrar fibras">
+
+                                <i class="bi bi-plus-lg"></i>
+                            </button>
+                        @endcan
+
+                    </div>
+
+                    <div class="card-body p-0">
+
+                        <div class="table-responsive">
+
+                            <table class="table table-sm table-hover align-middle mb-0">
+
+                                <thead class="table-light">
+                                    <tr>
+                                        <th class="ps-3">Fibra</th>
+                                        <th>Conexões</th>
+                                        <th>Status</th>
+                                        <th>Sinal</th>
+                                        <th width="85" class="text-end pe-3">
+                                            Ações
+                                        </th>
+                                    </tr>
+                                </thead>
+
+                                <tbody>
+
+                                    @forelse ($fibers as $fiber)
+
+                                        @php
+                                            $fiberNumber = $getFiberNumber($fiber->fiber_identification);
+                                            $fiberBackground = $fiberColors[$fiberNumber] ?? '#f8f9fa';
+                                            $fiberTextColor = $getTextColor($fiberBackground);
+
+                                            $statusClass = $getStatusClass($fiber->status);
+                                            $signalClass = $getSignalClass($fiber->optical_power);
+                                        @endphp
+
+                                        <tr class="fiber-row">
+
+                                            {{-- FIBRA --}}
+                                            <td class="fiber-color-cell ps-3"
+                                                style="
+                                                    background: {{ $fiberBackground }};
+                                                    color: {{ $fiberTextColor }};
+                                                    font-weight: 700;
+                                                ">
+
+                                                <div class="d-flex align-items-center gap-2">
+
+                                                    <span>
+                                                        {{ $fiber->fiber_identification }}
+                                                    </span>
+
+                                                </div>
+
+                                            </td>
+
+                                            {{-- FUSÃO / SPLITTER --}}
+                                            <td class="p-1">
+
+                                                @if ($fiber->splinter)
+                                                    <div class="rounded border bg-light p-2 mb-1 small">
+
+                                                        <div class="fw-semibold">
+
+                                                            <i class="bi bi-diagram-3 text-warning me-1"></i>
+
+                                                            {{ $fiber->splinter->name }}
+
+                                                        </div>
+
+                                                        <div class="text-muted mt-1">
+
+                                                            {{ $fiber->splinter->loss->type ?? 'Tipo não informado' }}
+
+                                                        </div>
+
+                                                    </div>
+                                                @endif
+
+                                                @foreach ($fiber->fusions1 as $fusion)
+                                                    @php
+                                                        $fusionFiberName =
+                                                            $fusion->fiber2->fiber_identification ?? null;
+
+                                                        $fusionNumber = $getFiberNumber($fusionFiberName);
+
+                                                        $fusionBackground = $fiberColors[$fusionNumber] ?? '#f8f9fa';
+
+                                                        $fusionTextColor = $getTextColor($fusionBackground);
+                                                    @endphp
+
+                                                    <div class="fusion-color-item px-2 py-2 mb-1"
+                                                        style="
+                                                            background: {{ $fusionBackground }};
+                                                            color: {{ $fusionTextColor }};
+                                                            border-left: 4px solid rgba(0, 0, 0, 0.2);
+                                                        ">
+
+                                                        <i class="bi bi-link-45deg me-1"></i>
+
+                                                        {{ $fusionFiberName ?? 'Fibra não encontrada' }}
+
+                                                    </div>
+                                                @endforeach
+
+                                                @foreach ($fiber->fusions2 ?? [] as $fusion)
+                                                    @php
+                                                        $fusionFiberName =
+                                                            $fusion->fiber1->fiber_identification ?? null;
+
+                                                        $fusionNumber = $getFiberNumber($fusionFiberName);
+
+                                                        $fusionBackground = $fiberColors[$fusionNumber] ?? '#f8f9fa';
+
+                                                        $fusionTextColor = $getTextColor($fusionBackground);
+                                                    @endphp
+
+                                                    <div class="fusion-color-item px-2 py-2 mb-1"
+                                                        style="
+                                                            background: {{ $fusionBackground }};
+                                                            color: {{ $fusionTextColor }};
+                                                            border-left: 4px solid rgba(0, 0, 0, 0.2);
+                                                        ">
+
+                                                        <i class="bi bi-link-45deg me-1"></i>
+
+                                                        {{ $fusionFiberName ?? 'Fibra não encontrada' }}
+
+                                                    </div>
+                                                @endforeach
+
+                                                @if (!$fiber->splinter && $fiber->fusions1->isEmpty() && (!isset($fiber->fusions2) || $fiber->fusions2->isEmpty()))
+                                                    <span class="small text-muted ps-2">
+                                                        Sem conexão
+                                                    </span>
+                                                @endif
+
+                                            </td>
+
+                                            {{-- STATUS --}}
+                                            <td>
+
+                                                <span class="badge bg-{{ $statusClass }}">
+                                                    {{ __('status.' . $fiber->status) }}
+                                                </span>
+
+                                            </td>
+
+                                            {{-- SINAL --}}
+                                            <td>
+
+                                                @if ($fiber->optical_power !== null && $fiber->optical_power !== '')
+                                                    <span
+                                                        class="badge signal-badge
+                                                        bg-{{ $signalClass }}-subtle
+                                                        text-{{ $signalClass }}
+                                                        border border-{{ $signalClass }}-subtle">
+
+                                                        <i class="bi bi-reception-4 me-1"></i>
+
+                                                        {{ number_format((float) $fiber->optical_power, 2, ',', '.') }}
+                                                        dBm
+
+                                                    </span>
+                                                @else
+                                                    <span
+                                                        class="badge signal-badge
+                                                        bg-secondary-subtle text-secondary border">
+
+                                                        Sem sinal
+                                                    </span>
+                                                @endif
+
+                                            </td>
+
+                                            {{-- AÇÕES --}}
+                                            <td class="text-end pe-3">
+
+                                                <div class="d-inline-flex justify-content-end gap-1">
+
+                                                    @if ($fiber->status === 'unused')
+                                                        @can('ftth.delete')
+                                                            <button type="button"
+                                                                class="btn btn-sm btn-outline-danger ftth-action-button"
+                                                                onclick="openConfirmModal(
+                                                                    '{{ route('fiber.destroy', $fiber->id) }}',
+                                                                    'Tem certeza que deseja excluir esta fibra?',
+                                                                    'Essa alteração não poderá ser revertida.',
+                                                                    'DELETE'
+                                                                )"
+                                                                title="Excluir fibra" aria-label="Excluir fibra">
+
+                                                                <i class="bi bi-trash"></i>
+                                                            </button>
+                                                        @endcan
+                                                    @endif
+
+                                                    @can('ftth.update')
+                                                        <button type="button"
+                                                            class="btn btn-sm btn-outline-warning
+                                                                ftth-action-button btn-edit-signal"
+                                                            data-id="{{ $fiber->id }}"
+                                                            data-fiber="{{ $fiber->fiber_identification }}"
+                                                            data-signal="{{ $fiber->optical_power }}" title="Editar sinal"
+                                                            aria-label="Editar sinal">
+
+                                                            <i class="bi bi-pencil"></i>
+                                                        </button>
+                                                    @endcan
+
+                                                </div>
+
+                                            </td>
+
+                                        </tr>
+
+                                    @empty
+
+                                        <tr>
+
+                                            <td colspan="5" class="empty-state text-center text-muted">
+
+                                                <i class="bi bi-list-ul d-block mb-2"></i>
+
+                                                <div class="fw-semibold">
+                                                    Nenhuma fibra cadastrada
+                                                </div>
+
+                                                <div class="small">
+                                                    Use o botão + para adicionar as fibras.
+                                                </div>
+
+                                            </td>
+
+                                        </tr>
+
+                                    @endforelse
+
+                                </tbody>
+
+                            </table>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            {{-- ================================================================
+                COLUNA DIREITA — SPLITTERS E FUSÕES
+            ================================================================= --}}
+
+            <div class="col-12 col-xl-4 ftth-column">
+
+                {{-- SPLITTERS --}}
+                <div class="card ftth-card shadow-sm mb-3">
+
+                    <div
+                        class="card-header bgc-primary text-white
+                                d-flex justify-content-between align-items-center">
+
+                        <div class="fw-bold">
+                            <i class="bi bi-diagram-3 me-1"></i>
+                            Splitters
+
+                            <span class="badge bg-light text-dark ms-1">
+                                {{ $splinters->count() }}
+                            </span>
+                        </div>
+
+                        @can('ftth.create')
+                            <button type="button" class="btn btn-sm btn-light ftth-action-button" data-bs-toggle="modal"
+                                data-bs-target="#modalSplinter" title="Cadastrar splitter" aria-label="Cadastrar splitter">
+
+                                <i class="bi bi-plus-lg"></i>
+                            </button>
+                        @endcan
+
+                    </div>
+
+                    <div class="card-body p-0">
+
+                        <div class="table-responsive">
+
+                            <table class="table table-hover table-sm align-middle mb-0">
+
+                                <thead class="table-light">
+                                    <tr>
+                                        <th class="ps-3">Nome</th>
+                                        <th>Tipo</th>
+                                        <th>Fibra</th>
+                                        <th>Splitter</th>
+                                        <th>Sinal</th>
+                                        <th width="55" class="text-end pe-3">
+                                            Ações
+                                        </th>
+                                    </tr>
+                                </thead>
+
+                                <tbody>
+
+                                    @forelse ($splinters as $spl)
+
+                                        @php
+                                            $inputPower = $spl->inputCable->optical_power ?? null;
+                                            $loss1 = $spl->loss->loss1 ?? 0;
+                                            $loss2 = $spl->loss->loss2 ?? 0;
+                                            $splitterType = $spl->loss->splinter_type ?? null;
+                                        @endphp
+
+                                        <tr>
+
+                                            {{-- NOME --}}
+                                            <td class="ps-3 fw-semibold">
+
+                                                <i class="bi bi-diagram-3 text-warning me-1"></i>
+
+                                                {{ $spl->name }}
+
+                                            </td>
+
+                                            {{-- TIPO --}}
+                                            <td>
+
+                                                <span class="badge bg-secondary">
+                                                    {{ __('fiber.' . $spl->type) }}
+                                                </span>
+
+                                            </td>
+
+                                            {{-- FIBRA --}}
+                                            <td>
+
+                                                @if ($spl->inputCable)
+                                                    <small class="fw-semibold">
+                                                        {{ $spl->inputCable->fiber_identification }}
+                                                    </small>
+                                                @else
+                                                    <small class="text-muted">
+                                                        —
+                                                    </small>
+                                                @endif
+
+                                            </td>
+
+                                            {{-- LOSS --}}
+                                            <td>
+
+                                                <span class="badge bg-dark">
+                                                    {{ $spl->loss->type ?? 'Não informado' }}
+                                                </span>
+
+                                            </td>
+
+                                            {{-- SINAL --}}
+                                            <td class="text-nowrap">
+
+                                                @if ($inputPower !== null)
+                                                    <div class="splitter-signal-line small text-muted">
+
+                                                        Entrada:
+
+                                                        <strong class="text-dark">
+                                                            {{ number_format((float) $inputPower, 2, ',', '.') }}
+                                                            dBm
+                                                        </strong>
+
+                                                    </div>
+
+                                                    @if ($splitterType === 'balanced')
+                                                        <div class="splitter-signal-line small mt-1">
+
+                                                            Saída:
+
+                                                            <strong>
+                                                                {{ number_format((float) $inputPower - (float) $loss1, 2, ',', '.') }}
+                                                                dBm
+                                                            </strong>
+
+                                                        </div>
+                                                    @else
+                                                        <div class="splitter-signal-line small mt-1">
+
+                                                            Saída 1:
+
+                                                            <strong>
+                                                                {{ number_format((float) $inputPower - (float) $loss1, 2, ',', '.') }}
+                                                                dBm
+                                                            </strong>
+
+                                                        </div>
+
+                                                        <div class="splitter-signal-line small">
+
+                                                            Saída 2:
+
+                                                            <strong>
+                                                                {{ number_format((float) $inputPower - (float) $loss2, 2, ',', '.') }}
+                                                                dBm
+                                                            </strong>
+
+                                                        </div>
+                                                    @endif
+                                                @else
+                                                    <span
+                                                        class="badge bg-secondary-subtle
+                                                        text-secondary border">
+
+                                                        Sem sinal
+                                                    </span>
+                                                @endif
+
+                                            </td>
+
+                                            {{-- AÇÕES --}}
+                                            <td class="text-end pe-3">
+
+                                                @can('ftth.delete')
+                                                    <button type="button"
+                                                        class="btn btn-sm btn-outline-danger ftth-action-button"
+                                                        onclick="openConfirmModal(
+                                                            '{{ route('splinter.destroy', $spl->id) }}',
+                                                            'Tem certeza que deseja excluir este splitter?',
+                                                            'Essa alteração não poderá ser revertida.',
+                                                            'DELETE'
+                                                        )"
+                                                        title="Excluir splitter" aria-label="Excluir splitter">
+
+                                                        <i class="bi bi-trash"></i>
+                                                    </button>
+                                                @endcan
+
+                                            </td>
+
+                                        </tr>
+
+                                    @empty
+
+                                        <tr>
+
+                                            <td colspan="6" class="empty-state text-center text-muted">
+
+                                                <i class="bi bi-diagram-3 d-block mb-2"></i>
+
+                                                <div class="fw-semibold">
+                                                    Nenhum splitter cadastrado
+                                                </div>
+
+                                                <div class="small">
+                                                    Use o botão + para cadastrar.
+                                                </div>
+
+                                            </td>
+
+                                        </tr>
+
+                                    @endforelse
+
+                                </tbody>
+
+                            </table>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                {{-- FUSÕES --}}
+                <div class="card ftth-card shadow-sm mb-3">
+
+                    <div
+                        class="card-header bgc-primary text-white
+                                d-flex justify-content-between align-items-center">
+
+                        <div class="fw-bold">
+                            <i class="bi bi-link-45deg me-1"></i>
+                            Fusões
+
+                            <span class="badge bg-light text-dark ms-1">
+                                {{ $fusions->count() }}
+                            </span>
+                        </div>
+
+                        @can('ftth.create')
+                            <button type="button" class="btn btn-sm btn-light ftth-action-button" data-bs-toggle="modal"
+                                data-bs-target="#modalFusion" title="Cadastrar fusão" aria-label="Cadastrar fusão">
+
+                                <i class="bi bi-plus-lg"></i>
+                            </button>
+                        @endcan
+
+                    </div>
+
+                    <div class="card-body p-0">
+
+                        <div class="table-responsive">
+
+                            <table class="table table-sm table-hover align-middle mb-0">
+
+                                <thead class="table-light">
+                                    <tr>
+                                        <th class="ps-3">Fibra 1</th>
+                                        <th>Fibra 2</th>
+                                        <th width="90" class="text-end pe-3">
+                                            Ações
+                                        </th>
+                                    </tr>
+                                </thead>
+
+                                <tbody>
+
+                                    @forelse ($fusions as $fusion)
+                                        @php
+                                            $fiberName1 = $fusion->fiber1->fiber_identification ?? null;
+
+                                            $fiberNumber1 = $getFiberNumber($fiberName1);
+
+                                            $fiberBackground1 = $fiberColors[$fiberNumber1] ?? '#f8f9fa';
+
+                                            $fiberText1 = $getTextColor($fiberBackground1);
+
+                                            $fiberName2 = $fusion->fiber2->fiber_identification ?? null;
+
+                                            $fiberNumber2 = $getFiberNumber($fiberName2);
+
+                                            $fiberBackground2 = $fiberColors[$fiberNumber2] ?? '#f8f9fa';
+
+                                            $fiberText2 = $getTextColor($fiberBackground2);
+                                        @endphp
+
+                                        <tr>
+
+                                            {{-- FIBRA 1 --}}
+                                            <td class="ps-3"
+                                                style="
+                                                    background: {{ $fiberBackground1 }};
+                                                    color: {{ $fiberText1 }};
+                                                    font-weight: 700;
+                                                ">
+
+                                                {{ $fiberName1 ?? 'Fibra não encontrada' }}
+
+                                            </td>
+
+                                            {{-- FIBRA 2 --}}
+                                            <td
+                                                style="
+                                                    background: {{ $fiberBackground2 }};
+                                                    color: {{ $fiberText2 }};
+                                                    font-weight: 700;
+                                                ">
+
+                                                {{ $fiberName2 ?? 'Fibra não encontrada' }}
+
+                                            </td>
+
+                                            {{-- AÇÕES --}}
+                                            <td class="text-end pe-3">
+
+                                                <div class="d-inline-flex align-items-center gap-1">
+
+                                                    @if ($fusion->info)
+                                                        <button type="button"
+                                                            class="btn btn-sm btn-outline-primary ftth-action-button"
+                                                            data-bs-toggle="tooltip" data-bs-placement="top"
+                                                            title="{{ $fusion->info }}"
+                                                            aria-label="Informações da fusão">
+
+                                                            <i class="bi bi-eye"></i>
+                                                        </button>
+                                                    @endif
+
+                                                    @can('ftth.delete')
+                                                        <button type="button"
+                                                            class="btn btn-sm btn-outline-danger ftth-action-button"
+                                                            onclick="openConfirmModal(
+                                                                '{{ route('fusion.destroy', $fusion->id) }}',
+                                                                'Tem certeza que deseja excluir esta fusão?',
+                                                                'Essa alteração não poderá ser revertida.',
+                                                                'DELETE'
+                                                            )"
+                                                            title="Excluir fusão" aria-label="Excluir fusão">
+
+                                                            <i class="bi bi-trash"></i>
+                                                        </button>
+                                                    @endcan
+
+                                                </div>
+
+                                            </td>
+
+                                        </tr>
+
+                                    @empty
+
+                                        <tr>
+
+                                            <td colspan="3" class="empty-state text-center text-muted">
+
+                                                <i class="bi bi-link-45deg d-block mb-2"></i>
+
+                                                <div class="fw-semibold">
+                                                    Nenhuma fusão cadastrada
+                                                </div>
+
+                                                <div class="small">
+                                                    Use o botão + para cadastrar.
+                                                </div>
+
+                                            </td>
+
+                                        </tr>
+                                    @endforelse
+
+                                </tbody>
+
+                            </table>
+
+                        </div>
+
+                    </div>
+
                 </div>
 
             </div>
@@ -522,271 +1124,31 @@
 
     </div>
 
-    {{-- MODAIS --}}
+    {{-- =====================================================================
+        MODAIS
+    ====================================================================== --}}
+
     @include('ftth.modals.cable')
     @include('ftth.modals.fiber')
     @include('ftth.modals.splinter')
     @include('ftth.modals.fusion')
-    {{-- @include('ftth.modals.editfiber') --}}
     @include('ftth.modals.editSignal')
 
+    {{-- =====================================================================
+        JAVASCRIPT
+    ====================================================================== --}}
+
+@push('scripts')
     <script>
-        document.addEventListener("DOMContentLoaded", function() {
-
-            let cableSelect = document.getElementById("cable_select");
-            let container = document.getElementById("fibers_container");
-
-            let fibersAll = @json($allFibers);
-            let currentBoxId = {{ $box->id }};
-
-            if (cableSelect && container) {
-
-                cableSelect.addEventListener("change", function() {
-
-                    let selected = this.options[this.selectedIndex];
-
-                    let fibers = parseInt(selected?.dataset?.fibers || 0);
-                    let info = selected?.dataset?.info || 'CABO';
-
-                    container.innerHTML = "";
-
-                    if (!fibers) return;
-
-                    for (let i = 1; i <= fibers; i++) {
-
-                        let fiberName = info + "-F-" + String(i).padStart(2, '0');
-
-                        // NÃO DUPLICAR NA BOX
-                        let exists = fibersAll.find(f =>
-                            f.fiber_identification === fiberName &&
-                            f.fiber_box_id == currentBoxId &&
-                            f.deleted_at === null
-                        );
-
-                        if (exists) continue;
-
-                        // BUSCA SINAL EM OUTRA BOX
-                        let mirror = fibersAll.find(f =>
-                            f.fiber_identification === fiberName &&
-                            f.fiber_box_id != currentBoxId &&
-                            f.optical_power !== null
-                        );
-
-                        let power = mirror ? mirror.optical_power : '';
-
-                        container.innerHTML += `
-    <div class="row mb-2 align-items-center fiber-item">
-
-        <div class="col-md-5">
-            <input type="hidden" name="fibers[${i}][fiber_identification]" value="${fiberName}">
-            <input class="form-control shadow-sm" value="${fiberName}" disabled>
-        </div>
-
-        <div class="col-md-5">
-            <input type="number" step="0.01"
-                name="fibers[${i}][optical_power]"
-                class="form-control shadow-sm"
-                value="${power}">
-        </div>
-        
-<div class="col-md-1 d-flex align-items-center p-0">
-<button type="button" 
-        class="btn btn-sm btn-outline-danger remove-fiber"
-        style="padding: 4px 8px;">
-    <i class="bi bi-dash-lg"></i>
-</button>
-        </div>
-
-    </div>
-`;
-                    }
-
-                });
-
-            }
-
-        });
-
-        document.addEventListener('click', function(e) {
-
-            if (e.target.closest('.remove-fiber')) {
-                let row = e.target.closest('.fiber-item');
-                if (row) row.remove();
-            }
-
-        });
+        window.ftthBoxData = {
+            fibersAll: @json($allFibers),
+            currentBoxId: @json($box->id),
+            fiberColors: @json($fiberColors),
+            updateSignalUrl: @json(url('/ftth/fiber-box/updatesignal')),
+            fiberUpdateUrl: @json(route('fiber.update', ':id')),
+        };
     </script>
 
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
-
-            let fiberColors = @json($fiberColors);
-
-            function getFiberNumber(name) {
-                if (!name) return null;
-                let match = name.match(/(\d+)$/);
-                return match ? parseInt(match[1]) : null;
-            }
-
-            function paintSelect(selectEl) {
-
-                if (!selectEl || selectEl.selectedIndex < 0) return;
-
-                let option = selectEl.options[selectEl.selectedIndex];
-                if (!option) return;
-
-                let text = option.text;
-
-                let num = getFiberNumber(text);
-                let color = fiberColors[num] || '#ffffff';
-
-                selectEl.style.backgroundColor = color;
-                selectEl.style.color =
-                    (color === '#ffffff' || color === '#ffff00') ? '#000' : '#fff';
-            }
-
-            let fiber1 = document.getElementById('fiber1');
-            let fiber2 = document.getElementById('fiber2');
-
-
-            // -----------------------------
-            // FIBER 1
-            // -----------------------------
-            if (fiber1 && fiber2) {
-
-                fiber1.addEventListener('change', function() {
-
-                    let selected = this.value;
-
-                    Array.from(fiber2.options).forEach(option => {
-                        option.disabled = (option.value === selected);
-                    });
-
-                    paintSelect(this);
-                });
-
-                paintSelect(fiber1);
-            }
-
-            // -----------------------------
-            // FIBER 2
-            // -----------------------------
-            if (fiber2) {
-
-                fiber2.addEventListener('change', function() {
-                    paintSelect(this);
-                });
-
-                paintSelect(fiber2);
-            }
-
-            // -----------------------------
-            // TOOLTIP BOOTSTRAP
-            // -----------------------------
-            if (typeof bootstrap !== 'undefined') {
-
-                let tooltipTriggerList = [].slice.call(
-                    document.querySelectorAll('[data-bs-toggle="tooltip"]')
-                );
-
-                tooltipTriggerList.map(function(el) {
-                    return new bootstrap.Tooltip(el, {
-                        boundary: 'window'
-                    });
-                });
-            }
-
-        });
-
-
-
-        const colorPicker = document.getElementById('colorPicker');
-        const colorHex = document.getElementById('colorHex');
-
-        // Quando escolher no seletor
-        colorPicker.addEventListener('input', () => {
-            colorHex.value = colorPicker.value;
-        });
-
-        // Quando digitar manualmente
-        colorHex.addEventListener('input', () => {
-            if (/^#([0-9A-F]{3}){1,2}$/i.test(colorHex.value)) {
-                colorPicker.value = colorHex.value;
-            }
-        });
-
-        // Valor inicial sincronizado
-        colorHex.value = colorPicker.value;
-
-
-        // Modal editar sinal
-        function openEditFiberModal(id, name, power) {
-
-            let modal = new bootstrap.Modal(document.getElementById('modalEditFiber'));
-
-            document.getElementById('editFiberName').value = name;
-            document.getElementById('editFiberPower').value = power;
-
-            let url = "{{ route('fiber.update', ':id') }}";
-            url = url.replace(':id', id);
-
-            document.getElementById('formEditFiber').action = url;
-
-            modal.show();
-        }
-
-        //Copiar cor do cabo
-
-        function copyColor(color) {
-
-            navigator.clipboard.writeText(color).then(() => {
-                toastr.success("Cor copiada: " + color);
-            }).catch(() => {
-                toastr.error("Erro ao copiar");
-            });
-
-        }
-
-        //
-
-        document.addEventListener('DOMContentLoaded', function() {
-
-            const modalElement = document.getElementById('editSignalModal');
-
-            if (!modalElement) {
-                console.error('Modal editSignalModal não encontrado.');
-                return;
-            }
-
-            const modal = new bootstrap.Modal(modalElement);
-
-            document.querySelectorAll('.btn-edit-signal').forEach(function(btn) {
-
-                btn.addEventListener('click', function() {
-
-                    console.clear();
-
-                    const id = this.dataset.id;
-                    const fiber = this.dataset.fiber;
-                    const signal = this.dataset.signal ?? '';
-
-                    console.log("ID:", id);
-                    console.log("Fibra:", fiber);
-                    console.log("Sinal:", signal);
-
-
-                    document.getElementById('fiber_name').value = fiber;
-                    document.getElementById('old_signal').value = signal;
-
-                    document.getElementById('formEditSignal').action =
-                        "/ftth/fiber-box/updatesignal/" + id;
-
-                    modal.show();
-
-                });
-
-            });
-
-        });
-    </script>
+    <script src="{{ asset('js/ftthbox.js') }}"></script>
+@endpush
 @endsection
