@@ -1,0 +1,365 @@
+/* =========================================================
+   Vacation Manager - Index pages
+   Arquivo: public/css/vacation-manager-index.css
+   ========================================================= */
+
+:root {
+    --vm-primary: var(--color-primary, #24b153);
+    --vm-primary-dark: color-mix(in srgb, var(--vm-primary) 78%, #000);
+    --vm-primary-soft: color-mix(in srgb, var(--vm-primary) 12%, #fff);
+    --vm-bg: #f4f7fb;
+    --vm-surface: #ffffff;
+    --vm-border: #e3e8ef;
+    --vm-text: #263238;
+    --vm-muted: #6c757d;
+    --vm-danger: #dc3545;
+    --vm-warning: #f0ad4e;
+    --vm-shadow: 0 10px 30px rgba(30, 45, 62, 0.08);
+}
+
+.vm-page {
+    padding-top: 2rem;
+    padding-bottom: 3rem;
+}
+
+.vm-card {
+    overflow: hidden;
+    background: var(--vm-surface);
+    border: 1px solid var(--vm-border);
+    border-radius: 18px;
+    box-shadow: var(--vm-shadow);
+}
+
+.vm-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 1.25rem 1.4rem;
+    border-bottom: 1px solid var(--vm-border);
+    background:
+        linear-gradient(
+            135deg,
+            color-mix(in srgb, var(--vm-primary) 8%, #fff),
+            #fff 60%
+        );
+}
+
+.vm-title-group {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    min-width: 0;
+}
+
+.vm-title-icon {
+    display: grid;
+    flex: 0 0 44px;
+    width: 44px;
+    height: 44px;
+    place-items: center;
+    color: #fff;
+    font-size: 1.15rem;
+    border-radius: 13px;
+    background: var(--vm-primary);
+    box-shadow: 0 8px 20px color-mix(in srgb, var(--vm-primary) 25%, transparent);
+}
+
+.vm-title {
+    margin: 0;
+    color: var(--vm-text);
+    font-size: clamp(1.25rem, 2vw, 1.65rem);
+    font-weight: 700;
+    line-height: 1.2;
+}
+
+.vm-subtitle {
+    margin: 0.2rem 0 0;
+    color: var(--vm-muted);
+    font-size: 0.88rem;
+}
+
+.vm-btn-add {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.45rem;
+    min-height: 38px;
+    padding: 0.5rem 0.85rem;
+    color: #fff;
+    border: 0;
+    border-radius: 10px;
+    background: var(--vm-primary);
+    font-weight: 600;
+    box-shadow: 0 6px 16px color-mix(in srgb, var(--vm-primary) 20%, transparent);
+    transition: transform 0.18s ease, box-shadow 0.18s ease, filter 0.18s ease;
+}
+
+.vm-btn-add:hover,
+.vm-btn-add:focus {
+    color: #fff;
+    filter: brightness(0.95);
+    transform: translateY(-1px);
+    box-shadow: 0 9px 20px color-mix(in srgb, var(--vm-primary) 28%, transparent);
+}
+
+.vm-table-wrapper {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.vm-table {
+    width: 100%;
+    margin: 0;
+    vertical-align: middle;
+}
+
+.vm-table thead th {
+    padding: 0.9rem 1rem;
+    color: #52606d;
+    border-bottom: 1px solid var(--vm-border);
+    background: #f8fafc;
+    font-size: 0.76rem;
+    font-weight: 700;
+    letter-spacing: 0.045em;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+.vm-table tbody td {
+    padding: 0.95rem 1rem;
+    color: var(--vm-text);
+    border-color: #edf0f4;
+    font-size: 0.92rem;
+}
+
+.vm-table tbody tr {
+    transition: background-color 0.16s ease;
+}
+
+.vm-table tbody tr:hover {
+    background: #fbfcfd;
+}
+
+.vm-name {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    font-weight: 600;
+}
+
+.vm-avatar {
+    display: grid;
+    flex: 0 0 36px;
+    width: 36px;
+    height: 36px;
+    place-items: center;
+    color: #fff;
+    border: 2px solid rgba(255, 255, 255, 0.9);
+    border-radius: 50%;
+    font-size: 0.82rem;
+    font-weight: 700;
+    box-shadow: 0 0 0 1px var(--vm-border);
+}
+
+.vm-color-swatch {
+    display: inline-block;
+    width: 28px;
+    height: 28px;
+    border: 3px solid #fff;
+    border-radius: 9px;
+    box-shadow: 0 0 0 1px var(--vm-border);
+    vertical-align: middle;
+}
+
+.vm-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.36rem 0.62rem;
+    border-radius: 999px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    line-height: 1;
+}
+
+.vm-badge-status {
+    color: #1d6f42;
+    background: #e8f7ef;
+}
+
+.vm-badge-status.is-inactive {
+    color: #8b3a3a;
+    background: #fdecec;
+}
+
+.vm-badge-days {
+    color: #315b8a;
+    background: #eaf3ff;
+}
+
+.vm-badge-days.is-over-limit {
+    color: #9a2f39;
+    background: #fde8eb;
+}
+
+.vm-collaborator-badge {
+    color: #fff;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.vm-date {
+    white-space: nowrap;
+}
+
+.vm-file-actions,
+.vm-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.vm-action-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.35rem;
+    min-width: 34px;
+    min-height: 32px;
+    padding: 0.38rem 0.58rem;
+    border-radius: 8px;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.vm-empty {
+    padding: 3rem 1rem !important;
+    color: var(--vm-muted) !important;
+    text-align: center;
+}
+
+.vm-empty i {
+    display: block;
+    margin-bottom: 0.65rem;
+    color: #adb5bd;
+    font-size: 2rem;
+}
+
+.vm-pagination {
+    display: flex;
+    justify-content: center;
+    padding: 1.2rem;
+    border-top: 1px solid var(--vm-border);
+    background: #fff;
+}
+
+/* Modal */
+.vm-modal .modal-content {
+    overflow: hidden;
+    border: 0;
+    border-radius: 16px;
+    box-shadow: 0 20px 60px rgba(20, 30, 45, 0.18);
+}
+
+.vm-modal .modal-header {
+    color: #fff;
+    border-bottom: 0;
+    background: var(--vm-primary);
+}
+
+.vm-modal .modal-header .btn-close {
+    filter: brightness(0) invert(1);
+}
+
+.vm-modal .modal-body {
+    padding: 1.35rem;
+}
+
+.vm-modal .modal-footer {
+    padding: 1rem 1.35rem;
+    border-top-color: var(--vm-border);
+    background: #fafbfc;
+}
+
+.vm-modal .form-label {
+    margin-bottom: 0.4rem;
+    color: #46515d;
+    font-size: 0.84rem;
+    font-weight: 600;
+}
+
+.vm-modal .form-control,
+.vm-modal .form-select {
+    min-height: 42px;
+    border-color: #dce2e8;
+    border-radius: 9px;
+}
+
+.vm-modal textarea.form-control {
+    min-height: 95px;
+}
+
+.vm-modal .form-control:focus,
+.vm-modal .form-select:focus {
+    border-color: var(--vm-primary);
+    box-shadow: 0 0 0 0.2rem color-mix(in srgb, var(--vm-primary) 17%, transparent);
+}
+
+/* Indicador de arquivo */
+.vm-file-name {
+    display: block;
+    margin-top: 0.4rem;
+    color: var(--vm-muted);
+    font-size: 0.78rem;
+}
+
+/* Responsivo */
+@media (max-width: 767.98px) {
+    .vm-page {
+        padding-top: 1rem;
+    }
+
+    .vm-card {
+        border-radius: 14px;
+    }
+
+    .vm-card-header {
+        align-items: flex-start;
+        padding: 1rem;
+    }
+
+    .vm-title-icon {
+        width: 40px;
+        height: 40px;
+        flex-basis: 40px;
+    }
+
+    .vm-btn-add .vm-btn-text {
+        display: none;
+    }
+
+    .vm-table {
+        min-width: 760px;
+    }
+
+    .vm-table thead th,
+    .vm-table tbody td {
+        padding-right: 0.8rem;
+        padding-left: 0.8rem;
+    }
+}
+
+@media (max-width: 575.98px) {
+    .vm-card-header {
+        gap: 0.65rem;
+    }
+
+    .vm-subtitle {
+        display: none;
+    }
+
+    .vm-actions {
+        flex-wrap: nowrap;
+    }
+}

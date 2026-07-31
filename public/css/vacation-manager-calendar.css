@@ -1,0 +1,334 @@
+/* ==========================================================
+   Calendário de férias
+========================================================== */
+
+.vacation-calendar-filter {
+    width: min(100%, 310px);
+}
+
+.vacation-calendar-filter .form-control {
+    min-width: 90px;
+}
+
+.vacation-calendar-summary {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 0.85rem;
+    margin-bottom: 1rem;
+}
+
+.vacation-calendar-summary-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    min-height: 72px;
+    padding: 0.8rem 0.9rem;
+    background: #fff;
+    border: 1px solid #e8ebef;
+    border-radius: 0.75rem;
+}
+
+.vacation-calendar-summary-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 38px;
+    width: 38px;
+    height: 38px;
+    color: var(--color-primary);
+    background: color-mix(
+        in srgb,
+        var(--color-primary) 12%,
+        white
+    );
+    border-radius: 0.65rem;
+    font-size: 1rem;
+}
+
+.vacation-calendar-summary-item div:last-child {
+    min-width: 0;
+}
+
+.vacation-calendar-summary-item span {
+    display: block;
+    color: #6c757d;
+    font-size: 0.72rem;
+    line-height: 1.2;
+}
+
+.vacation-calendar-summary-item strong {
+    display: block;
+    margin-top: 0.15rem;
+    color: #212529;
+    font-size: 1rem;
+    line-height: 1.2;
+}
+
+.vacation-calendar-legend {
+    padding: 0.85rem 1rem;
+    margin-bottom: 1rem;
+    background: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-radius: 0.75rem;
+}
+
+.vacation-calendar-legend-title {
+    margin-bottom: 0.65rem;
+    color: #495057;
+    font-size: 0.78rem;
+    font-weight: 700;
+}
+
+.vacation-calendar-legend-items {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.55rem 1rem;
+}
+
+.vacation-calendar-legend-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    color: #5c636a;
+    font-size: 0.72rem;
+}
+
+.vacation-calendar-legend-color,
+.vacation-calendar-legend-sunday {
+    display: inline-block;
+    flex: 0 0 auto;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+}
+
+.vacation-calendar-legend-sunday {
+    background: #dc3545;
+}
+
+.vacation-calendar-legend-holiday {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
+    width: 17px;
+    height: 17px;
+    color: #fff;
+    background: #dc3545;
+    border-radius: 50%;
+    font-size: 0.6rem;
+    font-weight: 800;
+}
+
+.vacation-calendar {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 0.85rem;
+}
+
+.vacation-calendar-month {
+    min-width: 0;
+    overflow: hidden;
+    background: #fff;
+    border: 1px solid #e1e5e9;
+    border-radius: 0.75rem;
+    box-shadow: 0 2px 8px rgb(0 0 0 / 4%);
+}
+
+.vacation-calendar-month-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 39px;
+    padding: 0.55rem 0.7rem;
+    color: #fff;
+    background:rgb(44, 51, 59);
+}
+
+.vacation-calendar-month-header span {
+    font-size: 0.82rem;
+    font-weight: 700;
+}
+
+.vacation-calendar-month-header small {
+    color: rgb(255 255 255 / 80%);
+    font-size: 0.62rem;
+}
+
+.vacation-calendar-weekdays,
+.vacation-calendar-days {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+}
+
+.vacation-calendar-weekdays {
+    background: #f5f6f8;
+    border-bottom: 1px solid #e5e8eb;
+}
+
+.vacation-calendar-weekdays > div {
+    padding: 0.35rem 0.1rem;
+    color: #687078;
+    text-align: center;
+    font-size: 0.6rem;
+    font-weight: 700;
+}
+
+.vacation-calendar-weekdays > .is-sunday {
+    color: #dc3545;
+}
+
+.vacation-calendar-day {
+    position: relative;
+    display: flex;
+    align-items: flex-start;
+    justify-content: flex-start;
+    min-width: 0;
+    min-height: 35px;
+    padding: 0.25rem;
+    overflow: hidden;
+    background: #fff;
+    border-right: 1px solid #edf0f2;
+    border-bottom: 1px solid #edf0f2;
+    cursor: default;
+    transition:
+        transform 0.15s ease,
+        box-shadow 0.15s ease;
+}
+
+.vacation-calendar-day:nth-child(7n) {
+    border-right: 0;
+}
+
+.vacation-calendar-day:hover:not(.is-empty) {
+    z-index: 3;
+    transform: scale(1.05);
+    box-shadow: 0 3px 12px rgb(0 0 0 / 14%);
+}
+
+.vacation-calendar-day.is-empty {
+    background: #fafafa;
+}
+
+.vacation-calendar-day-number {
+    position: relative;
+    z-index: 2;
+    color: #394047;
+    font-size: 0.65rem;
+    font-weight: 700;
+    line-height: 1;
+}
+
+.vacation-calendar-day.is-sunday
+.vacation-calendar-day-number {
+    color: #dc3545;
+}
+
+.vacation-calendar-day.has-vacation
+.vacation-calendar-day-number {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 0.2rem;
+    color: #212529;
+    background: rgb(255 255 255 / 88%);
+    border-radius: 0.3rem;
+    box-shadow: 0 1px 3px rgb(0 0 0 / 10%);
+}
+
+.vacation-calendar-day-background {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    z-index: 1;
+    opacity: 0.8;
+}
+
+.vacation-calendar-day-background span {
+    flex: 1 1 0;
+    min-width: 0;
+}
+
+.vacation-calendar-holiday-indicator {
+    position: absolute;
+    top: 3px;
+    right: 3px;
+    z-index: 3;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 15px;
+    height: 15px;
+    color: #fff;
+    background: #dc3545;
+    border: 1px solid rgb(255 255 255 / 75%);
+    border-radius: 50%;
+    font-size: 0.52rem;
+    font-weight: 800;
+    line-height: 1;
+    box-shadow: 0 1px 3px rgb(0 0 0 / 20%);
+}
+
+/* ==========================================================
+   Responsividade
+========================================================== */
+
+@media (max-width: 1199.98px) {
+    .vacation-calendar {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .vacation-calendar-summary {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 991.98px) {
+    .vacation-calendar {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 767.98px) {
+    .vacation-calendar-filter {
+        width: 100%;
+    }
+
+    .vacation-calendar-summary {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .vacation-calendar {
+        grid-template-columns: 1fr;
+    }
+
+    .vacation-calendar-day {
+        min-height: 44px;
+    }
+
+    .vacation-calendar-weekdays > div {
+        font-size: 0.68rem;
+    }
+
+    .vacation-calendar-day-number {
+        font-size: 0.72rem;
+    }
+}
+
+@media (max-width: 479.98px) {
+    .vacation-calendar-summary {
+        grid-template-columns: 1fr;
+    }
+
+    .vacation-calendar-summary-item {
+        min-height: 62px;
+    }
+
+    .vacation-calendar-legend-items {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+}
