@@ -1,43 +1,74 @@
 @extends('layouts.header')
 @section('title', 'Novo Item de Estoque')
 
-@section('content')
-    <div class="container mt-4">
-        <h2>Novo Item</h2>
+@push('styles')
+    <link rel="stylesheet" href="{{ asset('css/stock-module.css') }}">
+@endpush
 
-        <form action="{{ route('stock.items.store') }}" method="POST">
+@section('content')
+<div class="container stock-page">
+    <div class="stock-form-card">
+        <div class="stock-form-header">
+            <div class="stock-title-icon"><i class="bi bi-box-seam"></i></div>
+            <div>
+                <h1 class="stock-title">Novo item</h1>
+                <p class="stock-subtitle">Cadastre um novo item e seu estoque inicial.</p>
+            </div>
+        </div>
+
+        <form action="{{ route('stock.items.store') }}" method="POST" data-submit-lock data-stock-item-form>
             @csrf
-            {{-- Checkbox de status em destaque --}}
-            <div class="mb-4 d-flex align-items-center gap-2">
-                <label for="status" class="fw-bold fs-5 mb-0">Status:</label>
-                <div class="form-check form-switch mb-0">
-                    <input type="checkbox" name="status" id="status" class="form-check-input" checked>
+
+            <div class="stock-form-body">
+                <div class="stock-status-box">
+                    <div>
+                        <strong>Item ativo</strong>
+                        <div class="small text-muted">Itens inativos permanecem cadastrados, mas ficam indisponíveis.</div>
+                    </div>
+                    <div class="form-check form-switch m-0">
+                        <input type="checkbox" name="status" id="status" class="form-check-input" checked>
+                    </div>
+                </div>
+
+                <div class="row g-3">
+                    <div class="col-12">
+                        <label for="name" class="form-label">Nome <span class="text-danger">*</span></label>
+                        <input type="text" name="name" id="name" class="form-control @error('name') is-invalid @enderror" value="{{ old('name') }}" required data-disable-when-inactive>
+                        @error('name')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                    </div>
+
+                    <div class="col-md-4">
+                        <label for="min_stock" class="form-label">Estoque mínimo</label>
+                        <input type="number" name="min_stock" id="min_stock" class="form-control @error('min_stock') is-invalid @enderror" value="{{ old('min_stock') }}" min="0" data-disable-when-inactive>
+                        @error('min_stock')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                    </div>
+
+                    <div class="col-md-4">
+                        <label for="current_stock" class="form-label">Estoque inicial</label>
+                        <input type="number" name="current_stock" id="current_stock" class="form-control @error('current_stock') is-invalid @enderror" value="{{ old('current_stock', 0) }}" min="0" data-disable-when-inactive>
+                        @error('current_stock')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                    </div>
+
+                    <div class="col-md-4">
+                        <label for="price" class="form-label">Preço</label>
+                        <div class="input-group">
+                            <span class="input-group-text">R$</span>
+                            <input type="number" step="0.01" min="0" name="price" id="price" class="form-control @error('price') is-invalid @enderror" value="{{ old('price') }}" data-disable-when-inactive>
+                            @error('price')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                        </div>
+                    </div>
                 </div>
             </div>
 
-
-            <div class="mb-3">
-                <label for="name" class="form-label">Nome *</label>
-                <input type="text" name="name" id="name" class="form-control" required>
+            <div class="stock-form-footer">
+                <a href="{{ route('stock.items.index') }}" class="btn btn-outline-secondary"><i class="bi bi-arrow-left me-1"></i>Cancelar</a>
+                <button type="submit" class="btn dcm-btn-primary"><i class="bi bi-check-lg me-1"></i>Salvar item</button>
             </div>
-
-            <div class="mb-3">
-                <label for="min_stock" class="form-label">Estoque Mínimo</label>
-                <input type="number" name="min_stock" id="min_stock" class="form-control">
-            </div>
-
-            <div class="mb-3">
-                <label for="current_stock" class="form-label">Estoque Inicial</label>
-                <input type="number" name="current_stock" id="current_stock" value="0" class="form-control">
-            </div>
-
-            <div class="mb-3">
-                <label for="price" class="form-label">Preço</label>
-                <input type="number" step="0.01" name="price" id="price" class="form-control">
-            </div>
-
-            <button type="submit" class="btn dcm-btn-primary">Salvar</button>
-            <a href="{{ route('stock.items.index') }}" class="btn btn-secondary">Cancelar</a>
         </form>
     </div>
+</div>
 @endsection
+
+@push('scripts')
+    <script src="{{ asset('js/stock-module.js') }}"></script>
+@endpush

@@ -737,7 +737,7 @@
                                             <div class="app-menu-group-title">
                                                 Integrações
                                             </div>
-
+                                            {{--
                                             @can('api.nfe')
                                                 <a class="app-menu-link" href="{{ route('api.mk.nfe') }}">
 
@@ -751,7 +751,7 @@
                                                     </span>
                                                 </a>
                                             @endcan
-
+--}}
                                             @if (config('services.wireguard.url') && config('services.wireguard.password'))
                                                 @can('administrator.vpn')
                                                     <a class="app-menu-link" href="{{ route('api.vpn.index') }}">

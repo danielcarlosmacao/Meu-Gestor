@@ -48,7 +48,7 @@
     <div class="col-md-6 col-lg-3">
       <div class="card info-card bg-sistema p-3">
         <div class="card-body text-center">
-          <div class="info-icon">🖥️</div>
+          <div class="info-icon"></div>
           <h5 class="card-title">Sistema</h5>
           <p class="card-text">{{ php_uname('s') }} {{ php_uname('r') }}</p>
           <h5 class="card-title">Versao</h5>
@@ -111,7 +111,7 @@
   <div class="col-md-6 col-lg-3">
     <div class="card info-card bg-memoria p-3">
       <div class="card-body">
-        <div class="info-icon">🧠</div>
+        <div class="info-icon"></div>
         <h5 class="card-title">Memória RAM do Sistema</h5>
         <p class="card-text">Uso: {{ formatMemory($memUsed) }}</p>
         <p class="card-text">Total: {{ formatMemory($memTotal) }}</p>
@@ -137,7 +137,7 @@
     <div class="col-md-6 col-lg-3">
       <div class="card info-card bg-memoria p-3">
         <div class="card-body">
-          <div class="info-icon">🧠</div>
+          <div class="info-icon"></div>
           <h5 class="card-title">Memória RAM do PHP</h5>
           <p class="card-text">Uso: {{ round($memUsed / 1024 / 1024, 2) }} MB</p>
           <p class="card-text">Limite: {{ ini_get('memory_limit') }}</p>
@@ -159,7 +159,7 @@
     <div class="col-md-6 col-lg-3">
       <div class="card info-card bg-disco p-3">
         <div class="card-body">
-          <div class="info-icon">💾</div>
+          <div class="info-icon"></div>
           <h5 class="card-title">Disco</h5>
           <p class="card-text">Livre: {{ round($diskFree / 1024 / 1024 / 1024, 2) }} GB</p>
           <p class="card-text">Total: {{ round($diskTotal / 1024 / 1024 / 1024, 2) }} GB</p>
@@ -174,7 +174,7 @@
     <div class="col-md-6 col-lg-3">
       <div class="card info-card bg-php p-3">
         <div class="card-body text-center">
-          <div class="info-icon">⚙️</div>
+          <div class="info-icon"></div>
           <h5 class="card-title">PHP</h5>
           <p class="card-text">Versão: {{ phpversion() }}</p>
           <p class="card-text">Execução: {{ round(microtime(true) - $_SERVER["REQUEST_TIME_FLOAT"], 4) }}s</p>
@@ -186,7 +186,7 @@
     <div class="col-md-6 col-lg-3">
       <div class="card info-card bg-software p-3">
         <div class="card-body text-center">
-          <div class="info-icon">📦</div>
+          <div class="info-icon"></div>
           <h5 class="card-title">Servidor</h5>
           <p class="card-text">{{ $_SERVER['SERVER_SOFTWARE'] ?? 'Desconhecido' }}</p>
           <p class="card-text">Porta: {{ $_SERVER['SERVER_PORT'] ?? 'N/A' }}</p>
@@ -198,7 +198,7 @@
     <div class="col-md-6 col-lg-3">
       <div class="card info-card bg-cliente p-3">
         <div class="card-body text-center">
-          <div class="info-icon">🧑</div>
+          <div class="info-icon"></div>
           <h5 class="card-title">Cliente</h5>
           <p class="card-text">IP: {{ $_SERVER['REMOTE_ADDR'] ?? 'N/A' }}</p>
           <p class="card-text">Navegador: {{ Str::limit($_SERVER['HTTP_USER_AGENT'] ?? 'N/A', 50) }}</p>
@@ -227,7 +227,7 @@
 <div class="col-md-6 col-lg-3">
     <div class="card info-card p-3" style="background-color: #e8eaf6;">
         <div class="card-body">
-            <div class="info-icon">🖲️</div>
+            <div class="info-icon"></div>
             <h5 class="card-title">CPU</h5>
             <p class="card-text">{{ $cpuModel }}</p>
             <p class="card-text">Cores: {{ $cpuCores ?: 'N/A' }}</p>
@@ -251,7 +251,7 @@
 <div class="col-md-6 col-lg-3">
     <div class="card info-card p-3" style="background-color: #fff8e1;">
         <div class="card-body">
-            <div class="info-icon">🗄️</div>
+            <div class="info-icon"></div>
             <h5 class="card-title">Banco de Dados</h5>
             <p class="card-text">Status: {{ $dbStatus }}</p>
             <p class="card-text">Versão: {{ $dbVersion }}</p>
@@ -263,7 +263,7 @@
 <div class="col-md-6 col-lg-3">
     <div class="card info-card p-3" style="background-color: #f1f8e9;">
         <div class="card-body">
-            <div class="info-icon">⏰</div>
+            <div class="info-icon"></div>
             <h5 class="card-title">Servidor</h5>
             <p class="card-text">Data/Hora: {{ now()->format('d/m/Y H:i:s') }}</p>
             @if(PHP_OS_FAMILY === 'Linux' && is_readable('/proc/uptime'))
