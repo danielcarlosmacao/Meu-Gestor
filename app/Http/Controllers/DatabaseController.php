@@ -122,271 +122,58 @@ class DatabaseController extends Controller
         }
     }
 
-    public function updateSystem()
+     public function updateSystem()
     {
+
         if (!app()->environment('production')) {
             Log::warning('Tentativa de update bloqueada fora do ambiente de produção.');
-
-            return back()->with(
-                'error',
-                'Atualização não permitida fora do ambiente de produção.'
-            );
+            return back()->with('error', 'Atualização não permitida fora do ambiente de produção.');
         }
-
         try {
             $projectRoot = base_path();
 
-            /*
-         * Busca somente a branch cadastrada no banco.
-         * Caso não exista ou esteja vazia, utiliza main.
-         */
-            $branch = trim((string) \App\Models\Option::query()
-                ->where('reference', 'branch')
-                ->value('value'));
-
-            if (
-                $branch === ''
-                || strtolower($branch) === 'null'
-            ) {
-                $branch = 'main';
-            }
-
-            /*
-         * Valida o nome da branch antes de utilizar no comando.
-         */
-            if (
-                str_starts_with($branch, '-')
-                || str_contains($branch, '..')
-                || str_contains($branch, '@{')
-                || str_ends_with($branch, '.')
-                || str_ends_with($branch, '/')
-                || str_ends_with($branch, '.lock')
-                || !preg_match('/^[A-Za-z0-9._\/-]+$/', $branch)
-            ) {
-                Log::warning('Branch inválida configurada para atualização.', [
-                    'branch' => $branch,
-                ]);
-
-                return back()->with(
-                    'error',
-                    'A branch configurada para atualização é inválida.'
-                );
-            }
-
-            /*
-         * Protege os valores utilizados nos comandos.
-         */
-            $escapedProjectRoot = escapeshellarg($projectRoot);
-            $escapedBranch = escapeshellarg($branch);
-
-            Log::info('Iniciando update via Git', [
-                'branch' => $branch,
-            ]);
+            Log::info('Iniciando update via Git');
 
             // Define o diretório como seguro
-            exec(
-                "git config --global --add safe.directory {$escapedProjectRoot}"
-            );
-
-            exec(
-                "cd {$escapedProjectRoot} && sudo chown -R $(whoami):$(whoami) .git"
-            );
-
-            exec(
-                "cd {$escapedProjectRoot} && chmod -R u+rwX .git"
-            );
-
+            exec("git config --global --add safe.directory '$projectRoot'");
+            exec("sudo chown -R $(whoami):$(whoami) .git");
+            exec("chmod -R u+rwX .git");
             Log::info('Configurações do diretório .git aplicadas');
 
-            // Salva alterações locais, caso existam
-            exec(
-                "cd {$escapedProjectRoot} && git stash"
-            );
-
+            // Salva alterações locais (se houver)
+            exec("cd $projectRoot && git stash");
             Log::info('Alterações locais stashed');
 
             // Garante que o .env local será ignorado
-            exec(
-                "cd {$escapedProjectRoot} && git update-index --skip-worktree .env"
-            );
-
+            exec("git update-index --skip-worktree .env");
             Log::info('.env marcado como skip-worktree');
 
-            /*
-         * Verifica se a branch existe no repositório origin.
-         */
-            $branchCheckOutput = [];
-            $branchCheckResult = 0;
-
-            exec(
-                "cd {$escapedProjectRoot} && git ls-remote --exit-code --heads origin {$escapedBranch} 2>&1",
-                $branchCheckOutput,
-                $branchCheckResult
-            );
-
-            if ($branchCheckResult !== 0) {
-                Log::error('Branch não encontrada no repositório remoto.', [
-                    'branch' => $branch,
-                    'output' => $branchCheckOutput,
-                ]);
-
-                return back()->with(
-                    'error',
-                    "A branch '{$branch}' não existe no repositório origin."
-                );
-            }
-
-            /*
-         * Busca as alterações do repositório.
-         */
-            $fetchOutput = [];
-            $fetchResult = 0;
-
-            exec(
-                "cd {$escapedProjectRoot} && git fetch origin {$escapedBranch} 2>&1",
-                $fetchOutput,
-                $fetchResult
-            );
-
-            Log::info('Git fetch output:', $fetchOutput);
-
-            if ($fetchResult !== 0) {
-                $errorMessage = implode("\n", $fetchOutput);
-
-                Log::error('Erro no git fetch', [
-                    'branch' => $branch,
-                    'output' => $fetchOutput,
-                ]);
-
-                return back()->with(
-                    'error',
-                    "Erro ao buscar a branch '{$branch}':\n{$errorMessage}"
-                );
-            }
-
-            /*
-         * Troca para a branch configurada.
-         *
-         * Caso ela não exista localmente, cria a partir de origin/branch.
-         */
-            $localBranchExists = 0;
-
-            exec(
-                "cd {$escapedProjectRoot} && git show-ref --verify --quiet refs/heads/{$escapedBranch}",
-                $localBranchOutput,
-                $localBranchExists
-            );
-
-            $checkoutOutput = [];
-            $checkoutResult = 0;
-
-            if ($localBranchExists === 0) {
-                exec(
-                    "cd {$escapedProjectRoot} && git checkout {$escapedBranch} 2>&1",
-                    $checkoutOutput,
-                    $checkoutResult
-                );
-            } else {
-                exec(
-                    "cd {$escapedProjectRoot} && git checkout -b {$escapedBranch} origin/{$escapedBranch} 2>&1",
-                    $checkoutOutput,
-                    $checkoutResult
-                );
-            }
-
-            Log::info('Git checkout output:', $checkoutOutput);
-
-            if ($checkoutResult !== 0) {
-                $errorMessage = implode("\n", $checkoutOutput);
-
-                Log::error('Erro ao trocar de branch', [
-                    'branch' => $branch,
-                    'output' => $checkoutOutput,
-                ]);
-
-                return back()->with(
-                    'error',
-                    "Erro ao acessar a branch '{$branch}':\n{$errorMessage}"
-                );
-            }
-
-            // Atualiza usando a branch configurada
+            // Atualiza com Git Pull
             $pullOutput = [];
             $result = 0;
-
-            exec(
-                "cd {$escapedProjectRoot} && git pull origin {$escapedBranch} 2>&1",
-                $pullOutput,
-                $result
-            );
-
+            exec("cd $projectRoot && git pull origin main 2>&1", $pullOutput, $result);
             Log::info('Git pull output:', $pullOutput);
 
             if ($result !== 0) {
                 $errorMessage = implode("\n", $pullOutput);
-
-                Log::error('Erro no git pull', [
-                    'branch' => $branch,
-                    'output' => $pullOutput,
-                ]);
-
-                return back()->with(
-                    'error',
-                    "Erro ao atualizar via Git:\n{$errorMessage}"
-                );
+                Log::error('Erro no git pull', ['output' => $pullOutput]);
+                return back()->with('error', "Erro ao atualizar via Git:\n" . $errorMessage);
             }
 
             // Checa se o link de storage já existe antes de criar
             $storageLink = public_path('storage');
-
             if (!is_link($storageLink)) {
-                Log::info(
-                    'Link simbólico storage/storage não encontrado, criando...'
-                );
-
+                Log::info('Link simbólico storage/storage não encontrado, criando...');
                 Artisan::call('storage:link');
-
-                Log::info(
-                    'Link simbólico storage/storage criado com sucesso'
-                );
+                Log::info('Link simbólico storage/storage criado com sucesso');
             } else {
-                Log::info(
-                    'Link simbólico storage/storage já existe, pulando criação'
-                );
+                Log::info('Link simbólico storage/storage já existe, pulando criação');
             }
 
-            /*
-         * Executa o Composer dentro do diretório do projeto.
-         */
-            $composerOutput = [];
-            $composerResult = 0;
+            exec('composer install --no-dev --optimize-autoloader 2>&1', $output, $returnVar);
 
-            exec(
-                "cd {$escapedProjectRoot} && composer install --no-dev --optimize-autoloader 2>&1",
-                $composerOutput,
-                $composerResult
-            );
-
-            Log::info('Composer install output:', $composerOutput);
-
-            if ($composerResult !== 0) {
-                $errorMessage = implode("\n", $composerOutput);
-
-                Log::error('Erro no composer install', [
-                    'output' => $composerOutput,
-                ]);
-
-                return back()->with(
-                    'error',
-                    "Erro ao instalar dependências:\n{$errorMessage}"
-                );
-            }
-
-            // Roda migrations
-            Artisan::call('migrate', [
-                '--force' => true,
-            ]);
-
+            // Roda migrations e limpa caches
+            Artisan::call('migrate', ['--force' => true]);
             Log::info('Migrations rodadas com sucesso');
 
             // Executa o Hook
@@ -394,10 +181,9 @@ class DatabaseController extends Controller
                 \App\Support\SystemUpdateHook::run();
             } catch (\Throwable $hookException) {
                 Log::error('Erro ao executar SystemUpdateHook', [
-                    'erro' => $hookException->getMessage(),
+                    'erro' => $hookException->getMessage()
                 ]);
-
-                // Não interrompe o update se o hook falhar
+                // NÃO interrompe o update se o hook falhar
             }
 
             Artisan::call('optimize:clear');
@@ -405,24 +191,14 @@ class DatabaseController extends Controller
             Artisan::call('cache:clear');
             Artisan::call('route:clear');
             Artisan::call('view:clear');
-
             Log::info('Caches limpos');
 
-            return back()->with(
-                'success',
-                "Sistema atualizado com sucesso pela branch '{$branch}'!"
-            );
-        } catch (\Throwable $e) {
-            Log::error('Erro ao atualizar sistema', [
-                'erro' => $e->getMessage(),
-                'arquivo' => $e->getFile(),
-                'linha' => $e->getLine(),
-            ]);
+            return back()->with('success', 'Sistema atualizado com sucesso!');
 
-            return back()->with(
-                'error',
-                'Erro ao atualizar: ' . $e->getMessage()
-            );
+        } catch (\Exception $e) {
+            Log::error('Erro ao atualizar sistema', ['erro' => $e->getMessage()]);
+            return back()->with('error', 'Erro ao atualizar: ' . $e->getMessage());
         }
+
     }
 }
