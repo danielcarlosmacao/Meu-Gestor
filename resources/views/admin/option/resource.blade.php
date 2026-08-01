@@ -2,7 +2,12 @@
 
 @section('title', 'Configurações do Sistema')
 
+
+@push('styles')
+    <link rel="stylesheet" href="{{ asset('css/admin-module.css') }}">
+@endpush
 @section('content')
+<div class="admin-module-scope">
 
     <div class="container py-4">
 
@@ -350,119 +355,7 @@
 
             </div>
 
-            {{-- =====================================================
-                ATUALIZAÇÃO DO SISTEMA
-            ====================================================== --}}
-
-            <div class="card shadow-sm border-0 mb-4">
-
-                <div class="card-header bg-white py-3">
-
-                    <div class="d-flex align-items-center gap-3">
-
-                        <span class="fs-4">
-                            <i class="bi bi-github"></i>
-                        </span>
-
-                        <div>
-                            <h5 class="mb-0">
-                                Atualização do Sistema
-                            </h5>
-
-                            <small class="text-muted">
-                                Repositório Git e branch utilizados para atualizar a aplicação.
-                            </small>
-                        </div>
-
-                    </div>
-
-                </div>
-
-                <div class="card-body">
-
-                    <div class="alert alert-warning d-flex gap-3 align-items-start" role="alert">
-
-                        <i class="bi bi-exclamation-triangle-fill fs-5"></i>
-
-                        <div>
-                            <strong>Atenção:</strong>
-
-                            altere estas informações somente quando tiver certeza de qual
-                            repositório e branch devem ser utilizados no servidor.
-                        </div>
-
-                    </div>
-
-                    <div class="row g-4">
-
-                        <div class="col-lg-8">
-
-                            <label for="repository" class="form-label">
-                                Repositório
-                            </label>
-
-                            <div class="input-group">
-
-                                <span class="input-group-text">
-                                    <i class="bi bi-git"></i>
-                                </span>
-
-                                <input type="text" id="repository" name="repository"
-                                    class="form-control @error('repository') is-invalid @enderror"
-                                    value="{{ old('repository', $options['repository'] ?? '') }}"
-                                    placeholder="https://github.com/usuario/repositorio.git" maxlength="500"
-                                    autocomplete="off">
-
-                                @error('repository')
-                                    <div class="invalid-feedback">
-                                        {{ $message }}
-                                    </div>
-                                @enderror
-
-                            </div>
-
-                            <div class="form-text">
-                                Pode ser uma URL HTTPS ou SSH do Git.
-                            </div>
-
-                        </div>
-
-                        <div class="col-lg-4">
-
-                            <label for="branch" class="form-label">
-                                Branch
-                            </label>
-
-                            <div class="input-group">
-
-                                <span class="input-group-text">
-                                    <i class="bi bi-diagram-2"></i>
-                                </span>
-
-                                <input type="text" id="branch" name="branch"
-                                    class="form-control @error('branch') is-invalid @enderror"
-                                    value="{{ old('branch', $options['branch'] ?? 'main') }}" placeholder="main"
-                                    maxlength="255" autocomplete="off">
-
-                                @error('branch')
-                                    <div class="invalid-feedback">
-                                        {{ $message }}
-                                    </div>
-                                @enderror
-
-                            </div>
-
-                            <div class="form-text">
-                                Exemplos: main, develop ou feature/new-appearance.
-                            </div>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-            </div>
+          
 
             {{-- =====================================================
                 AÇÕES
@@ -490,6 +383,8 @@
 
     </div>
 
+
+</div>
 @endsection
 
 @push('scripts')
@@ -513,4 +408,8 @@
             });
         });
     </script>
+@endpush
+
+@push('scripts')
+    <script src="{{ asset('js/admin-module.js') }}"></script>
 @endpush

@@ -1,3 +1,7 @@
+
+@push('styles')
+    <link rel="stylesheet" href="{{ asset('css/admin-module.css') }}">
+@endpush
 @php
     $selectedRoles = isset($user) ? $user->roles->pluck('name')->toArray() : [];
     $selectedPermissions = isset($user) ? $user->permissions->pluck('name')->toArray() : [];
@@ -95,4 +99,8 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 });
 </script>
+@endpush
+
+@push('scripts')
+    <script src="{{ asset('js/admin-module.js') }}"></script>
 @endpush

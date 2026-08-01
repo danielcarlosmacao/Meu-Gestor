@@ -1,6 +1,11 @@
 @extends('layouts.header')
 @section('title', 'Painel do sistema')
+
+@push('styles')
+    <link rel="stylesheet" href="{{ asset('css/admin-module.css') }}">
+@endpush
 @section('content')
+<div class="admin-module-scope">
 
 <style>
   .info-card {
@@ -285,4 +290,9 @@
 </div>
 
 
+
+</div>
 @endsection
+@push('scripts')
+    <script src="{{ asset('js/admin-module.js') }}"></script>
+@endpush

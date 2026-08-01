@@ -1,7 +1,12 @@
 @extends('layouts.header')
 @section('title', 'Gerenciar Roles')
 
+
+@push('styles')
+    <link rel="stylesheet" href="{{ asset('css/admin-module.css') }}">
+@endpush
 @section('content')
+<div class="admin-module-scope">
 <div class="container py-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h1 class="fw-bold text-bgc-primary">Roles do Sistema</h1>
@@ -71,4 +76,10 @@
         </div>
     </div>
 </div>
+
+</div>
 @endsection
+
+@push('scripts')
+    <script src="{{ asset('js/admin-module.js') }}"></script>
+@endpush

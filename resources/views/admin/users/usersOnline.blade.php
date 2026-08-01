@@ -1,7 +1,12 @@
 @extends('layouts.header')
 @section('title', 'Usuários Online')
 
+
+@push('styles')
+    <link rel="stylesheet" href="{{ asset('css/admin-module.css') }}">
+@endpush
 @section('content')
+<div class="admin-module-scope">
     <div class="container mt-5">
         <h3>Usuários Logados</h3>
         @if (count($users))
@@ -39,4 +44,10 @@
             <div class="alert alert-warning">Nenhum usuário online.</div>
         @endif
     </div>
+
+</div>
 @endsection
+
+@push('scripts')
+    <script src="{{ asset('js/admin-module.js') }}"></script>
+@endpush

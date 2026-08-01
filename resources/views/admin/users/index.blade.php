@@ -1,7 +1,12 @@
 @extends('layouts.header')
 @section('title', 'Gerenciar Usuários')
 
+
+@push('styles')
+    <link rel="stylesheet" href="{{ asset('css/admin-module.css') }}">
+@endpush
 @section('content')
+<div class="admin-module-scope">
 
 
 <div class="container mt-5">
@@ -94,6 +99,8 @@
 
 </div>
 
+
+</div>
 @endsection
 
 
@@ -120,3 +127,7 @@
 </script>
 @endpush
 
+
+@push('scripts')
+    <script src="{{ asset('js/admin-module.js') }}"></script>
+@endpush
