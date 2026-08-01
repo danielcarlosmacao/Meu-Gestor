@@ -36,7 +36,6 @@ class DatabaseController extends Controller
                 // Sem senha, não usa -p nem MYSQL_PWD
                 $command = "\"{$mysqldump}\" -u {$dbUser} -h {$dbHost} {$dbName} > \"{$filepath}\"";
             }
-
         } else {
             // Linux/macOS
             if ($dbPass) {
@@ -123,7 +122,7 @@ class DatabaseController extends Controller
         }
     }
 
-    public function updateSystem()
+     public function updateSystem()
     {
 
         if (!app()->environment('production')) {
@@ -202,6 +201,4 @@ class DatabaseController extends Controller
         }
 
     }
-
-
 }
