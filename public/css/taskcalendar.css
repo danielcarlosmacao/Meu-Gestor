@@ -1,3 +1,5 @@
+/* Otimizado para consumir os tokens globais de system-theme.css.
+   Mantenha este arquivo carregado depois do tema global. */
 /* ===== CONTAINER ===== */
 #calendar {
     max-width: 100%;
@@ -30,7 +32,7 @@
 
 /* ===== DIAS DA SEMANA ===== */
 .fc-col-header-cell {
-    background: #f8f9fa;
+    background: var(--sys-surface-soft);
     padding: 12px 0;
     font-weight: 600;
     font-size: 0.85rem;

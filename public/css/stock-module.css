@@ -1,8 +1,10 @@
+/* Otimizado para consumir os tokens globais de system-theme.css.
+   Mantenha este arquivo carregado depois do tema global. */
 :root {
-    --stock-primary: var(--color-primary, #24b153);
+    --stock-primary: var(--sys-primary, var(--color-primary, #24b153));
     --stock-primary-soft: color-mix(in srgb, var(--stock-primary) 12%, #fff);
-    --stock-border: #e3e8ef;
-    --stock-text: #263238;
+    --stock-border: var(--sys-border);
+    --stock-text: var(--sys-text);
     --stock-muted: #6c757d;
     --stock-surface: #fff;
     --stock-bg: #f5f7fa;
@@ -135,7 +137,7 @@
 
 .stock-table thead th {
     padding: .85rem 1rem;
-    background: #f8fafc;
+    background: var(--sys-surface-soft);
     border-bottom: 1px solid var(--stock-border);
     color: #52606d;
     font-size: .75rem;
@@ -147,7 +149,7 @@
 
 .stock-table tbody td {
     padding: .9rem 1rem;
-    border-color: #edf0f4;
+    border-color: var(--sys-border-soft);
     color: var(--stock-text);
     font-size: .92rem;
 }

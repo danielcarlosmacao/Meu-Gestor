@@ -1,21 +1,23 @@
+/* Otimizado para consumir os tokens globais de system-theme.css.
+   Mantenha este arquivo carregado depois do tema global. */
 /* =========================================================
    Notification Module
    Arquivo: public/css/notification-module.css
 ========================================================= */
 
 :root {
-    --notification-primary: var(--color-primary, #24b153);
-    --notification-secondary: var(--color-secondary, #6fbe89);
+    --notification-primary: var(--sys-primary, var(--color-primary, #24b153));
+    --notification-secondary: var(--sys-secondary, var(--color-secondary, #6fbe89));
 
-    --notification-background: #f4f7fb;
+    --notification-background: var(--sys-page-bg);
     --notification-surface: #ffffff;
-    --notification-surface-soft: #f8fafc;
+    --notification-surface-soft: var(--sys-surface-soft);
 
-    --notification-border: #e2e7ec;
-    --notification-border-light: #edf0f3;
+    --notification-border: var(--sys-border);
+    --notification-border-light: var(--sys-border-soft);
 
-    --notification-text: #2f3944;
-    --notification-muted: #74808c;
+    --notification-text: var(--sys-text);
+    --notification-muted: var(--sys-muted);
 
     --notification-success: #198754;
     --notification-warning: #f0ad4e;
@@ -219,7 +221,7 @@
     padding: 0.92rem 1rem;
 
     color: #53606c;
-    background: #f8fafc;
+    background: var(--sys-surface-soft);
 
     border-bottom: 1px solid var(--notification-border);
 
@@ -715,7 +717,7 @@
     border: 1px solid #dce2e8;
     border-radius: 10px;
 
-    background: #f8fafc;
+    background: var(--sys-surface-soft);
 
     transition:
         border-color 0.18s ease,
@@ -757,7 +759,7 @@
 
     margin: 0;
 
-    border: 1px solid #e2e7ec;
+    border: 1px solid var(--sys-border);
     border-radius: 9px;
 
     background: #ffffff;

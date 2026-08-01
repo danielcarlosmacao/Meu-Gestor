@@ -1,17 +1,19 @@
+/* Otimizado para consumir os tokens globais de system-theme.css.
+   Mantenha este arquivo carregado depois do tema global. */
 /* =========================================================
    Admin Module
    Arquivo: public/css/admin-module.css
 ========================================================= */
 :root {
-    --am-primary: var(--color-primary, #24b153);
-    --am-secondary: var(--color-secondary, #6fbe89);
-    --am-bg: #f4f7fb;
+    --am-primary: var(--sys-primary, var(--color-primary, #24b153));
+    --am-secondary: var(--sys-secondary, var(--color-secondary, #6fbe89));
+    --am-bg: var(--sys-page-bg);
     --am-surface: #ffffff;
-    --am-surface-soft: #f8fafc;
-    --am-border: #e2e8f0;
-    --am-border-soft: #edf2f7;
-    --am-text: #27313b;
-    --am-muted: #718096;
+    --am-surface-soft: var(--sys-surface-soft);
+    --am-border: var(--sys-border);
+    --am-border-soft: var(--sys-border-soft);
+    --am-text: var(--sys-text);
+    --am-muted: var(--sys-muted);
     --am-success: #198754;
     --am-warning: #d99614;
     --am-danger: #dc3545;
@@ -110,7 +112,7 @@
 
 .admin-module-scope .user-inactive {
     opacity: .58;
-    background: #f8f9fa;
+    background: var(--sys-surface-soft);
 }
 
 .admin-module-scope .btn {

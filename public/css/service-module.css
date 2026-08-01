@@ -1,3 +1,5 @@
+/* Otimizado para consumir os tokens globais de system-theme.css.
+   Mantenha este arquivo carregado depois do tema global. */
 /* ================================================================
    SERVICE MODULE
    Estilos compartilhados do módulo de serviços
@@ -54,7 +56,7 @@
 
 .service-page-title {
     margin: 0;
-    color: #1f2937;
+    color: var(--sys-text-strong);
     font-size: 1.65rem;
     font-weight: 700;
     line-height: 1.25;
@@ -62,7 +64,7 @@
 
 .service-page-subtitle {
     margin: 0.3rem 0 0;
-    color: #6b7280;
+    color: var(--sys-muted);
     font-size: 0.93rem;
 }
 
@@ -142,7 +144,7 @@
 
 .service-card {
     overflow: hidden;
-    border: 1px solid #e2e8f0;
+    border: 1px solid var(--sys-border);
     border-radius: 15px;
     background-color: #fff;
     box-shadow: 0 6px 22px rgba(15, 23, 42, 0.05);
@@ -154,20 +156,20 @@
     justify-content: space-between;
     gap: 1rem;
     padding: 1.15rem 1.3rem;
-    border-bottom: 1px solid #edf0f3;
+    border-bottom: 1px solid var(--sys-border-soft);
     background-color: #fff;
 }
 
 .service-card-title {
     margin: 0;
-    color: #1f2937;
+    color: var(--sys-text-strong);
     font-size: 1.05rem;
     font-weight: 700;
 }
 
 .service-card-subtitle {
     margin: 0.25rem 0 0;
-    color: #6b7280;
+    color: var(--sys-muted);
     font-size: 0.85rem;
 }
 
@@ -196,7 +198,7 @@
     gap: 0.9rem;
     min-height: 92px;
     padding: 1rem;
-    border: 1px solid #e2e8f0;
+    border: 1px solid var(--sys-border);
     border-radius: 14px;
     background-color: #fff;
     box-shadow: 0 5px 18px rgba(15, 23, 42, 0.045);
@@ -218,14 +220,14 @@
 .service-summary-label {
     display: block;
     margin-bottom: 0.2rem;
-    color: #6b7280;
+    color: var(--sys-muted);
     font-size: 0.78rem;
     font-weight: 600;
 }
 
 .service-summary-value {
     display: block;
-    color: #1f2937;
+    color: var(--sys-text-strong);
     font-size: 1.2rem;
     font-weight: 700;
 }
@@ -264,7 +266,7 @@
 .service-table tbody td {
     padding: 0.85rem 0.9rem;
     border: 0;
-    border-bottom: 1px solid #edf0f3;
+    border-bottom: 1px solid var(--sys-border-soft);
     color: #374151;
     font-size: 0.89rem;
     vertical-align: middle;
@@ -281,7 +283,7 @@
 }
 
 .service-table tbody tr:hover {
-    background-color: #f8fafc;
+    background-color: var(--sys-surface-soft);
 }
 
 .service-table tbody tr.service-row-hidden {
@@ -338,7 +340,7 @@
 
 .service-record-name {
     display: block;
-    color: #1f2937;
+    color: var(--sys-text-strong);
     font-weight: 700;
 }
 
@@ -394,7 +396,7 @@
 
 .service-badge-dark {
     background-color: #e5e7eb;
-    color: #1f2937;
+    color: var(--sys-text-strong);
 }
 
 /* ================================================================
@@ -402,7 +404,7 @@
 ================================================================ */
 
 .service-money {
-    color: #1f2937;
+    color: var(--sys-text-strong);
     font-weight: 700;
     white-space: nowrap;
 }
@@ -489,7 +491,7 @@
 .service-modal .input-group-text {
     border-color: #d5dce3;
     background-color: #f5f7f9;
-    color: #6b7280;
+    color: var(--sys-muted);
 }
 
 .service-required {
@@ -505,7 +507,7 @@
 .service-form-section {
     margin-bottom: 1.25rem;
     padding-bottom: 1.1rem;
-    border-bottom: 1px solid #edf0f3;
+    border-bottom: 1px solid var(--sys-border-soft);
 }
 
 .service-form-section:last-child {
@@ -540,7 +542,7 @@
     align-items: center;
     justify-content: space-between;
     padding: 1.15rem 1.3rem;
-    border-bottom: 1px solid #edf0f3;
+    border-bottom: 1px solid var(--sys-border-soft);
     background-color: #fff;
 }
 
@@ -575,7 +577,7 @@
 
 .service-modal .modal-title {
     margin: 0;
-    color: #1f2937;
+    color: var(--sys-text-strong);
     font-size: 1.05rem;
     font-weight: 700;
 }
@@ -592,7 +594,7 @@
 
 .service-modal .modal-footer {
     padding: 1rem 1.3rem;
-    border-top: 1px solid #edf0f3;
+    border-top: 1px solid var(--sys-border-soft);
     background-color: #fafbfc;
 }
 
@@ -644,7 +646,7 @@
     justify-content: center;
     min-height: 270px;
     padding: 2rem;
-    color: #6b7280;
+    color: var(--sys-muted);
     text-align: center;
 }
 

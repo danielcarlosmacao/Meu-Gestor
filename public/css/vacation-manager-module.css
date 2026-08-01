@@ -1,16 +1,18 @@
+/* Otimizado para consumir os tokens globais de system-theme.css.
+   Mantenha este arquivo carregado depois do tema global. */
 /* =========================================================
    Vacation Manager - Index pages
    Arquivo: public/css/vacation-manager-index.css
    ========================================================= */
 
 :root {
-    --vm-primary: var(--color-primary, #24b153);
+    --vm-primary: var(--sys-primary, var(--color-primary, #24b153));
     --vm-primary-dark: color-mix(in srgb, var(--vm-primary) 78%, #000);
     --vm-primary-soft: color-mix(in srgb, var(--vm-primary) 12%, #fff);
-    --vm-bg: #f4f7fb;
+    --vm-bg: var(--sys-page-bg);
     --vm-surface: #ffffff;
-    --vm-border: #e3e8ef;
-    --vm-text: #263238;
+    --vm-border: var(--sys-border);
+    --vm-text: var(--sys-text);
     --vm-muted: #6c757d;
     --vm-danger: #dc3545;
     --vm-warning: #f0ad4e;
@@ -118,7 +120,7 @@
     padding: 0.9rem 1rem;
     color: #52606d;
     border-bottom: 1px solid var(--vm-border);
-    background: #f8fafc;
+    background: var(--sys-surface-soft);
     font-size: 0.76rem;
     font-weight: 700;
     letter-spacing: 0.045em;
@@ -129,7 +131,7 @@
 .vm-table tbody td {
     padding: 0.95rem 1rem;
     color: var(--vm-text);
-    border-color: #edf0f4;
+    border-color: var(--sys-border-soft);
     font-size: 0.92rem;
 }
 

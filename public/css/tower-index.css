@@ -1,3 +1,5 @@
+/* Otimizado para consumir os tokens globais de system-theme.css.
+   Mantenha este arquivo carregado depois do tema global. */
 /*
 |--------------------------------------------------------------------------
 | PÁGINA
@@ -27,7 +29,7 @@
 
 .tower-page-title {
     margin: 0;
-    color: #1f2937;
+    color: var(--sys-text-strong);
     font-size: clamp(1.75rem, 3vw, 2.35rem);
     font-weight: 750;
     letter-spacing: -0.04em;
@@ -36,7 +38,7 @@
 .tower-page-description {
     max-width: 680px;
     margin: 0.55rem 0 0;
-    color: #64748b;
+    color: var(--sys-muted);
     font-size: 0.94rem;
     line-height: 1.65;
 }
@@ -98,13 +100,13 @@
 
 .tower-summary-label {
     margin-bottom: 0.15rem;
-    color: #64748b;
+    color: var(--sys-muted);
     font-size: 0.75rem;
     font-weight: 600;
 }
 
 .tower-summary-value {
-    color: #1f2937;
+    color: var(--sys-text-strong);
     font-size: 1.15rem;
     font-weight: 750;
 }
@@ -134,14 +136,14 @@
 
 .tower-table-title {
     margin: 0;
-    color: #1f2937;
+    color: var(--sys-text-strong);
     font-size: 1.05rem;
     font-weight: 750;
 }
 
 .tower-table-subtitle {
     margin: 0.22rem 0 0;
-    color: #64748b;
+    color: var(--sys-muted);
     font-size: 0.78rem;
 }
 
