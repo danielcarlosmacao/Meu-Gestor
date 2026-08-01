@@ -1,234 +1,380 @@
 @extends('layouts.header')
+
 @section('title', 'Calendário de Férias')
+
+@push('styles')
+    <link rel="stylesheet" href="{{ asset('css/vacation-manager-module.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/vacation-manager-calendar.css') }}">
+@endpush
 
 @section('content')
 
-    <style>
-        .calendar {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            /* Agora 4 meses por linha */
-            gap: 0.75rem;
-        }
-
-        .month {
-            border: 1px solid #ccc;
-            border-radius: 6px;
-            overflow: visible;
-            font-size: 0.7rem;
-        }
-
-        .month-name {
-            background: var(--color-primary);
-            color: #fff;
-            text-align: center;
-            padding: 4px;
-            font-weight: bold;
-            font-size: 0.75rem;
-        }
-
-        .day-names,
-        .days {
-            display: grid;
-            grid-template-columns: repeat(7, 1fr);
-            text-align: center;
-        }
-
-        .day-names div {
-            font-weight: bold;
-            background: #f0f0f0;
-            padding: 2px 0;
-            font-size: 0.65rem;
-        }
-
-        .day {
-            border: 1px solid #eee;
-            padding: 3px;
-            min-height: 30px;
-            font-size: 0.65rem;
-            position: relative;
-            overflow: visible;
-        }
-
-        .vacation-day-multi {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            display: flex;
-            z-index: 1;
-            border-radius: 3px;
-            opacity: 0.85;
-        }
-
-        .vacation-day-multi div {
-            flex: 1;
-            min-height: 10px;
-            cursor: pointer;
-        }
-
-        .day-number {
-            position: relative;
-            z-index: 2;
-            font-weight: bold;
-            font-size: 0.7rem;
-        }
-
-        .sunday .day-number {
-            color: #ff1919;
-            font-weight: 500;
-        }
-
-        .holiday .day-number {
-            color: #b30000;
-            font-weight: 900;
-            font-size: 0.8rem;
-        }
-
-        .day.has-vacation .day-number {
-            color: inherit !important;
-            font-weight: bold;
-        }
-
-        .day.has-vacation.holiday::after {
-            content: "F";
-            color: red;
-            position: absolute;
-            top: 2px;
-            right: 4px;
-            font-size: 10px;
-        }
-    </style>
-
     @php
+        /*
+         * Feriados fixos e datas específicas do município.
+         */
         $holidays = [
-            "$year-01-01" => 'Confraternização Universal',
-            "$year-02-13" => 'Aniversario da cidade',
-            "$year-04-21" => 'Tiradentes',
-            "$year-05-01" => 'Dia do Trabalho',
-            "$year-09-07" => 'Independência do Brasil',
-            "$year-10-12" => 'Nossa Senhora Aparecida',
-            "$year-11-02" => 'Finados',
-            "$year-11-15" => 'Proclamação da República',
-            "$year-12-25" => 'Natal',
+            "{$year}-01-01" => 'Confraternização Universal',
+            "{$year}-02-13" => 'Aniversário da cidade',
+            "{$year}-04-21" => 'Tiradentes',
+            "{$year}-05-01" => 'Dia do Trabalho',
+            "{$year}-09-07" => 'Independência do Brasil',
+            "{$year}-10-12" => 'Nossa Senhora Aparecida',
+            "{$year}-11-02" => 'Finados',
+            "{$year}-11-15" => 'Proclamação da República',
+            "{$year}-12-25" => 'Natal',
         ];
+
+        /*
+         * Monta todo o mapa de férias uma única vez.
+         *
+         * Estrutura:
+         * $vacationMap['2026-07-01'] = [
+         *     [
+         *         'name'  => 'João',
+         *         'color' => '#24b153',
+         *     ]
+         * ];
+         */
+        $vacationMap = [];
+
+        foreach ($vacations as $vacation) {
+            if (!$vacation->start_date || !$vacation->end_date) {
+                continue;
+            }
+
+            $startDate = \Carbon\Carbon::parse($vacation->start_date);
+            $endDate = \Carbon\Carbon::parse($vacation->end_date);
+
+            $period = \Carbon\CarbonPeriod::create($startDate, $endDate);
+
+            foreach ($period as $periodDate) {
+                if ((int) $periodDate->year !== (int) $year) {
+                    continue;
+                }
+
+                $dateKey = $periodDate->format('Y-m-d');
+
+                $vacationMap[$dateKey][] = [
+                    'name' => $vacation->collaborator->name ?? 'Colaborador não informado',
+                    'color' => $vacation->collaborator->color ?? '#adb5bd',
+                ];
+            }
+        }
+
+        /*
+         * Colaboradores que aparecem no calendário.
+         */
+        $calendarCollaborators = $vacations
+            ->filter(fn($vacation) => !is_null($vacation->collaborator))
+            ->map(
+                fn($vacation) => [
+                    'id' => $vacation->collaborator->id,
+                    'name' => $vacation->collaborator->name,
+                    'color' => $vacation->collaborator->color ?? '#adb5bd',
+                ],
+            )
+            ->unique('id')
+            ->sortBy('name')
+            ->values();
     @endphp
 
-    <div class="container my-4">
-        <form method="GET" class="text-center mb-4">
-            <label for="year">Ano:</label>
-            <input type="number" name="year" id="year" value="{{ $year }}" class="form-control d-inline w-auto"
-                min="2000" max="2100">
-            <button class="btn dcm-btn-primary btn-sm">Atualizar</button>
-        </form>
+    <div class="container-fluid vm-page">
 
-        <div class="calendar">
-            @for ($month = 1; $month <= 12; $month++)
-                @php
-                    $date = \Carbon\Carbon::create($year, $month, 1);
-                    $startDayOfWeek = $date->copy()->startOfMonth()->dayOfWeekIso; // 1 (Mon) to 7 (Sun)
-                    $daysInMonth = $date->daysInMonth;
-                    $vacationMap = [];
+        <div class="vm-card">
 
-                    foreach ($vacations as $vacation) {
-                        $start = \Carbon\Carbon::parse($vacation->start_date);
-                        $end = \Carbon\Carbon::parse($vacation->end_date);
-                        $period = \Carbon\CarbonPeriod::create($start, $end);
+            {{-- Cabeçalho --}}
+            <div class="vm-card-header">
 
-                        foreach ($period as $day) {
-                            if ($day->year == $year && $day->month == $month) {
-                                $vacationMap[$day->day][] = [
-                                    'color' => $vacation->collaborator->color ?? '#ccc',
-                                    'name' => $vacation->collaborator->name ?? 'N/A',
-                                ];
-                            }
-                        }
-                    }
-                @endphp
+                <div class="vm-title-group">
 
-                <div class="month">
-                    <div class="month-name">{{ $date->translatedFormat('F') }}</div>
-
-                    <div class="day-names">
-                        <div>Dom</div>
-                        <div>Seg</div>
-                        <div>Ter</div>
-                        <div>Qua</div>
-                        <div>Qui</div>
-                        <div>Sex</div>
-                        <div>Sáb</div>
+                    <div class="vm-title-icon">
+                        <i class="bi bi-calendar3"></i>
                     </div>
 
-                    <div class="days">
+                    <div>
+                        <h1 class="vm-title">
+                            Calendário de férias
+                        </h1>
+
+                        <p class="vm-subtitle">
+                            Visualização anual dos períodos de férias dos colaboradores.
+                        </p>
+                    </div>
+
+                </div>
+
+                <form method="GET" action="{{ url()->current() }}" class="vacation-calendar-filter">
+                    <div class="input-group input-group-sm">
+
+                        <span class="input-group-text">
+                            <i class="bi bi-calendar-event"></i>
+                        </span>
+
+                        <input type="number" name="year" id="calendarYear" value="{{ $year }}"
+                            class="form-control" min="2000" max="2100" aria-label="Ano do calendário" required>
+
+                        <button type="submit" class="btn dcm-btn-primary">
+                            <i class="bi bi-arrow-repeat me-1"></i>
+                            Atualizar
+                        </button>
+
+                    </div>
+                </form>
+
+            </div>
+
+            <div class="vm-card-body">
+
+                {{-- Resumo --}}
+                <div class="vacation-calendar-summary">
+
+                    <div class="vacation-calendar-summary-item">
+
+                        <div class="vacation-calendar-summary-icon">
+                            <i class="bi bi-calendar3"></i>
+                        </div>
+
+                        <div>
+                            <span>Ano</span>
+                            <strong>{{ $year }}</strong>
+                        </div>
+
+                    </div>
+
+                    <div class="vacation-calendar-summary-item">
+
+                        <div class="vacation-calendar-summary-icon">
+                            <i class="bi bi-people"></i>
+                        </div>
+
+                        <div>
+                            <span>Colaboradores</span>
+                            <strong>
+                                {{ $calendarCollaborators->count() }}
+                            </strong>
+                        </div>
+
+                    </div>
+
+                    <div class="vacation-calendar-summary-item">
+
+                        <div class="vacation-calendar-summary-icon">
+                            <i class="bi bi-calendar-check"></i>
+                        </div>
+
+                        <div>
+                            <span>Períodos cadastrados</span>
+                            <strong>
+                                {{ $vacations->count() }}
+                            </strong>
+                        </div>
+
+                    </div>
+
+                    <div class="vacation-calendar-summary-item">
+
+                        <div class="vacation-calendar-summary-icon">
+                            <i class="bi bi-flag"></i>
+                        </div>
+
+                        <div>
+                            <span>Feriados cadastrados</span>
+                            <strong>
+                                {{ count($holidays) }}
+                            </strong>
+                        </div>
+
+                    </div>
+
+                </div>
+
+                {{-- Legenda 
+                <div class="vacation-calendar-legend">
+
+                    <div class="vacation-calendar-legend-title">
+                        <i class="bi bi-info-circle me-1"></i>
+                        Legenda
+                    </div>
+
+                    <div class="vacation-calendar-legend-items">
+
+                        <div class="vacation-calendar-legend-item">
+                            <span class="vacation-calendar-legend-sunday"></span>
+                            Domingo
+                        </div>
+
+                        <div class="vacation-calendar-legend-item">
+                            <span class="vacation-calendar-legend-holiday">
+                                F
+                            </span>
+                            Feriado
+                        </div>
+
+                        @foreach ($calendarCollaborators as $calendarCollaborator)
+                            <div class="vacation-calendar-legend-item">
+
+                                <span class="vacation-calendar-legend-color"
+                                    style="background-color: {{ $calendarCollaborator['color'] }}"></span>
+
+                                {{ $calendarCollaborator['name'] }}
+
+                            </div>
+                        @endforeach
+
+                    </div>
+
+                </div>
+--}}
+                {{-- Calendário --}}
+                <div class="vacation-calendar">
+
+                    @for ($month = 1; $month <= 12; $month++)
                         @php
-                            $adjustedStart = $startDayOfWeek % 7; // transform ISO start into week starting on Sunday
+                            $monthDate = \Carbon\Carbon::create($year, $month, 1);
+
+                            $daysInMonth = $monthDate->daysInMonth;
+
+                            /*
+                             * Carbon:
+                             * 0 = domingo
+                             * 1 = segunda
+                             * ...
+                             * 6 = sábado
+                             */
+                            $monthStartOffset = $monthDate->dayOfWeek;
                         @endphp
 
-                        @for ($i = 0; $i < $adjustedStart; $i++)
-                            <div class="day"></div>
-                        @endfor
-                        @for ($day = 1; $day <= $daysInMonth; $day++)
-                            @php
-                                $currentDay = \Carbon\Carbon::create($year, $month, $day);
-                                $isSunday = $currentDay->dayOfWeek === 0;
-                                $dateFormatted = $currentDay->format('Y-m-d');
-                                $isHoliday = isset($holidays[$dateFormatted]);
-                                $holidayName = $holidays[$dateFormatted] ?? null;
-                                $hasVacation = isset($vacationMap[$day]);
+                        <section class="vacation-calendar-month">
 
-                                // Monta tooltip combinado
-                                $tooltipText = '';
+                            <header class="vacation-calendar-month-header">
 
-                                if ($hasVacation) {
-                                    $names = collect($vacationMap[$day])->pluck('name')->implode(', ');
-                                    $tooltipText .= $names;
-                                }
+                                <span>
+                                    {{ ucfirst($monthDate->translatedFormat('F')) }}
+                                </span>
 
-                                if ($isHoliday) {
-                                    if ($tooltipText) {
-                                        $tooltipText .= ' | ';
-                                    }
-                                    $tooltipText .= $holidayName;
-                                }
-                            @endphp
+                                <small>
+                                    {{ $monthDate->format('m/Y') }}
+                                </small>
 
-                            <div class="day 
-    {{ $isSunday ? 'sunday' : '' }} 
-    {{ $isHoliday ? 'holiday' : '' }} 
-    {{ $hasVacation ? 'has-vacation' : '' }}"
-                                @if ($tooltipText) data-bs-toggle="tooltip"
-        data-bs-placement="top"
-        title="{{ $tooltipText }}" @endif>
-                                @if ($hasVacation)
-                                    <div class="vacation-day-multi">
-                                        @foreach ($vacationMap[$day] as $info)
-                                            <div style="background-color: {{ $info['color'] }};" data-bs-toggle="tooltip"
-                                                data-bs-placement="top" title="{{ $info['name'] }}">
-                                            </div>
-                                        @endforeach
-                                    </div>
-                                @endif
+                            </header>
 
-                                <div class="day-number">{{ $day }}</div>
+                            <div class="vacation-calendar-weekdays">
+
+                                <div class="is-sunday">
+                                    Dom
+                                </div>
+
+                                <div>
+                                    Seg
+                                </div>
+
+                                <div>
+                                    Ter
+                                </div>
+
+                                <div>
+                                    Qua
+                                </div>
+
+                                <div>
+                                    Qui
+                                </div>
+
+                                <div>
+                                    Sex
+                                </div>
+
+                                <div>
+                                    Sáb
+                                </div>
+
                             </div>
-                        @endfor
-                    </div>
+
+                            <div class="vacation-calendar-days">
+
+                                {{-- Espaços antes do primeiro dia --}}
+                                @for ($emptyDay = 0; $emptyDay < $monthStartOffset; $emptyDay++)
+                                    <div class="vacation-calendar-day is-empty" aria-hidden="true"></div>
+                                @endfor
+
+                                {{-- Dias do mês --}}
+                                @for ($day = 1; $day <= $daysInMonth; $day++)
+                                    @php
+                                        $currentDate = \Carbon\Carbon::create($year, $month, $day);
+
+                                        $dateKey = $currentDate->format('Y-m-d');
+
+                                        $isSunday = $currentDate->isSunday();
+
+                                        $isHoliday = isset($holidays[$dateKey]);
+
+                                        $holidayName = $holidays[$dateKey] ?? null;
+
+                                        $dayVacations = $vacationMap[$dateKey] ?? [];
+
+                                        $hasVacation = count($dayVacations) > 0;
+
+                                        $tooltipItems = [];
+
+                                        foreach ($dayVacations as $vacationInfo) {
+                                            $tooltipItems[] = $vacationInfo['name'];
+                                        }
+
+                                        if ($isHoliday) {
+                                            $tooltipItems[] = $holidayName;
+                                        }
+
+                                        $tooltipText = implode(' • ', array_unique($tooltipItems));
+                                    @endphp
+
+                                    <div class="vacation-calendar-day
+                                            {{ $isSunday ? 'is-sunday' : '' }}
+                                            {{ $isHoliday ? 'is-holiday' : '' }}
+                                            {{ $hasVacation ? 'has-vacation' : '' }}"
+                                        @if ($tooltipText) data-bs-toggle="tooltip"
+                                            data-bs-placement="top"
+                                            data-bs-title="{{ $tooltipText }}" @endif>
+
+                                        @if ($hasVacation)
+                                            <div class="vacation-calendar-day-background">
+
+                                                @foreach ($dayVacations as $vacationInfo)
+                                                    <span style="background-color: {{ $vacationInfo['color'] }}"></span>
+                                                @endforeach
+
+                                            </div>
+                                        @endif
+
+                                        <span class="vacation-calendar-day-number">
+                                            {{ $day }}
+                                        </span>
+
+                                        @if ($isHoliday)
+                                            <span class="vacation-calendar-holiday-indicator" aria-label="Feriado">
+                                                F
+                                            </span>
+                                        @endif
+
+                                    </div>
+                                @endfor
+
+                            </div>
+
+                        </section>
+                    @endfor
+
                 </div>
-            @endfor
+
+            </div>
+
         </div>
+
     </div>
 
-    <!-- Script para tooltips -->
-    @push('scripts')
-        <script>
-            document.addEventListener('DOMContentLoaded', function() {
-                const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-                tooltipTriggerList.forEach(function(tooltipTriggerEl) {
-                    new bootstrap.Tooltip(tooltipTriggerEl);
-                });
-            });
-        </script>
-    @endpush
-
 @endsection
+
+@push('scripts')
+    <script src="{{ asset('js/vacation-manager-module.js') }}"></script>
+    <script src="{{ asset('js/vacation-manager-calendar.js') }}"></script>
+@endpush

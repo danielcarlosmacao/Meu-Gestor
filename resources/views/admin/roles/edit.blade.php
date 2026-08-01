@@ -1,7 +1,12 @@
 @extends('layouts.header')
 @section('title', 'Editar Role')
 
+
+@push('styles')
+    <link rel="stylesheet" href="{{ asset('css/admin-module.css') }}">
+@endpush
 @section('content')
+<div class="admin-module-scope">
 <div class="container py-4">
     <h1 class="fw-bold text-bgc-primary mb-4">Editar Role: {{ $role->name }}</h1>
 
@@ -57,4 +62,10 @@
         <a href="{{ route('admin.roles.index') }}" class="btn btn-secondary">Cancelar</a>
     </form>
 </div>
+
+</div>
 @endsection
+
+@push('scripts')
+    <script src="{{ asset('js/admin-module.js') }}"></script>
+@endpush

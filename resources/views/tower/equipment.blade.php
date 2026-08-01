@@ -1,178 +1,736 @@
 @extends('layouts.header')
+
 @section('title', 'Equipamentos')
+
+@push('styles')
+    <link rel="stylesheet" href="{{ asset('css/tower-resource-index.css') }}">
+@endpush
+
 @section('content')
 
-    <div class="container mb-2 mb-md-5 mt-2 mt-md-5">
-        <h2 class="text-center">Equipamentos
-            <!-- Botão que abre o modal -->
-            @can('towers.create')
-                <button type="button" class="btn btn dcm-btn-primary" data-bs-toggle="modal" data-bs-target="#modalForm">
-                    <i class="bi bi-plus-lg"></i>
-                </button>
-            @endcan
-        </h2>
+    <div class="resource-page">
 
-    </div>
+        {{-- ============================================================
+            CABEÇALHO
+        ============================================================= --}}
 
-    <div class="container table-responsive">
-        <table class="table table-striped ">
-            <thead class="bgc-primary text-white">
-                <tr>
-                    <th scope="col">Nome</th>
-                    <th scope="col">Watts</th>
-                    <th scope="col">Em Produção</th>
-                    <th scope="col"></th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach ($equipments as $equipment)
-                    <tr>
-                        <th scope="row">{{ $equipment->name }}</th>
-                        <td>{{ $equipment->watts }}</td>
-                        <td>{{ $equipment->equipment_productions_count }}</td>
-                        <td class="text-center align-middle p-1">
-                            <div class="btn-group">
-                                <button type="button" class="btn btn-sm dcm-btn-primary dropdown-toggle"
-                                    data-bs-toggle="dropdown">
-                                    <i class="bi bi-gear"></i> Ações
-                                </button>
-                                <ul class="dropdown-menu dropdown-menu-end">
-                                    <li>
-                                        @can('towers.edit')
-                                            <button type="button" class="dropdown-item edit-equipment-btn"
-                                                data-id="{{ $equipment->id }}" data-name="{{ $equipment->name }}"
-                                                data-watts="{{ $equipment->watts }}"data-stock="{{ $equipment->stock }}"
-                                                data-bs-toggle="modal" data-bs-target="#editModal">
-                                                <i class="bi bi-pencil-square"></i> Editar
-                                            </button>
-                                        @endcan
-                                    </li>
-                                    <li>
-                                        @can('towers.delete')
-                                            <form action="{{ route('equipment.destroy', $equipment->id) }}" method="POST"
-                                                style="display:inline;">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit" class="dropdown-item"
-                                                    onclick="return confirm('Tem certeza que deseja deletar este equipamento ?')">
-                                                    <i class="bi bi-trash"></i> Deletar
-                                                </button>
-                                            </form>
-                                        @endcan
-                                    </li>
-                                </ul>
-                            </div>
-                        </td>
-                    </tr>
-                @endforeach
-            </tbody>
-        </table>
-        <div class="d-flex justify-content-center mt-4">
-            {{ $equipments->links() }}
-        </div>
-        <br>
-    </div>
+        <header class="resource-page-header">
 
-    <!-- Modal -->
-    <div class="modal fade" id="modalForm" tabindex="-1" aria-labelledby="modalFormLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
+            <div>
 
-                <!-- Cabeçalho -->
-                <div class="modal-header">
-                    <h5 class="modal-title text-bgc-primary" id="modalFormLabel">Adicionar Equipamento</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                <div class="resource-page-eyebrow">
+                    <i class="bi bi-router"></i>
+                    Equipamentos das torres
                 </div>
 
-                <!-- Corpo do modal com formulário -->
-                <div class="modal-body">
-                    <form action="{{ route('equipment.store') }}" method="post">
-                        @csrf
+                <h1 class="resource-page-title">
+                    Equipamentos
+                </h1>
 
-                        <div class="mb-3">
-                            <label for="name" class="form-label">Nome:</label>
-                            <input type="text" class="form-control" id="name" name="name" required>
+                <p class="resource-page-description">
+                    Gerencie os equipamentos utilizados nas torres,
+                    seu consumo elétrico e a quantidade disponível em estoque.
+                </p>
+
+            </div>
+
+            <div class="resource-header-actions">
+
+                @can('towers.create')
+                    <button type="button" class="btn dcm-btn-primary resource-primary-button" data-bs-toggle="modal"
+                        data-bs-target="#addEquipmentModal">
+
+                        <i class="bi bi-plus-lg"></i>
+                        Novo equipamento
+                    </button>
+                @endcan
+
+            </div>
+
+        </header>
+
+        {{-- ============================================================
+            CARDS DE RESUMO
+        ============================================================= --}}
+
+        <div class="row g-3 mb-4">
+
+            <div class="col-6 col-lg-4">
+
+                <div class="resource-summary-card">
+
+                    <div class="card-body">
+
+                        <div class="resource-summary-content">
+
+                            <span class="resource-summary-icon">
+                                <i class="bi bi-router"></i>
+                            </span>
+
+                            <div>
+
+                                <span class="resource-summary-label">
+                                    Equipamentos cadastrados
+                                </span>
+
+                                <strong class="resource-summary-value">
+                                    {{ $equipments->total() }}
+                                </strong>
+
+                            </div>
+
                         </div>
 
-                        <div class="mb-3">
-                            <label for="watts" class="form-label">Watts:</label>
-                            <input type="number" class="form-control" id="watts" name="watts" min="0"
-                                max="1000" step="0.01" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="stock" class="form-label">Estoque:</label>
-                            <input type="number" class="form-control" id="stock" name="stock" min="0"
-                                max="1000" step="1" required>
-                        </div>
+                    </div>
 
-                        <!-- Botão de envio -->
-                        <div class="text-end">
-                            <button type="submit" class="btn dcm-btn-primary">Salvar</button>
-                        </div>
-                    </form>
                 </div>
 
             </div>
-        </div>
-    </div>
 
-    <!-- Modal de edição (fora do loop) -->
-    <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <form id="editForm" method="POST">
-                @csrf
-                @method('PUT')
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title text-bgc-primary" id="editModalLabel">Editar Equipamento</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
-                    </div>
-                    <div class="modal-body">
-                        <input type="hidden" id="edit_id" name="id">
+            <div class="col-6 col-lg-4">
 
-                        <div class="mb-3">
-                            <label for="edit_name" class="form-label">Nome</label>
-                            <input type="text" class="form-control" id="edit_name" name="name" required>
+                <div class="resource-summary-card">
+
+                    <div class="card-body">
+
+                        <div class="resource-summary-content">
+
+                            <span class="resource-summary-icon">
+                                <i class="bi bi-box-seam"></i>
+                            </span>
+
+                            <div>
+
+                                <span class="resource-summary-label">
+                                    Estoque nesta página
+                                </span>
+
+                                <strong class="resource-summary-value">
+                                    {{ $equipments->sum('stock') }}
+                                </strong>
+
+                            </div>
+
                         </div>
 
-                        <div class="mb-3">
-                            <label for="edit_watts" class="form-label">Watts</label>
-                            <input type="number" class="form-control" id="edit_watts" name="watts" min="0"
-                                max="1000" step="0.01" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="edit_stock" class="form-label">Estoque</label>
-                            <input type="number" class="form-control" id="edit_stock" name="stock" min="0"
-                                max="1000" step="1" required>
-                        </div>
                     </div>
-                    <div class="modal-footer">
-                        <button type="submit" class="btn dcm-btn-primary">Salvar</button>
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    </div>
+
                 </div>
-            </form>
+
+            </div>
+
+            <div class="col-12 col-lg-4">
+
+                <div class="resource-summary-card">
+
+                    <div class="card-body">
+
+                        <div class="resource-summary-content">
+
+                            <span class="resource-summary-icon">
+                                <i class="bi bi-broadcast-pin"></i>
+                            </span>
+
+                            <div>
+
+                                <span class="resource-summary-label">
+                                    Em produção nesta página
+                                </span>
+
+                                <strong class="resource-summary-value">
+                                    {{ $equipments->sum('equipment_productions_count') }}
+                                </strong>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
         </div>
+
+        {{-- ============================================================
+            TABELA
+        ============================================================= --}}
+
+        <section class="resource-table-card">
+
+            <div class="resource-table-header">
+
+                <div>
+
+                    <h2 class="resource-table-title">
+                        Equipamentos cadastrados
+                    </h2>
+
+                    <p class="resource-table-subtitle">
+                        Consulte consumo, estoque disponível e quantidade em produção.
+                    </p>
+
+                </div>
+
+                <div class="resource-table-tools">
+
+                    <div class="resource-search">
+
+                        <i class="bi bi-search"></i>
+
+                        <input type="search" class="form-control" data-resource-search="#equipmentTable"
+                            placeholder="Pesquisar equipamento..." autocomplete="off">
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="resource-table-responsive">
+
+                <table id="equipmentTable" class="table resource-table align-middle">
+
+                    <thead>
+
+                        <tr>
+
+                            <th class="resource-sortable ps-4" data-sortable="true">
+
+                                <span>
+                                    Nome
+                                    <i class="bi bi-arrow-down-up resource-sort-icon"></i>
+                                </span>
+
+                            </th>
+
+                            <th class="resource-sortable" data-sortable="true">
+
+                                <span>
+                                    Consumo
+                                    <i class="bi bi-arrow-down-up resource-sort-icon"></i>
+                                </span>
+
+                            </th>
+
+                            <th class="resource-sortable" data-sortable="true">
+
+                                <span>
+                                    Estoque
+                                    <i class="bi bi-arrow-down-up resource-sort-icon"></i>
+                                </span>
+
+                            </th>
+
+                            <th class="resource-sortable" data-sortable="true">
+
+                                <span>
+                                    Em produção
+                                    <i class="bi bi-arrow-down-up resource-sort-icon"></i>
+                                </span>
+
+                            </th>
+
+                            <th class="text-center pe-4">
+                                Ações
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                        @forelse ($equipments as $equipment)
+
+                            <tr data-resource-row
+                                data-search="{{ mb_strtolower(
+                                    implode(' ', [$equipment->name, $equipment->watts, $equipment->stock, $equipment->equipment_productions_count]),
+                                ) }}">
+
+                                {{-- NOME --}}
+                                <td class="ps-4">
+
+                                    <div class="resource-name">
+
+                                        <span class="resource-name-icon">
+                                            <i class="bi bi-router"></i>
+                                        </span>
+
+                                        <span>
+
+                                            <strong>
+                                                {{ $equipment->name }}
+                                            </strong>
+
+                                            <small>
+                                                Equipamento da torre
+                                            </small>
+
+                                        </span>
+
+                                    </div>
+
+                                </td>
+
+                                {{-- WATTS --}}
+                                <td data-value="{{ $equipment->watts }}">
+
+                                    <span class="resource-value-badge">
+                                        {{ number_format((float) $equipment->watts, 2, ',', '.') }}
+                                        W
+                                    </span>
+
+                                </td>
+
+                                {{-- ESTOQUE --}}
+                                <td data-value="{{ $equipment->stock }}">
+
+                                    <span class="resource-value-badge">
+                                        {{ $equipment->stock }}
+                                    </span>
+
+                                </td>
+
+                                {{-- EM PRODUÇÃO --}}
+                                <td data-value="{{ $equipment->equipment_productions_count }}">
+
+                                    <span class="resource-value-badge">
+                                        {{ $equipment->equipment_productions_count }}
+                                    </span>
+
+                                </td>
+
+                                {{-- AÇÕES --}}
+                                <td class="text-center pe-4">
+
+                                    <div class="btn-group">
+
+                                        <button type="button"
+                                            class="btn btn-sm dcm-btn-primary
+                                                dropdown-toggle resource-actions-button"
+                                            data-bs-toggle="dropdown" aria-expanded="false">
+
+                                            <i class="bi bi-gear"></i>
+                                            Ações
+                                        </button>
+
+                                        <ul class="dropdown-menu dropdown-menu-end">
+
+                                            @can('towers.edit')
+                                                <li>
+
+                                                    <button type="button" class="dropdown-item"
+                                                        data-resource-edit="#editEquipmentModal"
+                                                        data-update-url="{{ route('equipment.update', $equipment->id) }}"
+                                                        data-name="{{ $equipment->name }}"
+                                                        data-watts="{{ $equipment->watts }}"
+                                                        data-stock="{{ $equipment->stock }}" data-bs-toggle="modal"
+                                                        data-bs-target="#editEquipmentModal">
+
+                                                        <i class="bi bi-pencil-square"></i>
+                                                        Editar
+                                                    </button>
+
+                                                </li>
+                                            @endcan
+
+                                            @can('towers.delete')
+                                                @can('towers.edit')
+                                                    <li>
+                                                        <hr class="dropdown-divider">
+                                                    </li>
+                                                @endcan
+
+                                                <li>
+
+                                                    <button type="button" class="dropdown-item resource-delete-item"
+                                                        data-resource-delete="{{ route('equipment.destroy', $equipment->id) }}"
+                                                        data-delete-title="Deseja excluir este equipamento?"
+                                                        data-delete-description="Essa alteração não poderá ser desfeita.">
+
+                                                        <i class="bi bi-trash"></i>
+                                                        Excluir
+                                                    </button>
+
+                                                </li>
+                                            @endcan
+
+                                        </ul>
+
+                                    </div>
+
+                                </td>
+
+                            </tr>
+
+                        @empty
+
+                            <tr>
+
+                                <td colspan="5" class="resource-empty-state">
+
+                                    <span class="resource-empty-icon">
+                                        <i class="bi bi-router"></i>
+                                    </span>
+
+                                    <h3>
+                                        Nenhum equipamento cadastrado
+                                    </h3>
+
+                                    <p>
+                                        Cadastre o primeiro equipamento para começar.
+                                    </p>
+
+                                </td>
+
+                            </tr>
+
+                        @endforelse
+
+                        {{-- SEM RESULTADO NA PESQUISA --}}
+                        <tr class="d-none" data-search-empty>
+
+                            <td colspan="5" class="resource-empty-state">
+
+                                <span class="resource-empty-icon">
+                                    <i class="bi bi-search"></i>
+                                </span>
+
+                                <h3>
+                                    Nenhum equipamento encontrado
+                                </h3>
+
+                                <p>
+                                    Tente pesquisar utilizando outro nome ou valor.
+                                </p>
+
+                            </td>
+
+                        </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+            {{-- PAGINAÇÃO --}}
+            @if ($equipments->hasPages())
+                <div class="resource-pagination">
+                    {{ $equipments->withQueryString()->links() }}
+                </div>
+            @endif
+
+        </section>
+
     </div>
 
-    <script>
-        const routeUpdate = "{{ route('equipment.update', ['id' => ':id']) }}";
+    {{-- ================================================================
+        MODAL ADICIONAR
+    ================================================================= --}}
 
-        document.querySelectorAll('.edit-equipment-btn').forEach(button => {
-            button.addEventListener('click', () => {
-                const id = button.dataset.id;
-                const name = button.dataset.name;
-                const watts = button.dataset.watts;
-                const stock = button.dataset.stock;
+    @can('towers.create')
+        <div class="modal fade resource-modal" id="addEquipmentModal" tabindex="-1"
+            aria-labelledby="addEquipmentModalLabel" aria-hidden="true">
 
-                document.getElementById('edit_id').value = id;
-                document.getElementById('edit_name').value = name;
-                document.getElementById('edit_watts').value = watts;
-                document.getElementById('edit_stock').value = stock;
+            <div class="modal-dialog modal-dialog-centered">
 
-                const form = document.getElementById('editForm');
-                form.action = routeUpdate.replace(':id', id);
-            });
-        });
-    </script>
+                <form action="{{ route('equipment.store') }}" method="POST" class="modal-content js-resource-form"
+                    novalidate>
+
+                    @csrf
+
+                    <div class="modal-header">
+
+                        <div class="resource-modal-title-area">
+
+                            <span class="resource-modal-icon">
+                                <i class="bi bi-router"></i>
+                            </span>
+
+                            <div>
+
+                                <h5 class="modal-title" id="addEquipmentModalLabel">
+
+                                    Novo equipamento
+                                </h5>
+
+                                <p class="resource-modal-description">
+                                    Informe o consumo e o estoque do equipamento.
+                                </p>
+
+                            </div>
+
+                        </div>
+
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar">
+                        </button>
+
+                    </div>
+
+                    <div class="modal-body">
+
+                        <div class="mb-3">
+
+                            <label for="equipment_name" class="form-label">
+
+                                Nome
+                            </label>
+
+                            <input type="text"
+                                class="form-control
+                                    @error('name') is-invalid @enderror"
+                                id="equipment_name" name="name" value="{{ old('name') }}" maxlength="150" required
+                                autofocus>
+
+                            @error('name')
+                                <div class="invalid-feedback">
+                                    {{ $message }}
+                                </div>
+                            @else
+                                <div class="invalid-feedback">
+                                    Informe o nome do equipamento.
+                                </div>
+                            @enderror
+
+                        </div>
+
+                        <div class="row g-3">
+
+                            <div class="col-md-6">
+
+                                <label for="equipment_watts" class="form-label">
+
+                                    Consumo
+                                </label>
+
+                                <div class="input-group">
+
+                                    <input type="number"
+                                        class="form-control
+                                            @error('watts') is-invalid @enderror"
+                                        id="equipment_watts" name="watts" value="{{ old('watts') }}" min="0"
+                                        max="1000" step="0.01" required>
+
+                                    <span class="input-group-text">
+                                        W
+                                    </span>
+
+                                    @error('watts')
+                                        <div class="invalid-feedback">
+                                            {{ $message }}
+                                        </div>
+                                    @enderror
+
+                                </div>
+
+                            </div>
+
+                            <div class="col-md-6">
+
+                                <label for="equipment_stock" class="form-label">
+
+                                    Estoque
+                                </label>
+
+                                <input type="number"
+                                    class="form-control
+                                        @error('stock') is-invalid @enderror"
+                                    id="equipment_stock" name="stock" value="{{ old('stock') }}" min="0"
+                                    max="1000" step="1" required>
+
+                                @error('stock')
+                                    <div class="invalid-feedback">
+                                        {{ $message }}
+                                    </div>
+                                @else
+                                    <div class="invalid-feedback">
+                                        Informe a quantidade em estoque.
+                                    </div>
+                                @enderror
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <div class="modal-footer">
+
+                        <button type="button" class="btn btn-light" data-bs-dismiss="modal">
+
+                            Cancelar
+                        </button>
+
+                        <button type="submit" class="btn dcm-btn-primary" data-submit-button
+                            data-loading-text="Salvando...">
+
+                            <span class="spinner-border spinner-border-sm d-none" data-submit-spinner aria-hidden="true">
+                            </span>
+
+                            <i class="bi bi-check-lg" data-submit-icon>
+                            </i>
+
+                            <span data-submit-text>
+                                Salvar equipamento
+                            </span>
+
+                        </button>
+
+                    </div>
+
+                </form>
+
+            </div>
+
+        </div>
+    @endcan
+
+    {{-- ================================================================
+        MODAL EDITAR
+    ================================================================= --}}
+
+    @can('towers.edit')
+        <div class="modal fade resource-modal" id="editEquipmentModal" tabindex="-1"
+            aria-labelledby="editEquipmentModalLabel" aria-hidden="true">
+
+            <div class="modal-dialog modal-dialog-centered">
+
+                <form method="POST" class="modal-content js-resource-form" data-edit-form novalidate>
+
+                    @csrf
+                    @method('PUT')
+
+                    <div class="modal-header">
+
+                        <div class="resource-modal-title-area">
+
+                            <span class="resource-modal-icon">
+                                <i class="bi bi-pencil-square"></i>
+                            </span>
+
+                            <div>
+
+                                <h5 class="modal-title" id="editEquipmentModalLabel">
+
+                                    Editar equipamento
+                                </h5>
+
+                                <p class="resource-modal-description">
+                                    Atualize as informações do equipamento.
+                                </p>
+
+                            </div>
+
+                        </div>
+
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar">
+                        </button>
+
+                    </div>
+
+                    <div class="modal-body">
+
+                        <div class="mb-3">
+
+                            <label for="edit_equipment_name" class="form-label">
+
+                                Nome
+                            </label>
+
+                            <input type="text" class="form-control" id="edit_equipment_name" name="name"
+                                data-edit-field="name" maxlength="150" required>
+
+                            <div class="invalid-feedback">
+                                Informe o nome do equipamento.
+                            </div>
+
+                        </div>
+
+                        <div class="row g-3">
+
+                            <div class="col-md-6">
+
+                                <label for="edit_equipment_watts" class="form-label">
+
+                                    Consumo
+                                </label>
+
+                                <div class="input-group">
+
+                                    <input type="number" class="form-control" id="edit_equipment_watts" name="watts"
+                                        data-edit-field="watts" min="0" max="1000" step="0.01" required>
+
+                                    <span class="input-group-text">
+                                        W
+                                    </span>
+
+                                </div>
+
+                            </div>
+
+                            <div class="col-md-6">
+
+                                <label for="edit_equipment_stock" class="form-label">
+
+                                    Estoque
+                                </label>
+
+                                <input type="number" class="form-control" id="edit_equipment_stock" name="stock"
+                                    data-edit-field="stock" min="0" max="1000" step="1" required>
+
+                                <div class="invalid-feedback">
+                                    Informe a quantidade em estoque.
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <div class="modal-footer">
+
+                        <button type="button" class="btn btn-light" data-bs-dismiss="modal">
+
+                            Cancelar
+                        </button>
+
+                        <button type="submit" class="btn dcm-btn-primary" data-submit-button
+                            data-loading-text="Salvando...">
+
+                            <span class="spinner-border spinner-border-sm d-none" data-submit-spinner aria-hidden="true">
+                            </span>
+
+                            <i class="bi bi-check-lg" data-submit-icon>
+                            </i>
+
+                            <span data-submit-text>
+                                Salvar alterações
+                            </span>
+
+                        </button>
+
+                    </div>
+
+                </form>
+
+            </div>
+
+        </div>
+    @endcan
+
 @endsection
+
+@push('scripts')
+    <script>
+        window.resourceIndexConfig = {
+            openModalOnValidationError: @json($errors->any()),
+            validationModal: '#addEquipmentModal'
+        };
+    </script>
+
+    <script src="{{ asset('js/tower-resource-index.js') }}"></script>
+@endpush

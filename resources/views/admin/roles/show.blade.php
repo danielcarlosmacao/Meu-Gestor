@@ -1,7 +1,12 @@
 @extends('layouts.header')
 @section('title', 'Detalhes do Papel')
 
+
+@push('styles')
+    <link rel="stylesheet" href="{{ asset('css/admin-module.css') }}">
+@endpush
 @section('content')
+<div class="admin-module-scope">
 <div class="container mt-4">
     <h2 class="mb-3 fw-bold text-primary">{{ $role->name }}</h2>
 
@@ -26,4 +31,10 @@
         <i class="bi bi-arrow-left"></i> Voltar
     </a>
 </div>
+
+</div>
 @endsection
+
+@push('scripts')
+    <script src="{{ asset('js/admin-module.js') }}"></script>
+@endpush

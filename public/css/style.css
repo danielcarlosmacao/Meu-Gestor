@@ -1,3 +1,5 @@
+/* Otimizado para consumir os tokens globais de system-theme.css.
+   Mantenha este arquivo carregado depois do tema global. */
 :root {
   --color-primary: #24b153;
   --color-secondary: #6fbe89;
@@ -155,7 +157,7 @@ nav.navbar.bgc-primary {
 
 
 tr.user-inactive td {
-  background-color: #f8f9fa;
+  background-color: var(--sys-surface-soft);
   /* cinza claro */
   color: #6c757d;
   /* texto apagado */

@@ -1,7 +1,12 @@
 @extends('layouts.header')
 @section('title', 'Log do sistema')
 
+
+@push('styles')
+    <link rel="stylesheet" href="{{ asset('css/admin-module.css') }}">
+@endpush
 @section('content')
+<div class="admin-module-scope">
 <div class="container mt-4">
     <h3 class="mb-3">Log do sistema</h3>
 
@@ -49,4 +54,9 @@
         </div>
     </div>
 </div>
+
+</div>
 @endsection
+@push('scripts')
+    <script src="{{ asset('js/admin-module.js') }}"></script>
+@endpush

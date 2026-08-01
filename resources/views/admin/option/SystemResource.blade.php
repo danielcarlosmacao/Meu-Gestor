@@ -1,7 +1,12 @@
 @extends('layouts.header')
 @section('title', 'Recursos do sistema')
 
+
+@push('styles')
+    <link rel="stylesheet" href="{{ asset('css/admin-module.css') }}">
+@endpush
 @section('content')
+<div class="admin-module-scope">
     <div class="container py-4">
         <h2>Gestão do sistema</h2>
 
@@ -164,4 +169,10 @@
             }
         </script>
     @endpush
+
+</div>
 @endsection
+
+@push('scripts')
+    <script src="{{ asset('js/admin-module.js') }}"></script>
+@endpush

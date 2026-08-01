@@ -1,216 +1,428 @@
 @extends('layouts.header')
+
 @section('title', 'Cursos dos Colaboradores')
+
+@push('styles')
+    <link rel="stylesheet" href="{{ asset('css/vacation-manager-module.css') }}">
+@endpush
 
 @section('content')
 
-    <div class="container mt-5">
+    <div class="container vm-page">
 
-        <h2 class="text-center">
-            Cursos Realizados
-            @can('collaborators.courses.create')
-                <button class="btn dcm-btn-primary btn-sm ms-2" data-bs-toggle="modal" data-bs-target="#addCourseModal">
-                    <i class="bi bi-plus-lg"></i>
-                </button>
-            @endcan
-        </h2>
+        <div class="vm-card">
 
-        <table class="table table-striped mt-4">
-            <thead class="bgc-primary">
-                <tr>
-                    <th>Título</th>
-                    <th>Colaborador</th>
-                    <th>Validade</th>
-                    <th>Anexo</th>
-                    <th>Ações</th>
-                </tr>
-            </thead>
+            {{-- Cabeçalho --}}
+            <div class="vm-card-header">
 
-            <tbody>
-                @foreach ($courses as $course)
-                    <tr>
-                        <td>{{ $course->title }}</td>
+                <div class="vm-title-group">
 
-                        <td>
-                            <span class="badge" style="background: {{ $course->collaborator->color }};">
-                                {{ $course->collaborator->name }}
-                            </span>
-                        </td>
+                    <div class="vm-title-icon">
+                        <i class="bi bi-mortarboard-fill"></i>
+                    </div>
 
-                        <td>
-                            {{ $course->valid_until ? \Carbon\Carbon::parse($course->valid_until)->format('d/m/Y') : '-' }}
-                        </td>
+                    <div>
+                        <h1 class="vm-title">
+                            Cursos realizados
+                        </h1>
 
-                        <td>
-                            @if ($course->token)
-                                @can('collaborators.courses.view.pdf')
-                                    <a href="{{ route('vacation_manager.collaborator.courses.show', $course->token) }}"
-                                        class="btn btn-sm dcm-btn-primary ms-1" target="_blank">
-                                        PDF
-                                    </a>
+                        <p class="vm-subtitle">
+                            Controle de cursos, treinamentos, certificados e validades
+                        </p>
+                    </div>
 
-                                    <a href="{{ route('vacation_manager.collaborator.courses.download', $course->token) }}"
-                                        class="btn btn-sm dcm-btn-primary ms-1">
-                                        <i class="bi bi-download"></i>
-                                    </a>
-                                @endcan
-                            @else
-                                -
-                            @endif
-                        </td>
+                </div>
 
+                @can('collaborators.courses.create')
+                    <button type="button" class="btn vm-btn-add" data-bs-toggle="modal" data-bs-target="#addCourseModal"
+                        title="Adicionar curso">
+                        <i class="bi bi-plus-lg"></i>
 
-                        <td>
-                            @can('collaborators.courses.edit')
-                                <button class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#editCourseModal"
-                                    data-token="{{ $course->token }}" data-title="{{ $course->title }}"
-                                    data-collaborator="{{ $course->collaborator_id }}"
-                                    data-validity="{{ $course->valid_until ? \Carbon\Carbon::parse($course->valid_until)->format('Y-m-d') : '' }}">
-                                    Editar
-                                </button>
-                            @endcan
-                            @can('collaborators.courses.edit')
-                                <form action="{{ route('vacation_manager.collaborator.courses.destroy', $course->token) }}"
-                                    method="POST" style="display:inline;">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button class="btn btn-danger btn-sm"
-                                        onclick="return confirm('Deseja excluir este curso?')">
-                                        Excluir
-                                    </button>
-                                </form>
-                            @endcan
-                        </td>
-                    </tr>
-                @endforeach
-            </tbody>
-        </table>
+                        <span class="vm-btn-text">
+                            Novo curso
+                        </span>
+                    </button>
+                @endcan
 
-        <div class="d-flex justify-content-center mt-4">
-            {{ $courses->links() }}
+            </div>
+
+            {{-- Tabela --}}
+            <div class="vm-table-wrapper">
+
+                <table class="table vm-table">
+
+                    <thead>
+                        <tr>
+                            <th>Curso</th>
+                            <th>Colaborador</th>
+                            <th>Validade</th>
+                            <th>Anexo</th>
+                            <th class="text-end">Ações</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        @forelse ($courses as $course)
+                            <tr>
+
+                                {{-- Curso --}}
+                                <td>
+                                    <div class="fw-semibold">
+                                        {{ $course->title }}
+                                    </div>
+
+                                    @if (!empty($course->description))
+                                        <small class="text-muted">
+                                            {{ \Illuminate\Support\Str::limit($course->description, 70) }}
+                                        </small>
+                                    @endif
+                                </td>
+
+                                {{-- Colaborador --}}
+                                <td>
+                                    <span class="vm-badge vm-collaborator-badge"
+                                        style="background-color: {{ $course->collaborator->color ?? '#6c757d' }}">
+                                        <i class="bi bi-person-fill"></i>
+
+                                        {{ $course->collaborator->name }}
+                                    </span>
+                                </td>
+
+                                {{-- Validade --}}
+                                <td class="vm-date">
+
+                                    @if ($course->valid_until)
+                                        @php
+                                            $validUntil = \Carbon\Carbon::parse($course->valid_until);
+                                            $isExpired = $validUntil->isPast();
+                                        @endphp
+
+                                        <span
+                                            class="vm-badge {{ $isExpired ? 'vm-badge-days is-over-limit' : 'vm-badge-status' }}">
+                                            <i
+                                                class="bi {{ $isExpired ? 'bi-exclamation-circle-fill' : 'bi-calendar-check-fill' }}"></i>
+
+                                            {{ $validUntil->format('d/m/Y') }}
+                                        </span>
+                                    @else
+                                        <span class="text-muted">
+                                            <i class="bi bi-infinity me-1"></i>
+                                            Sem validade
+                                        </span>
+                                    @endif
+
+                                </td>
+
+                                {{-- Anexo --}}
+                                <td>
+
+                                    <div class="vm-file-actions">
+
+                                        @if ($course->token)
+                                            @can('collaborators.courses.view.pdf')
+                                                <a href="{{ route('vacation_manager.collaborator.courses.show', $course->token) }}"
+                                                    class="btn btn-outline-primary vm-action-btn" target="_blank"
+                                                    rel="noopener noreferrer" title="Visualizar PDF">
+                                                    <i class="bi bi-file-earmark-pdf"></i>
+                                                    PDF
+                                                </a>
+
+                                                <a href="{{ route('vacation_manager.collaborator.courses.download', $course->token) }}"
+                                                    class="btn btn-outline-secondary vm-action-btn" title="Baixar PDF">
+                                                    <i class="bi bi-download"></i>
+                                                </a>
+                                            @endcan
+                                        @else
+                                            <span class="text-muted">
+                                                <i class="bi bi-paperclip me-1"></i>
+                                                Sem anexo
+                                            </span>
+                                        @endif
+
+                                    </div>
+
+                                </td>
+
+                                {{-- Ações --}}
+                                <td>
+
+                                    <div class="vm-actions justify-content-end">
+
+                                        @can('collaborators.courses.edit')
+                                            <button type="button" class="btn btn-warning vm-action-btn" data-bs-toggle="modal"
+                                                data-bs-target="#editCourseModal" data-token="{{ $course->token }}"
+                                                data-title="{{ $course->title }}"
+                                                data-collaborator="{{ $course->collaborator_id }}"
+                                                data-validity="{{ $course->valid_until ? \Carbon\Carbon::parse($course->valid_until)->format('Y-m-d') : '' }}"
+                                                data-update-url="{{ route('vacation_manager.collaborator.courses.update', $course->token) }}"
+                                                title="Editar curso">
+                                                <i class="bi bi-pencil-square"></i>
+                                                Editar
+                                            </button>
+
+                                            <form
+                                                action="{{ route('vacation_manager.collaborator.courses.destroy', $course->token) }}"
+                                                method="POST" class="d-inline">
+                                                @csrf
+                                                @method('DELETE')
+
+                                                <button type="submit" class="btn btn-danger vm-action-btn"
+                                                    data-confirm="Deseja excluir este curso?" title="Excluir curso">
+                                                    <i class="bi bi-trash"></i>
+                                                    Excluir
+                                                </button>
+                                            </form>
+                                        @endcan
+
+                                    </div>
+
+                                </td>
+
+                            </tr>
+
+                        @empty
+
+                            <tr>
+                                <td colspan="5" class="vm-empty">
+
+                                    <i class="bi bi-mortarboard"></i>
+
+                                    <strong>
+                                        Nenhum curso cadastrado
+                                    </strong>
+
+                                    <div class="mt-1">
+                                        Cadastre o primeiro curso ou treinamento.
+                                    </div>
+
+                                </td>
+                            </tr>
+                        @endforelse
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+            {{-- Paginação --}}
+            @if ($courses->hasPages())
+                <div class="vm-pagination">
+                    {{ $courses->links() }}
+                </div>
+            @endif
+
         </div>
 
     </div>
 
-    {{-- ========================
-    MODAL: ADICIONAR CURSO
-========================= --}}
-    <div class="modal fade" id="addCourseModal" tabindex="-1">
-        <div class="modal-dialog">
+    {{-- =====================================================
+        MODAL: ADICIONAR CURSO
+    ====================================================== --}}
+    <div class="modal fade vm-modal" id="addCourseModal" tabindex="-1" aria-hidden="true">
+
+        <div class="modal-dialog modal-dialog-centered">
+
             <form method="POST" action="{{ route('vacation_manager.collaborator.courses.store') }}"
-                enctype="multipart/form-data" class="modal-content">
+                enctype="multipart/form-data" class="modal-content" data-submit-lock>
+
                 @csrf
 
                 <div class="modal-header">
-                    <h5 class="modal-title">Adicionar Curso</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+
+                    <h5 class="modal-title">
+                        <i class="bi bi-mortarboard-fill me-2"></i>
+                        Adicionar curso
+                    </h5>
+
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+
                 </div>
 
                 <div class="modal-body">
 
-                    <label>Colaborador</label>
-                    <select name="collaborator_id" class="form-control" required>
-                        <option value="">Selecione...</option>
-                        @foreach ($collaborators as $c)
-                            <option value="{{ $c->id }}">{{ $c->name }}</option>
-                        @endforeach
-                    </select>
+                    <div class="mb-3">
 
-                    <label class="mt-3">Título</label>
-                    <input type="text" name="title" class="form-control" required>
+                        <label class="form-label">
+                            Colaborador
+                        </label>
 
-                    <label class="mt-3">Descrição</label>
-                    <textarea name="description" class="form-control"></textarea>
+                        <select name="collaborator_id" class="form-select" required>
+                            <option value="">
+                                Selecione...
+                            </option>
 
-                    <label class="mt-3">Validade</label>
-                    <input type="date" name="valid_until" class="form-control">
+                            @foreach ($collaborators as $collaborator)
+                                <option value="{{ $collaborator->id }}">
+                                    {{ $collaborator->name }}
+                                </option>
+                            @endforeach
+                        </select>
 
-                    <label class="mt-3">Arquivo do Curso (PDF)</label>
-                    <input type="file" name="file" class="form-control" accept="application/pdf" required>
+                    </div>
+
+                    <div class="mb-3">
+
+                        <label class="form-label">
+                            Título
+                        </label>
+
+                        <input type="text" name="title" class="form-control"
+                            placeholder="Ex.: NR-10, Trabalho em altura..." required>
+
+                    </div>
+
+                    <div class="mb-3">
+
+                        <label class="form-label">
+                            Descrição
+                        </label>
+
+                        <textarea name="description" class="form-control" rows="4" placeholder="Informações adicionais sobre o curso"></textarea>
+
+                    </div>
+
+                    <div class="mb-3">
+
+                        <label class="form-label">
+                            Validade
+                        </label>
+
+                        <input type="date" name="valid_until" class="form-control">
+
+                        <small class="text-muted">
+                            Deixe em branco caso o curso não tenha validade.
+                        </small>
+
+                    </div>
+
+                    <div class="mb-0">
+
+                        <label class="form-label">
+                            Arquivo do curso
+                        </label>
+
+                        <input type="file" name="file" class="form-control" accept="application/pdf"
+                            data-file-preview="#addCourseFileName" required>
+
+                        <span id="addCourseFileName" class="vm-file-name">
+                            Nenhum arquivo selecionado.
+                        </span>
+
+                    </div>
 
                 </div>
 
                 <div class="modal-footer">
-                    <button class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <button class="btn btn-success">Salvar</button>
+
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                        <i class="bi bi-x-circle me-1"></i>
+                        Cancelar
+                    </button>
+
+                    <button type="submit" class="btn dcm-btn-primary">
+                        <i class="bi bi-check-lg me-1"></i>
+                        Salvar curso
+                    </button>
+
                 </div>
 
             </form>
+
         </div>
+
     </div>
 
+    {{-- =====================================================
+        MODAL: EDITAR CURSO
+    ====================================================== --}}
+    <div class="modal fade vm-modal" id="editCourseModal" tabindex="-1" aria-hidden="true">
 
-    {{-- ===================================================== --}}
-    {{--   MODAL PARA EDIÇÃO --}}
-    {{-- ===================================================== --}}
-    <div class="modal fade" id="editCourseModal" tabindex="-1">
-        <div class="modal-dialog">
-            <div class="modal-content">
+        <div class="modal-dialog modal-dialog-centered">
 
-                <form id="editCourseForm" method="POST">
-                    @csrf
-                    @method('PUT')
+            <form id="editCourseForm" method="POST" class="modal-content" data-submit-lock>
 
-                    <div class="modal-header">
-                        <h5 class="modal-title">Editar Curso</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                @csrf
+                @method('PUT')
+
+                <div class="modal-header">
+
+                    <h5 class="modal-title">
+                        <i class="bi bi-pencil-square me-2"></i>
+                        Editar curso
+                    </h5>
+
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+
+                </div>
+
+                <div class="modal-body">
+
+                    <div class="mb-3">
+
+                        <label for="edit_title" class="form-label">
+                            Título
+                        </label>
+
+                        <input type="text" id="edit_title" name="title" class="form-control" required>
+
                     </div>
 
-                    <div class="modal-body">
+                    <div class="mb-3">
 
-                        <label class="form-label">Título</label>
-                        <input type="text" id="edit_title" name="title" class="form-control mb-3" required>
+                        <label for="edit_collaborator" class="form-label">
+                            Colaborador
+                        </label>
 
-                        <label class="form-label">Colaborador</label>
-                        <select id="edit_collaborator" name="collaborator_id" class="form-control mb-3" required>
-                            @foreach ($collaborators as $c)
-                                <option value="{{ $c->id }}">{{ $c->name }}</option>
+                        <select id="edit_collaborator" name="collaborator_id" class="form-select" required>
+                            @foreach ($collaborators as $collaborator)
+                                <option value="{{ $collaborator->id }}">
+                                    {{ $collaborator->name }}
+                                </option>
                             @endforeach
                         </select>
 
-                        <label class="form-label">Validade</label>
-                        <input type="date" id="edit_validity" name="valid_until" class="form-control mb-3" required>
+                    </div>
+
+                    <div class="mb-0">
+
+                        <label for="edit_validity" class="form-label">
+                            Validade
+                        </label>
+
+                        <input type="date" id="edit_validity" name="valid_until" class="form-control">
+
+                        <small class="text-muted">
+                            Deixe em branco caso o curso não tenha validade.
+                        </small>
 
                     </div>
 
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                        <button type="submit" class="btn btn-primary">
-                            Salvar
-                        </button>
-                    </div>
+                </div>
 
-                </form>
+                <div class="modal-footer">
 
-            </div>
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                        <i class="bi bi-x-circle me-1"></i>
+                        Cancelar
+                    </button>
+
+                    <button type="submit" class="btn dcm-btn-primary">
+                        <i class="bi bi-check-lg me-1"></i>
+                        Salvar alterações
+                    </button>
+
+                </div>
+
+            </form>
+
         </div>
+
     </div>
 
 @endsection
 
-{{-- ===================================================== --}}
-{{--   SCRIPT MODAL DE EDIÇÃO --}}
-{{-- ===================================================== --}}
-<script>
-    document.addEventListener("DOMContentLoaded", () => {
-
-        const modal = document.getElementById("editCourseModal");
-
-        modal.addEventListener("show.bs.modal", (event) => {
-
-            const button = event.relatedTarget;
-
-            const token = button.getAttribute("data-token");
-            const title = button.getAttribute("data-title");
-            const collaborator = button.getAttribute("data-collaborator");
-            const validity = button.getAttribute("data-validity");
-
-            document.getElementById("edit_title").value = title;
-            document.getElementById("edit_collaborator").value = collaborator;
-            document.getElementById("edit_validity").value = validity;
-
-            document.getElementById("editCourseForm").action =
-                "/vacation_manager/collaborators/courses/" + token;
-        });
-
-    });
-</script>
+@push('scripts')
+    <script src="{{ asset('js/vacation-manager-module.js') }}"></script>
+@endpush
