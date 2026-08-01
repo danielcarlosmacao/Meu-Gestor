@@ -4,8 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Models\Option;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Validation\Rule;
 
 class OptionController extends Controller
 {
@@ -21,8 +24,7 @@ class OptionController extends Controller
         'whatsapp_user' => '',
         'whatsapp_token' => '',
 
-        'repository' => '',
-        'branch' => 'main',
+        'themer' => 'header.css',
     ];
 
     /**
@@ -266,6 +268,28 @@ class OptionController extends Controller
         );
 
         /*
+         * Lista de temas disponíveis cadastrados com:
+         * reference = optionthemer
+         */
+        $themes = $this->availableThemes();
+
+        /*
+         * Tema atualmente selecionado.
+         */
+        $currentTheme = trim(
+            (string) ($options['themer'] ?? self::RESOURCE_DEFAULTS['themer'])
+        );
+
+        /*
+         * Caso o tema salvo não esteja mais na lista,
+         * utiliza o primeiro tema disponível.
+         */
+        if (!in_array($currentTheme, $themes, true)) {
+            $currentTheme = $themes[0];
+            $options['themer'] = $currentTheme;
+        }
+
+        /*
          * Informa à view se já existe um token configurado.
          */
         $tokenConfigured = filled($options['whatsapp_token']);
@@ -278,12 +302,16 @@ class OptionController extends Controller
 
         return view('admin.option.resource', compact(
             'options',
-            'tokenConfigured'
+            'tokenConfigured',
+            'themes',
+            'currentTheme'
         ));
     }
 
     public function updateResource(Request $request)
     {
+        $availableThemes = $this->availableThemes();
+
         $validated = $request->validate([
             'hours_Generation' => [
                 'required',
@@ -329,17 +357,11 @@ class OptionController extends Controller
                 'max:1000',
             ],
 
-            'repository' => [
-                'nullable',
-                'string',
-                'max:500',
-            ],
-
-            'branch' => [
-                'nullable',
+            'themer' => [
+                'required',
                 'string',
                 'max:255',
-                'regex:/^[A-Za-z0-9._\/-]+$/',
+                Rule::in($availableThemes),
             ],
         ], [
             'hours_Generation.required' => 'Informe as horas de geração.',
@@ -364,10 +386,9 @@ class OptionController extends Controller
             'whatsapp_user.max' => 'O usuário da API deve ter no máximo 255 caracteres.',
             'whatsapp_token.max' => 'O token deve ter no máximo 1.000 caracteres.',
 
-            'repository.max' => 'O repositório deve ter no máximo 500 caracteres.',
-
-            'branch.max' => 'A branch deve ter no máximo 255 caracteres.',
-            'branch.regex' => 'A branch contém caracteres inválidos.',
+            'themer.required' => 'Selecione um tema.',
+            'themer.max' => 'O tema deve ter no máximo 255 caracteres.',
+            'themer.in' => 'O tema selecionado não está cadastrado nas opções disponíveis.',
         ]);
 
         /*
@@ -449,6 +470,57 @@ class OptionController extends Controller
     }
     /*
     |--------------------------------------------------------------------------
+    | Limpeza de caches do sistema
+    |--------------------------------------------------------------------------
+    */
+
+    public function clearCache()
+    {
+        try {
+            $commands = [
+                'view:clear',
+                'route:clear',
+                'config:clear',
+                'cache:clear',
+                'optimize:clear',
+            ];
+
+            $outputs = [];
+
+            foreach ($commands as $command) {
+                Artisan::call($command);
+
+                $outputs[$command] = trim(Artisan::output());
+            }
+
+            Log::info('Caches do sistema limpos manualmente.', [
+                'user_id' => auth()->id(),
+                'commands' => $commands,
+                'outputs' => $outputs,
+            ]);
+
+            return back()->with(
+                'success',
+                'Caches do sistema limpos com sucesso.'
+            );
+        } catch (\Throwable $exception) {
+            Log::error('Erro ao limpar os caches do sistema.', [
+                'user_id' => auth()->id(),
+                'erro' => $exception->getMessage(),
+                'arquivo' => $exception->getFile(),
+                'linha' => $exception->getLine(),
+            ]);
+
+            return back()->with(
+                'error',
+                'Não foi possível limpar os caches: '
+                    . $exception->getMessage()
+            );
+        }
+    }
+
+    /*
+    |--------------------------------------------------------------------------
     | Recursos administrativos do sistema
     |--------------------------------------------------------------------------
     */
@@ -470,6 +542,48 @@ class OptionController extends Controller
     | Métodos auxiliares
     |--------------------------------------------------------------------------
     */
+
+    /**
+     * Retorna os temas cadastrados na tabela options.
+     *
+     * Cada tema deve possuir:
+     * reference = optionthemer
+     * value = nome-do-arquivo.css
+     */
+    private function availableThemes(): array
+    {
+        $themes = Option::query()
+            ->where('reference', 'optionthemer')
+            ->whereNotNull('value')
+            ->orderBy('value')
+            ->pluck('value')
+            ->map(fn($theme) => trim((string) $theme))
+            ->filter(function (string $theme) {
+                if ($theme === '') {
+                    return false;
+                }
+
+                /*
+                 * Permite somente o nome do arquivo CSS.
+                 * Evita caminhos como ../ ou subdiretórios.
+                 */
+                return preg_match(
+                    '/^[A-Za-z0-9._-]+\.css$/',
+                    $theme
+                ) === 1;
+            })
+            ->unique()
+            ->values()
+            ->all();
+
+        if (empty($themes)) {
+            return [
+                self::RESOURCE_DEFAULTS['themer'],
+            ];
+        }
+
+        return $themes;
+    }
 
     /**
      * Normaliza um valor antes de salvar na tabela options.

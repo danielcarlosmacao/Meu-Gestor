@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 use App\Http\Controllers\TowerController;
 use App\Http\Controllers\OptionController;
@@ -21,7 +21,9 @@ Route::middleware(['auth', 'permission:administrator.user'])->group(function () 
     Route::post('/admin/users/{user}/reset-password', [UserController::class, 'resetPassword'])->name('admin.users.reset-password');
     Route::get('/admin/sessions', [UserController::class, 'usersOnline'])->name('admin.users.sessions');
     Route::delete('/admin/sessions/{user}', [UserController::class, 'destroySession'])->name('admin.sessions.destroy');
-    Route::get('/admin/admin.systempanel', function () {return view('admin.systempanel'); })->name('admin.systempanel');
+    Route::get('/admin/admin.systempanel', function () {
+        return view('admin.systempanel');
+    })->name('admin.systempanel');
 
     // Rotas de Roles
     Route::get('/admin/roles', [RoleController::class, 'index'])->name('admin.roles.index');
@@ -31,7 +33,6 @@ Route::middleware(['auth', 'permission:administrator.user'])->group(function () 
     Route::get('/admin/roles/{role}/edit', [RoleController::class, 'edit'])->name('admin.roles.edit');
     Route::put('/admin/roles/{role}', [RoleController::class, 'update'])->name('admin.roles.update');
     Route::delete('/admin/roles/{role}', [RoleController::class, 'destroy'])->name('admin.roles.destroy');
-
 });
 
 //options
@@ -39,6 +40,7 @@ Route::middleware(['auth', 'permission:administrator.options'])->group(function 
     Route::get('/admin/options/colors', [OptionController::class, 'editColors'])->name('options.colors.edit');
     Route::post('/admin/options/colors', [OptionController::class, 'updateColors'])->name('options.colors.update');
     Route::get('/admin/options/resource', [OptionController::class, 'editResource'])->name('options.resource.edit');
+    Route::post('/options/clear-cache', [OptionController::class, 'clearCache'])->name('options.cache.clear');
     Route::post('/admin/options/system', [OptionController::class, 'updateSystemResource'])->name('options.systemresource.update');
     Route::post('/admin/options/logo', [OptionController::class, 'updatelogo'])->name('options.logo.update');
     Route::get('/tower/repairsummary', [TowerController::class, 'repairsummary'])->name('tower.repairsummary');
@@ -51,5 +53,4 @@ Route::middleware(['auth', 'permission:administrator.options'])->group(function 
 
     Route::get('admin/activity-logs', [ActivityLogController::class, 'index'])->name('activitylogs.index');
     Route::get('admin/system-logs', [ActivityLogController::class, 'laravelLog'])->name('systemlogs.index');
-
 });

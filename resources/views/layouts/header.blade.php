@@ -30,9 +30,9 @@
 
     {{-- CSS geral --}}
     <link href="{{ asset('css/style.css') }}" rel="stylesheet">
-
+    
     {{-- CSS do cabeçalho --}}
-    <link href="{{ asset('css/header.css') }}" rel="stylesheet">
+    <link href="{{ asset('css/themer/' . ($appOptions['themer'] ?? 'header.css')) }}" rel="stylesheet">
 
     {{-- Cores configuráveis --}}
     <style>

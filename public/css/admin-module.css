@@ -1,27 +1,43 @@
-/* Otimizado para consumir os tokens globais de system-theme.css.
+/* Otimizado para consumir os tokens globais de header.css/header2.css.
    Mantenha este arquivo carregado depois do tema global. */
+
 /* =========================================================
    Admin Module
    Arquivo: public/css/admin-module.css
 ========================================================= */
+
 :root {
     --am-primary: var(--sys-primary, var(--color-primary, #24b153));
     --am-secondary: var(--sys-secondary, var(--color-secondary, #6fbe89));
-    --am-bg: var(--sys-page-bg);
-    --am-surface: #ffffff;
-    --am-surface-soft: var(--sys-surface-soft);
-    --am-border: var(--sys-border);
-    --am-border-soft: var(--sys-border-soft);
-    --am-text: var(--sys-text);
-    --am-muted: var(--sys-muted);
-    --am-success: #198754;
-    --am-warning: #d99614;
-    --am-danger: #dc3545;
-    --am-info: #0d6efd;
-    --am-radius: 14px;
-    --am-radius-lg: 20px;
-    --am-shadow: 0 12px 34px rgba(24, 39, 58, .08);
+
+    --am-bg: var(--sys-page-bg, #f4f7fb);
+    --am-surface: var(--sys-surface, #ffffff);
+    --am-surface-soft: var(--sys-surface-soft, #f8fafc);
+
+    --am-border: var(--sys-border, #e2e8f0);
+    --am-border-soft: var(--sys-border-soft, #edf2f7);
+
+    --am-text: var(--sys-text, #263238);
+    --am-muted: var(--sys-muted, #64748b);
+
+    --am-success: var(--sys-success, #198754);
+    --am-warning: var(--sys-warning, #d99614);
+    --am-danger: var(--sys-danger, #dc3545);
+    --am-info: var(--sys-info, #0d6efd);
+
+    --am-radius: var(--sys-radius, 14px);
+    --am-radius-lg: var(--sys-radius-lg, 20px);
+
+    --am-shadow:
+        var(--sys-shadow, 0 12px 34px rgba(24, 39, 58, .08));
+
+    --am-shadow-sm:
+        var(--sys-shadow-sm, 0 5px 16px rgba(30, 41, 59, .06));
 }
+
+/* =========================================================
+   Estrutura geral
+========================================================= */
 
 .admin-module-scope {
     min-height: calc(100vh - 90px);
@@ -29,8 +45,8 @@
     color: var(--am-text);
 }
 
-.admin-module-scope > .container,
-.admin-module-scope > .container-fluid {
+.admin-module-scope>.container,
+.admin-module-scope>.container-fluid {
     margin-top: 0 !important;
 }
 
@@ -47,17 +63,16 @@
     margin-bottom: 1.4rem;
 }
 
+/* =========================================================
+   Cards e superfícies
+========================================================= */
+
 .admin-module-scope .card,
-.admin-module-scope .table-responsive,
-.admin-module-scope form:not(.d-inline):not(.dropdown-menu form) {
+.admin-module-scope .table-responsive {
     border: 1px solid var(--am-border);
     border-radius: var(--am-radius-lg);
     background: var(--am-surface);
     box-shadow: var(--am-shadow);
-}
-
-.admin-module-scope form:not(.d-inline):not(.dropdown-menu form):not(.modal-content):not(.table form) {
-    padding: 1.4rem;
 }
 
 .admin-module-scope .card {
@@ -67,6 +82,31 @@
 .admin-module-scope .card-body {
     padding: 1.35rem;
 }
+
+.admin-module-scope .card-header {
+    border-bottom: 1px solid var(--am-border);
+    background: var(--am-surface);
+}
+
+/*
+ * Formulários principais que precisam se comportar como card.
+ * Adicione class="admin-form-card" quando desejar esse visual.
+ *
+ * Não estilizamos todo <form> automaticamente, pois isso criava
+ * uma caixa branca ao redor de formulários pequenos, como
+ * "Limpar cache", excluir e outras ações.
+ */
+.admin-module-scope .admin-form-card {
+    padding: 1.4rem;
+    border: 1px solid var(--am-border);
+    border-radius: var(--am-radius-lg);
+    background: var(--am-surface);
+    box-shadow: var(--am-shadow);
+}
+
+/* =========================================================
+   Tabelas
+========================================================= */
 
 .admin-module-scope .table-responsive {
     overflow: auto;
@@ -101,7 +141,10 @@
 }
 
 .admin-module-scope .table tbody tr:hover {
-    background: color-mix(in srgb, var(--am-primary) 3%, white);
+    background:
+        color-mix(in srgb,
+            var(--am-primary) 3%,
+            var(--am-surface));
 }
 
 .admin-module-scope .table-success,
@@ -112,36 +155,117 @@
 
 .admin-module-scope .user-inactive {
     opacity: .58;
-    background: var(--sys-surface-soft);
+    background: var(--am-surface-soft);
 }
+
+/* =========================================================
+   Botões
+========================================================= */
 
 .admin-module-scope .btn {
     border-radius: 9px;
     font-weight: 620;
-    transition: transform .16s ease, box-shadow .16s ease, filter .16s ease;
+    transition:
+        transform .16s ease,
+        box-shadow .16s ease,
+        filter .16s ease;
 }
 
 .admin-module-scope .btn:hover {
     transform: translateY(-1px);
 }
 
+.admin-module-scope .btn:active {
+    transform: translateY(0);
+}
+
 .admin-module-scope .dcm-btn-primary,
 .admin-module-scope .btn-primary,
 .admin-module-scope .btn-success {
+    color: #fff;
     border-color: var(--am-primary);
     background: var(--am-primary);
-    color: #fff;
 }
 
 .admin-module-scope .dcm-btn-primary:hover,
 .admin-module-scope .btn-primary:hover,
 .admin-module-scope .btn-success:hover {
+    color: #fff;
     border-color: var(--am-primary);
     background: var(--am-primary);
-    color: #fff;
     filter: brightness(.94);
-    box-shadow: 0 7px 16px color-mix(in srgb, var(--am-primary) 22%, transparent);
+    box-shadow:
+        0 7px 16px color-mix(in srgb,
+            var(--am-primary) 22%,
+            transparent);
 }
+
+/* =========================================================
+   Ações da tela de configurações
+========================================================= */
+
+.admin-module-scope .settings-actions {
+    padding: 1rem;
+    border: 1px solid var(--am-border);
+    border-radius: var(--am-radius);
+    background: var(--am-surface);
+    box-shadow: var(--am-shadow-sm);
+}
+
+.admin-module-scope .settings-actions-group {
+    align-items: stretch;
+}
+
+.admin-module-scope .settings-actions-group form {
+    display: flex;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+}
+
+.admin-module-scope .settings-action-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: .5rem;
+
+    min-height: 44px;
+    padding: .65rem 1rem;
+
+    border-radius: 10px;
+
+    font-size: .88rem;
+    font-weight: 700;
+    line-height: 1.2;
+    white-space: nowrap;
+
+    box-shadow: 0 5px 14px rgba(15, 23, 42, .08);
+}
+
+.admin-module-scope .settings-action-btn:hover {
+    box-shadow: 0 8px 18px rgba(15, 23, 42, .12);
+}
+
+.admin-module-scope .settings-save-btn {
+    min-width: 220px;
+}
+
+.admin-module-scope .settings-actions .btn-warning {
+    color: #5c4300;
+    border-color: #e0a800;
+    background: #ffc107;
+}
+
+.admin-module-scope .settings-actions .btn-outline-danger {
+    background: var(--am-surface);
+}
+
+/* =========================================================
+   Formulários
+========================================================= */
 
 .admin-module-scope .form-label {
     margin-bottom: .4rem;
@@ -155,19 +279,27 @@
     min-height: 43px;
     border-color: #d9e0e7;
     border-radius: 9px;
+    background-color: var(--am-surface);
 }
 
 .admin-module-scope .form-control:focus,
 .admin-module-scope .form-select:focus,
 .admin-module-scope .form-check-input:focus {
     border-color: var(--am-primary);
-    box-shadow: 0 0 0 .2rem color-mix(in srgb, var(--am-primary) 16%, transparent);
+    box-shadow:
+        0 0 0 .2rem color-mix(in srgb,
+            var(--am-primary) 16%,
+            transparent);
 }
 
 .admin-module-scope .form-check-input:checked {
     border-color: var(--am-primary);
     background-color: var(--am-primary);
 }
+
+/* =========================================================
+   Badges, dropdowns e paginação
+========================================================= */
 
 .admin-module-scope .badge {
     padding: .38rem .6rem;
@@ -201,13 +333,19 @@
     background: var(--am-primary);
 }
 
-/* Painel do sistema */
+/* =========================================================
+   Painel do sistema
+========================================================= */
+
 .admin-module-scope .info-card {
     height: 100%;
     border: 1px solid var(--am-border) !important;
     border-radius: var(--am-radius) !important;
-    background: #fff !important;
+    background: var(--am-surface) !important;
     box-shadow: var(--am-shadow) !important;
+    transition:
+        transform .16s ease,
+        box-shadow .16s ease;
 }
 
 .admin-module-scope .info-card:hover {
@@ -221,8 +359,8 @@
 .admin-module-scope .info-card .card-title {
     color: #475569;
     font-size: .82rem;
-    text-transform: uppercase;
     letter-spacing: .04em;
+    text-transform: uppercase;
 }
 
 .admin-module-scope .info-card .card-text {
@@ -232,15 +370,18 @@
 
 .admin-module-scope .progress {
     height: 7px;
-    background: #e9eef3;
     border-radius: 999px;
+    background: #e9eef3;
 }
 
 .admin-module-scope .progress-bar {
     background: var(--am-primary) !important;
 }
 
-/* Roles / permissões */
+/* =========================================================
+   Roles e permissões
+========================================================= */
+
 .admin-module-scope .permission-group,
 .admin-module-scope .border.rounded.p-3.shadow-sm.h-100 {
     height: 100%;
@@ -251,16 +392,19 @@
     box-shadow: none !important;
 }
 
-.admin-module-scope .permission-checkbox:disabled + label,
-.admin-module-scope .permission-checkbox:disabled ~ label {
+.admin-module-scope .permission-checkbox:disabled+label,
+.admin-module-scope .permission-checkbox:disabled~label {
     opacity: .7;
 }
 
-/* Logs */
+/* =========================================================
+   Logs
+========================================================= */
+
 .admin-module-scope details {
     border: 1px solid var(--am-border-soft);
     border-radius: 9px;
-    background: #fff;
+    background: var(--am-surface);
 }
 
 .admin-module-scope details summary {
@@ -269,8 +413,8 @@
     font-weight: 650;
 }
 
-.admin-module-scope details > div,
-.admin-module-scope details > pre {
+.admin-module-scope details>div,
+.admin-module-scope details>pre {
     padding: .7rem;
     border-top: 1px solid var(--am-border-soft);
 }
@@ -285,7 +429,10 @@
     font-size: .76rem;
 }
 
-/* Modais */
+/* =========================================================
+   Modais
+========================================================= */
+
 .admin-module-scope .modal-content {
     overflow: hidden;
     border: 0;
@@ -305,17 +452,23 @@
 
 .admin-module-scope .modal-footer {
     border-top: 1px solid var(--am-border);
-    background: #fafbfc;
+    background: var(--am-surface-soft);
 }
 
-/* Alertas */
+/* =========================================================
+   Alertas
+========================================================= */
+
 .admin-module-scope .alert {
     border: 0;
     border-radius: 12px;
-    box-shadow: 0 5px 16px rgba(30, 41, 59, .06);
+    box-shadow: var(--am-shadow-sm);
 }
 
-/* Log Laravel */
+/* =========================================================
+   Log Laravel
+========================================================= */
+
 .admin-module-scope .system-log-viewer {
     max-height: 650px;
     padding: 1rem;
@@ -323,13 +476,27 @@
     border-radius: 12px;
     background: #0f172a;
     color: #dbeafe;
-    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-family:
+        ui-monospace,
+        SFMono-Regular,
+        Menlo,
+        Consolas,
+        monospace;
     font-size: .75rem;
 }
+
+/* =========================================================
+   Responsividade
+========================================================= */
 
 @media (max-width: 991.98px) {
     .admin-module-scope .table {
         min-width: 820px;
+    }
+
+    .admin-module-scope .settings-save-btn {
+        width: 100%;
+        min-width: 0;
     }
 }
 
@@ -344,7 +511,16 @@
     }
 
     .admin-module-scope .card-body,
-    .admin-module-scope form:not(.d-inline):not(.dropdown-menu form):not(.modal-content):not(.table form) {
+    .admin-module-scope .admin-form-card {
         padding: 1rem;
+    }
+}
+
+@media (max-width: 575.98px) {
+
+    .admin-module-scope .settings-actions-group,
+    .admin-module-scope .settings-actions-group form,
+    .admin-module-scope .settings-action-btn {
+        width: 100%;
     }
 }
