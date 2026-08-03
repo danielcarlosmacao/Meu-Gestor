@@ -549,8 +549,8 @@ body {
 
 .app-logo {
     width: auto;
-    max-width: 210px;
-    height: 45px;
+    max-width: 230px;
+    height: 60px;
     object-fit: contain;
 }
 

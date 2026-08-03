@@ -196,7 +196,7 @@
 
         .brand-logo {
             max-width: 210px;
-            max-height: 72px;
+            max-height:100px;
             object-fit: contain;
         }
 
