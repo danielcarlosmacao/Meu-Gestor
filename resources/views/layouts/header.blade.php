@@ -1117,6 +1117,7 @@
 
     {{-- Toast --}}
     @include('layouts.toast')
+    
     <script>
         let deferredInstallPrompt = null;
 
@@ -1146,30 +1147,67 @@
 
             deferredInstallPrompt = event;
 
-            document.getElementById('installAppContainer')?.classList.remove('d-none');
-            document.getElementById('installDivider')?.classList.remove('d-none');
+            console.log('Instalação disponível.');
+
+            document
+                .getElementById('installAppContainer')
+                ?.classList.remove('d-none');
+
+            document
+                .getElementById('installDivider')
+                ?.classList.remove('d-none');
         });
 
-        document.getElementById('installAppButton')?.addEventListener('click', async function() {
-            if (!deferredInstallPrompt) {
-                return;
-            }
+        document
+            .getElementById('installAppButton')
+            ?.addEventListener('click', async function() {
+                if (!deferredInstallPrompt) {
+                    console.warn('Prompt de instalação não disponível.');
+                    return;
+                }
 
-            deferredInstallPrompt.prompt();
+                try {
+                    deferredInstallPrompt.prompt();
 
-            await deferredInstallPrompt.userChoice;
+                    const choiceResult =
+                        await deferredInstallPrompt.userChoice;
 
-            deferredInstallPrompt = null;
+                    console.log(
+                        'Resultado da instalação:',
+                        choiceResult.outcome
+                    );
 
-            document.getElementById('installAppContainer')?.classList.add('d-none');
-            document.getElementById('installDivider')?.classList.add('d-none');
-        });
+                    if (choiceResult.outcome === 'accepted') {
+                        console.log(
+                            'Instalação aceita. Aguardando conclusão...'
+                        );
+                    } else {
+                        console.log(
+                            'Instalação cancelada pelo usuário.'
+                        );
+                    }
+                } catch (error) {
+                    console.error(
+                        'Erro ao solicitar instalação:',
+                        error
+                    );
+                }
+
+                deferredInstallPrompt = null;
+            });
 
         window.addEventListener('appinstalled', function() {
             deferredInstallPrompt = null;
 
-            document.getElementById('installAppContainer')?.classList.add('d-none');
-            document.getElementById('installDivider')?.classList.add('d-none');
+            document
+                .getElementById('installAppContainer')
+                ?.classList.add('d-none');
+
+            document
+                .getElementById('installDivider')
+                ?.classList.add('d-none');
+
+            console.log('Aplicativo instalado com sucesso.');
         });
     </script>
 </body>
