@@ -74,7 +74,6 @@ Route::middleware(['auth', 'permission:recipients.view'])->group(function () {
     Route::delete('/admin/recipients/{id}', [RecipientController::class, 'destroy'])->name('admin.recipients.destroy');
     Route::get('/admin/recipients/logs', [RecipientController::class, 'logs'])->name('admin.recipients.logs');
     Route::get('/api/mk/nfe', [MkAuthController::class, 'buscarNotas'])->name('api.mk.nfe');
-
 });
 //notification.view
 Route::middleware(['auth', 'permission:notification.view'])->prefix('admin')->name('admin.')->group(function () {
@@ -100,8 +99,4 @@ Route::get('/deploy/{token}', function ($token) {
 })->name('deploy.manual');
 
 
-
-
-
-
-
+Route::view('/offline', 'offline')->name('offline');

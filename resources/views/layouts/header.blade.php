@@ -4,9 +4,28 @@
 <head>
     <meta charset="utf-8">
 
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 
     <meta name="csrf-token" content="{{ csrf_token() }}">
+
+    {{-- Configurações PWA --}}
+    <meta name="theme-color" content="{{ $appOptions['color-primary'] ?? '#24b153' }}">
+
+    <meta name="mobile-web-app-capable" content="yes">
+
+    <meta name="apple-mobile-web-app-capable" content="yes">
+
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+    <meta name="apple-mobile-web-app-title" content="{{ config('app.name', 'Meu Gestor') }}">
+
+    <link rel="manifest" href="{{ asset('manifest.webmanifest') }}">
+
+    <link rel="apple-touch-icon" href="{{ asset('icons/apple-touch-icon.png') }}">
+
+    <link rel="icon" type="image/png" sizes="192x192" href="{{ asset('icons/icon-192.png') }}">
+
+    <link rel="icon" type="image/png" sizes="512x512" href="{{ asset('icons/icon-512.png') }}">
 
     <title>
         @hasSection('title')
@@ -30,7 +49,7 @@
 
     {{-- CSS geral --}}
     <link href="{{ asset('css/style.css') }}" rel="stylesheet">
-    
+
     {{-- CSS do cabeçalho --}}
     <link href="{{ asset('css/themer/' . ($appOptions['themer'] ?? 'header.css')) }}" rel="stylesheet">
 
@@ -1010,6 +1029,21 @@
                                     <hr class="dropdown-divider">
                                 </li>
 
+                                {{-- Instalar aplicativo --}}
+                                <li id="installAppContainer" class="d-none">
+
+                                    <button type="button" id="installAppButton" class="dropdown-item">
+
+                                        <i class="bi bi-phone"></i>
+                                        Instalar aplicativo
+                                    </button>
+
+                                </li>
+
+                                <li id="installDivider" class="d-none">
+                                    <hr class="dropdown-divider">
+                                </li>
+
                                 <li>
 
                                     <form method="POST" action="{{ route('logout') }}">
@@ -1083,7 +1117,61 @@
 
     {{-- Toast --}}
     @include('layouts.toast')
+    <script>
+        let deferredInstallPrompt = null;
 
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function() {
+                navigator.serviceWorker
+                    .register('{{ asset('service-worker.js') }}', {
+                        scope: '/'
+                    })
+                    .then(function(registration) {
+                        console.log(
+                            'Service Worker registrado com sucesso:',
+                            registration.scope
+                        );
+                    })
+                    .catch(function(error) {
+                        console.error(
+                            'Erro ao registrar Service Worker:',
+                            error
+                        );
+                    });
+            });
+        }
+
+        window.addEventListener('beforeinstallprompt', function(event) {
+            event.preventDefault();
+
+            deferredInstallPrompt = event;
+
+            document.getElementById('installAppContainer')?.classList.remove('d-none');
+            document.getElementById('installDivider')?.classList.remove('d-none');
+        });
+
+        document.getElementById('installAppButton')?.addEventListener('click', async function() {
+            if (!deferredInstallPrompt) {
+                return;
+            }
+
+            deferredInstallPrompt.prompt();
+
+            await deferredInstallPrompt.userChoice;
+
+            deferredInstallPrompt = null;
+
+            document.getElementById('installAppContainer')?.classList.add('d-none');
+            document.getElementById('installDivider')?.classList.add('d-none');
+        });
+
+        window.addEventListener('appinstalled', function() {
+            deferredInstallPrompt = null;
+
+            document.getElementById('installAppContainer')?.classList.add('d-none');
+            document.getElementById('installDivider')?.classList.add('d-none');
+        });
+    </script>
 </body>
 
 </html>
