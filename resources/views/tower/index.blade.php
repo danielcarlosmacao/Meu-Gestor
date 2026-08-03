@@ -365,9 +365,10 @@
                                     $platePercentage = (float) ($tower['plate_percentage'] ?? 0);
 
                                     $batteryClass = match (true) {
-                                        $batteryPercentage >= 70 => 'success',
-                                        $batteryPercentage >= 40 => 'warning',
-                                        default => 'danger',
+                                        $batteryPercentage >= 90 => 'danger', // Vermelho
+                                        $batteryPercentage >= 70 => 'warning', // Amarelo
+                                        $batteryPercentage >= 40 => 'info', // Azul
+                                        default => 'success', // Verde
                                     };
 
                                     $plateClass = match (true) {
