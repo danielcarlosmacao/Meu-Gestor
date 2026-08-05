@@ -28,22 +28,49 @@ class CableFiberBoxController extends Controller
     }
 
 
-public function destroy($id)
-{
-    $cable = FtthCableFiberBox::findOrFail($id);
+    public function destroy($id)
+    {
+        $cable = FtthCableFiberBox::findOrFail($id);
 
-    // verifica se tem fibras
-    $hasFibers = FtthFiberCable::where('cable_fiber_box_id', $id)->exists();
+        // verifica se tem fibras
+        $hasFibers = FtthFiberCable::where('cable_fiber_box_id', $id)->exists();
 
-    if ($hasFibers) {
+        if ($hasFibers) {
+            return redirect()->back()
+                ->with('error', 'Cabo possui fibras cadastradas');
+        }
+
+        $cable->delete();
+
         return redirect()->back()
-            ->with('error', 'Cabo possui fibras cadastradas');
+            ->with('success', 'Cabo removido');
     }
 
-    $cable->delete();
+    public function update(Request $request, $id)
+    {
+        $data = $request->validate([
+            'info' => [
+                'required',
+                'string',
+                'max:255',
+            ],
 
-    return redirect()->back()
-        ->with('success', 'Cabo removido');
-}
+            'color' => [
+                'required',
+                'regex:/^#[0-9A-Fa-f]{6}$/',
+            ],
+        ]);
 
+        $cable = \App\Models\FtthCableFiberBox::findOrFail($id);
+
+        $cable->update([
+            'info' => $data['info'],
+            'color' => strtoupper($data['color']),
+        ]);
+
+        return back()->with(
+            'success',
+            'Cabo atualizado com sucesso!'
+        );
+    }
 }

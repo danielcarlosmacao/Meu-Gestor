@@ -25,6 +25,7 @@ Route::prefix('ftth')->group(function () {
         Route::post('/pons', [PonController::class, 'store'])->name('pon.store');
         Route::post('/fiber-box', [FiberBoxController::class, 'store'])->name('fiberbox.store');
         Route::post('/cable', [CableFiberBoxController::class, 'store'])->name('cable.store');
+        Route::put('/cable/update/{id}', [CableFiberBoxController::class, 'update'])->name('cable.update');
         Route::post('/fiber', [FiberCableController::class, 'store'])->name('fiber.store');
         Route::post('/splinter', [SplinterController::class, 'store'])->name('splinter.store');
         Route::post('/fusion/store', [FusionController::class, 'store'])->name('fusion.store');

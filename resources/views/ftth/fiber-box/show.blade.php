@@ -12,15 +12,15 @@
         */
 
         $fiberColors = [
-            1  => '#00a651', // Verde
-            2  => '#ffff00', // Amarelo
-            3  => '#ffffff', // Branco
-            4  => '#0000ff', // Azul
-            5  => '#ff0000', // Vermelho
-            6  => '#8A2BE2', // Violeta
-            7  => '#8b4513', // Marrom
-            8  => '#ffc0cb', // Rosa
-            9  => '#000000', // Preto
+            1 => '#00a651', // Verde
+            2 => '#ffff00', // Amarelo
+            3 => '#ffffff', // Branco
+            4 => '#0000ff', // Azul
+            5 => '#ff0000', // Vermelho
+            6 => '#8A2BE2', // Violeta
+            7 => '#8b4513', // Marrom
+            8 => '#ffc0cb', // Rosa
+            9 => '#000000', // Preto
             10 => '#808080', // Cinza
             11 => '#ffa500', // Laranja
             12 => '#00ffff', // Água
@@ -57,29 +57,21 @@
         };
 
         $getTextColor = function ($background) {
-            $darkColors = [
-                '#000000',
-                '#0000ff',
-                '#8b4513',
-                '#8a2be2',
-                '#808080',
-            ];
+            $darkColors = ['#000000', '#0000ff', '#8b4513', '#8a2be2', '#808080'];
 
-            return in_array(strtolower((string) $background), $darkColors)
-                ? '#ffffff'
-                : '#000000';
+            return in_array(strtolower((string) $background), $darkColors) ? '#ffffff' : '#000000';
         };
 
         $getStatusClass = function ($status) {
             return match ($status) {
-                'unused'   => 'secondary',
-                'used'     => 'success',
-                'fusion'   => 'primary',
-                'fused'    => 'primary',
+                'unused' => 'secondary',
+                'used' => 'success',
+                'fusion' => 'primary',
+                'fused' => 'primary',
                 'splinter' => 'warning',
-                'active'   => 'success',
+                'active' => 'success',
                 'inactive' => 'danger',
-                default    => 'secondary',
+                default => 'secondary',
             };
         };
 
@@ -93,17 +85,17 @@
             return match (true) {
                 $value >= -15 => 'success',
                 $value >= -23 => 'warning',
-                default       => 'danger',
+                default => 'danger',
             };
         };
     @endphp
 
     <style>
         /*
-        |--------------------------------------------------------------------------
-        | ESTILO DA TELA
-        |--------------------------------------------------------------------------
-        */
+                                |--------------------------------------------------------------------------
+                                | ESTILO DA TELA
+                                |--------------------------------------------------------------------------
+                                */
 
         .ftth-page {
             padding-bottom: 2rem;
@@ -230,7 +222,8 @@
 
             <div class="card-body">
 
-                <div class="d-flex flex-column flex-lg-row
+                <div
+                    class="d-flex flex-column flex-lg-row
                             justify-content-between align-items-lg-center gap-3">
 
                     <div>
@@ -283,25 +276,21 @@
                             'pon' => $box->pon_id,
                             'map' => 'yes',
                         ]) }}"
-                            class="btn dcm-btn-primary"
-                            title="Voltar ao mapa"
-                            aria-label="Voltar ao mapa">
+                            class="btn dcm-btn-primary" title="Voltar ao mapa" aria-label="Voltar ao mapa">
 
                             <i class="bi bi-map me-1"></i>
                             <span class="d-none d-sm-inline">Mapa</span>
                         </a>
 
                         @can('ftth.create')
-                            <button type="button"
-                                class="btn btn-outline-warning"
+                            <button type="button" class="btn btn-outline-warning"
                                 onclick="openConfirmModal(
                                     '{{ route('fiberbox.recalculate.local', $box->id) }}',
                                     'Deseja recalcular toda a rede desta CTO?',
                                     'Essa alteração afeta esta caixa e todas as caixas conectadas a ela.',
                                     'POST'
                                 )"
-                                title="Recalcular sinais da rede"
-                                aria-label="Recalcular sinais da rede">
+                                title="Recalcular sinais da rede" aria-label="Recalcular sinais da rede">
 
                                 <i class="bi bi-arrow-repeat me-1"></i>
                                 <span class="d-none d-sm-inline">Recalcular</span>
@@ -427,7 +416,8 @@
 
                 <div class="card ftth-card shadow-sm mb-3">
 
-                    <div class="card-header bgc-primary text-white
+                    <div
+                        class="card-header bgc-primary text-white
                                 d-flex justify-content-between align-items-center">
 
                         <div class="fw-bold">
@@ -440,12 +430,8 @@
                         </div>
 
                         @can('ftth.create')
-                            <button type="button"
-                                class="btn btn-sm btn-light ftth-action-button"
-                                data-bs-toggle="modal"
-                                data-bs-target="#modalCable"
-                                title="Cadastrar cabo"
-                                aria-label="Cadastrar cabo">
+                            <button type="button" class="btn btn-sm btn-light ftth-action-button" data-bs-toggle="modal"
+                                data-bs-target="#modalCable" title="Cadastrar cabo" aria-label="Cadastrar cabo">
 
                                 <i class="bi bi-plus-lg"></i>
                             </button>
@@ -508,9 +494,7 @@
                                             <td>
 
                                                 @if ($cable->input_fiber_box_id == $box->id)
-
                                                     @if ($cable->output_fiber_box_id)
-
                                                         <a href="{{ route('fiberbox.show', $cable->output_fiber_box_id) }}"
                                                             class="text-decoration-none"
                                                             title="{{ $cable->outputFiberBox->info ?? 'Abrir caixa' }}">
@@ -520,20 +504,14 @@
                                                                 {{ $cable->outputFiberBox->info ?? 'Caixa não encontrada' }}
                                                             </span>
                                                         </a>
-
                                                     @else
-
                                                         <span class="badge bg-light text-muted border">
                                                             <i class="bi bi-dash-circle me-1"></i>
                                                             Sem destino
                                                         </span>
-
                                                     @endif
-
                                                 @else
-
                                                     @if ($cable->input_fiber_box_id)
-
                                                         <a href="{{ route('fiberbox.show', $cable->input_fiber_box_id) }}"
                                                             class="text-decoration-none"
                                                             title="{{ $cable->inputFiberBox->info ?? 'Abrir caixa' }}">
@@ -543,16 +521,12 @@
                                                                 {{ $cable->inputFiberBox->info ?? 'Caixa não encontrada' }}
                                                             </span>
                                                         </a>
-
                                                     @else
-
                                                         <span class="badge bg-light text-muted border">
                                                             <i class="bi bi-dash-circle me-1"></i>
                                                             Sem origem
                                                         </span>
-
                                                     @endif
-
                                                 @endif
 
                                             </td>
@@ -560,21 +534,32 @@
                                             {{-- AÇÕES --}}
                                             <td class="text-end pe-3">
 
-                                                @can('ftth.delete')
-                                                    <button type="button"
-                                                        class="btn btn-sm btn-outline-danger ftth-action-button"
-                                                        onclick="openConfirmModal(
+                                                <div class="d-inline-flex align-items-center gap-1">
+                                                    @can('ftth.create')
+                                                        <button type="button"
+                                                            class="btn btn-sm btn-outline-warning ftth-action-button btn-edit-cable"
+                                                            data-id="{{ $cable->id }}" data-info="{{ $cable->info }}"
+                                                            data-color="{{ $cable->color ?: '#000000' }}"
+                                                            data-update-url="{{ route('cable.update', $cable->id) }}"
+                                                            title="Editar cabo" aria-label="Editar cabo">
+                                                            <i class="bi bi-pencil"></i>
+                                                        </button>
+                                                    @endcan
+
+                                                    @can('ftth.delete')
+                                                        <button type="button"
+                                                            class="btn btn-sm btn-outline-danger ftth-action-button"
+                                                            onclick="openConfirmModal(
                                                             '{{ route('cable.destroy', $cable->id) }}',
                                                             'Tem certeza que deseja excluir este cabo?',
                                                             'Essa alteração não poderá ser revertida.',
                                                             'DELETE'
                                                         )"
-                                                        title="Excluir cabo"
-                                                        aria-label="Excluir cabo">
+                                                            title="Excluir cabo" aria-label="Excluir cabo">
 
-                                                        <i class="bi bi-trash"></i>
-                                                    </button>
-                                                @endcan
+                                                            <i class="bi bi-trash"></i>
+                                                        </button>
+                                                    @endcan
 
                                             </td>
 
@@ -620,7 +605,8 @@
 
                 <div class="card ftth-card shadow-sm mb-3">
 
-                    <div class="card-header bgc-primary text-white
+                    <div
+                        class="card-header bgc-primary text-white
                                 d-flex justify-content-between align-items-center">
 
                         <div class="fw-bold">
@@ -633,12 +619,8 @@
                         </div>
 
                         @can('ftth.create')
-                            <button type="button"
-                                class="btn btn-sm btn-light ftth-action-button"
-                                data-bs-toggle="modal"
-                                data-bs-target="#modalFiber"
-                                title="Cadastrar fibras"
-                                aria-label="Cadastrar fibras">
+                            <button type="button" class="btn btn-sm btn-light ftth-action-button" data-bs-toggle="modal"
+                                data-bs-target="#modalFiber" title="Cadastrar fibras" aria-label="Cadastrar fibras">
 
                                 <i class="bi bi-plus-lg"></i>
                             </button>
@@ -701,7 +683,6 @@
                                             <td class="p-1">
 
                                                 @if ($fiber->splinter)
-
                                                     <div class="rounded border bg-light p-2 mb-1 small">
 
                                                         <div class="fw-semibold">
@@ -719,23 +700,18 @@
                                                         </div>
 
                                                     </div>
-
                                                 @endif
 
                                                 @foreach ($fiber->fusions1 as $fusion)
-
                                                     @php
                                                         $fusionFiberName =
                                                             $fusion->fiber2->fiber_identification ?? null;
 
-                                                        $fusionNumber =
-                                                            $getFiberNumber($fusionFiberName);
+                                                        $fusionNumber = $getFiberNumber($fusionFiberName);
 
-                                                        $fusionBackground =
-                                                            $fiberColors[$fusionNumber] ?? '#f8f9fa';
+                                                        $fusionBackground = $fiberColors[$fusionNumber] ?? '#f8f9fa';
 
-                                                        $fusionTextColor =
-                                                            $getTextColor($fusionBackground);
+                                                        $fusionTextColor = $getTextColor($fusionBackground);
                                                     @endphp
 
                                                     <div class="fusion-color-item px-2 py-2 mb-1"
@@ -750,23 +726,18 @@
                                                         {{ $fusionFiberName ?? 'Fibra não encontrada' }}
 
                                                     </div>
-
                                                 @endforeach
 
                                                 @foreach ($fiber->fusions2 ?? [] as $fusion)
-
                                                     @php
                                                         $fusionFiberName =
                                                             $fusion->fiber1->fiber_identification ?? null;
 
-                                                        $fusionNumber =
-                                                            $getFiberNumber($fusionFiberName);
+                                                        $fusionNumber = $getFiberNumber($fusionFiberName);
 
-                                                        $fusionBackground =
-                                                            $fiberColors[$fusionNumber] ?? '#f8f9fa';
+                                                        $fusionBackground = $fiberColors[$fusionNumber] ?? '#f8f9fa';
 
-                                                        $fusionTextColor =
-                                                            $getTextColor($fusionBackground);
+                                                        $fusionTextColor = $getTextColor($fusionBackground);
                                                     @endphp
 
                                                     <div class="fusion-color-item px-2 py-2 mb-1"
@@ -781,19 +752,12 @@
                                                         {{ $fusionFiberName ?? 'Fibra não encontrada' }}
 
                                                     </div>
-
                                                 @endforeach
 
-                                                @if (
-                                                    !$fiber->splinter &&
-                                                    $fiber->fusions1->isEmpty() &&
-                                                    (!isset($fiber->fusions2) || $fiber->fusions2->isEmpty())
-                                                )
-
+                                                @if (!$fiber->splinter && $fiber->fusions1->isEmpty() && (!isset($fiber->fusions2) || $fiber->fusions2->isEmpty()))
                                                     <span class="small text-muted ps-2">
                                                         Sem conexão
                                                     </span>
-
                                                 @endif
 
                                             </td>
@@ -811,31 +775,25 @@
                                             <td>
 
                                                 @if ($fiber->optical_power !== null && $fiber->optical_power !== '')
-
-                                                    <span class="badge signal-badge
+                                                    <span
+                                                        class="badge signal-badge
                                                         bg-{{ $signalClass }}-subtle
                                                         text-{{ $signalClass }}
                                                         border border-{{ $signalClass }}-subtle">
 
                                                         <i class="bi bi-reception-4 me-1"></i>
 
-                                                        {{ number_format(
-                                                            (float) $fiber->optical_power,
-                                                            2,
-                                                            ',',
-                                                            '.'
-                                                        ) }} dBm
+                                                        {{ number_format((float) $fiber->optical_power, 2, ',', '.') }}
+                                                        dBm
 
                                                     </span>
-
                                                 @else
-
-                                                    <span class="badge signal-badge
+                                                    <span
+                                                        class="badge signal-badge
                                                         bg-secondary-subtle text-secondary border">
 
                                                         Sem sinal
                                                     </span>
-
                                                 @endif
 
                                             </td>
@@ -846,7 +804,6 @@
                                                 <div class="d-inline-flex justify-content-end gap-1">
 
                                                     @if ($fiber->status === 'unused')
-
                                                         @can('ftth.delete')
                                                             <button type="button"
                                                                 class="btn btn-sm btn-outline-danger ftth-action-button"
@@ -856,13 +813,11 @@
                                                                     'Essa alteração não poderá ser revertida.',
                                                                     'DELETE'
                                                                 )"
-                                                                title="Excluir fibra"
-                                                                aria-label="Excluir fibra">
+                                                                title="Excluir fibra" aria-label="Excluir fibra">
 
                                                                 <i class="bi bi-trash"></i>
                                                             </button>
                                                         @endcan
-
                                                     @endif
 
                                                     @can('ftth.create')
@@ -871,8 +826,7 @@
                                                                 ftth-action-button btn-edit-signal"
                                                             data-id="{{ $fiber->id }}"
                                                             data-fiber="{{ $fiber->fiber_identification }}"
-                                                            data-signal="{{ $fiber->optical_power }}"
-                                                            title="Editar sinal"
+                                                            data-signal="{{ $fiber->optical_power }}" title="Editar sinal"
                                                             aria-label="Editar sinal">
 
                                                             <i class="bi bi-pencil"></i>
@@ -928,7 +882,8 @@
                 {{-- SPLITTERS --}}
                 <div class="card ftth-card shadow-sm mb-3">
 
-                    <div class="card-header bgc-primary text-white
+                    <div
+                        class="card-header bgc-primary text-white
                                 d-flex justify-content-between align-items-center">
 
                         <div class="fw-bold">
@@ -941,12 +896,8 @@
                         </div>
 
                         @can('ftth.create')
-                            <button type="button"
-                                class="btn btn-sm btn-light ftth-action-button"
-                                data-bs-toggle="modal"
-                                data-bs-target="#modalSplinter"
-                                title="Cadastrar splitter"
-                                aria-label="Cadastrar splitter">
+                            <button type="button" class="btn btn-sm btn-light ftth-action-button" data-bs-toggle="modal"
+                                data-bs-target="#modalSplinter" title="Cadastrar splitter" aria-label="Cadastrar splitter">
 
                                 <i class="bi bi-plus-lg"></i>
                             </button>
@@ -1008,17 +959,13 @@
                                             <td>
 
                                                 @if ($spl->inputCable)
-
                                                     <small class="fw-semibold">
                                                         {{ $spl->inputCable->fiber_identification }}
                                                     </small>
-
                                                 @else
-
                                                     <small class="text-muted">
                                                         —
                                                     </small>
-
                                                 @endif
 
                                             </td>
@@ -1036,52 +983,36 @@
                                             <td class="text-nowrap">
 
                                                 @if ($inputPower !== null)
-
                                                     <div class="splitter-signal-line small text-muted">
 
                                                         Entrada:
 
                                                         <strong class="text-dark">
-                                                            {{ number_format(
-                                                                (float) $inputPower,
-                                                                2,
-                                                                ',',
-                                                                '.'
-                                                            ) }} dBm
+                                                            {{ number_format((float) $inputPower, 2, ',', '.') }}
+                                                            dBm
                                                         </strong>
 
                                                     </div>
 
                                                     @if ($splitterType === 'balanced')
-
                                                         <div class="splitter-signal-line small mt-1">
 
                                                             Saída:
 
                                                             <strong>
-                                                                {{ number_format(
-                                                                    (float) $inputPower - (float) $loss1,
-                                                                    2,
-                                                                    ',',
-                                                                    '.'
-                                                                ) }} dBm
+                                                                {{ number_format((float) $inputPower - (float) $loss1, 2, ',', '.') }}
+                                                                dBm
                                                             </strong>
 
                                                         </div>
-
                                                     @else
-
                                                         <div class="splitter-signal-line small mt-1">
 
                                                             Saída 1:
 
                                                             <strong>
-                                                                {{ number_format(
-                                                                    (float) $inputPower - (float) $loss1,
-                                                                    2,
-                                                                    ',',
-                                                                    '.'
-                                                                ) }} dBm
+                                                                {{ number_format((float) $inputPower - (float) $loss1, 2, ',', '.') }}
+                                                                dBm
                                                             </strong>
 
                                                         </div>
@@ -1091,26 +1022,19 @@
                                                             Saída 2:
 
                                                             <strong>
-                                                                {{ number_format(
-                                                                    (float) $inputPower - (float) $loss2,
-                                                                    2,
-                                                                    ',',
-                                                                    '.'
-                                                                ) }} dBm
+                                                                {{ number_format((float) $inputPower - (float) $loss2, 2, ',', '.') }}
+                                                                dBm
                                                             </strong>
 
                                                         </div>
-
                                                     @endif
-
                                                 @else
-
-                                                    <span class="badge bg-secondary-subtle
+                                                    <span
+                                                        class="badge bg-secondary-subtle
                                                         text-secondary border">
 
                                                         Sem sinal
                                                     </span>
-
                                                 @endif
 
                                             </td>
@@ -1127,8 +1051,7 @@
                                                             'Essa alteração não poderá ser revertida.',
                                                             'DELETE'
                                                         )"
-                                                        title="Excluir splitter"
-                                                        aria-label="Excluir splitter">
+                                                        title="Excluir splitter" aria-label="Excluir splitter">
 
                                                         <i class="bi bi-trash"></i>
                                                     </button>
@@ -1173,7 +1096,8 @@
                 {{-- FUSÕES --}}
                 <div class="card ftth-card shadow-sm mb-3">
 
-                    <div class="card-header bgc-primary text-white
+                    <div
+                        class="card-header bgc-primary text-white
                                 d-flex justify-content-between align-items-center">
 
                         <div class="fw-bold">
@@ -1186,12 +1110,8 @@
                         </div>
 
                         @can('ftth.create')
-                            <button type="button"
-                                class="btn btn-sm btn-light ftth-action-button"
-                                data-bs-toggle="modal"
-                                data-bs-target="#modalFusion"
-                                title="Cadastrar fusão"
-                                aria-label="Cadastrar fusão">
+                            <button type="button" class="btn btn-sm btn-light ftth-action-button" data-bs-toggle="modal"
+                                data-bs-target="#modalFusion" title="Cadastrar fusão" aria-label="Cadastrar fusão">
 
                                 <i class="bi bi-plus-lg"></i>
                             </button>
@@ -1218,31 +1138,22 @@
                                 <tbody>
 
                                     @forelse ($fusions as $fusion)
-
                                         @php
-                                            $fiberName1 =
-                                                $fusion->fiber1->fiber_identification ?? null;
+                                            $fiberName1 = $fusion->fiber1->fiber_identification ?? null;
 
-                                            $fiberNumber1 =
-                                                $getFiberNumber($fiberName1);
+                                            $fiberNumber1 = $getFiberNumber($fiberName1);
 
-                                            $fiberBackground1 =
-                                                $fiberColors[$fiberNumber1] ?? '#f8f9fa';
+                                            $fiberBackground1 = $fiberColors[$fiberNumber1] ?? '#f8f9fa';
 
-                                            $fiberText1 =
-                                                $getTextColor($fiberBackground1);
+                                            $fiberText1 = $getTextColor($fiberBackground1);
 
-                                            $fiberName2 =
-                                                $fusion->fiber2->fiber_identification ?? null;
+                                            $fiberName2 = $fusion->fiber2->fiber_identification ?? null;
 
-                                            $fiberNumber2 =
-                                                $getFiberNumber($fiberName2);
+                                            $fiberNumber2 = $getFiberNumber($fiberName2);
 
-                                            $fiberBackground2 =
-                                                $fiberColors[$fiberNumber2] ?? '#f8f9fa';
+                                            $fiberBackground2 = $fiberColors[$fiberNumber2] ?? '#f8f9fa';
 
-                                            $fiberText2 =
-                                                $getTextColor($fiberBackground2);
+                                            $fiberText2 = $getTextColor($fiberBackground2);
                                         @endphp
 
                                         <tr>
@@ -1260,7 +1171,8 @@
                                             </td>
 
                                             {{-- FIBRA 2 --}}
-                                            <td style="
+                                            <td
+                                                style="
                                                     background: {{ $fiberBackground2 }};
                                                     color: {{ $fiberText2 }};
                                                     font-weight: 700;
@@ -1276,17 +1188,14 @@
                                                 <div class="d-inline-flex align-items-center gap-1">
 
                                                     @if ($fusion->info)
-
                                                         <button type="button"
                                                             class="btn btn-sm btn-outline-primary ftth-action-button"
-                                                            data-bs-toggle="tooltip"
-                                                            data-bs-placement="top"
+                                                            data-bs-toggle="tooltip" data-bs-placement="top"
                                                             title="{{ $fusion->info }}"
                                                             aria-label="Informações da fusão">
 
                                                             <i class="bi bi-eye"></i>
                                                         </button>
-
                                                     @endif
 
                                                     @can('ftth.delete')
@@ -1298,8 +1207,7 @@
                                                                 'Essa alteração não poderá ser revertida.',
                                                                 'DELETE'
                                                             )"
-                                                            title="Excluir fusão"
-                                                            aria-label="Excluir fusão">
+                                                            title="Excluir fusão" aria-label="Excluir fusão">
 
                                                             <i class="bi bi-trash"></i>
                                                         </button>
@@ -1330,7 +1238,6 @@
                                             </td>
 
                                         </tr>
-
                                     @endforelse
 
                                 </tbody>
@@ -1354,14 +1261,16 @@
     ====================================================================== --}}
 
     @include('ftth.modals.cable')
+    @include('ftth.modals.editcable')
     @include('ftth.modals.fiber')
     @include('ftth.modals.splinter')
     @include('ftth.modals.fusion')
     @include('ftth.modals.editSignal')
 
+
     {{-- =====================================================================
-        JAVASCRIPT
-    ====================================================================== --}}
+    JAVASCRIPT
+====================================================================== --}}
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
@@ -1448,42 +1357,57 @@
                             'row g-2 mb-2 align-items-center fiber-item';
 
                         item.innerHTML = `
-                            <div class="col-12 col-md-5">
-                                <input type="hidden"
-                                    name="fibers[${index}][fiber_identification]"
-                                    value="${escapeHtml(fiberName)}">
+                        <div class="col-12 col-md-5">
 
-                                <input type="text"
+                            <input
+                                type="hidden"
+                                name="fibers[${index}][fiber_identification]"
+                                value="${escapeHtml(fiberName)}"
+                            >
+
+                            <input
+                                type="text"
+                                class="form-control shadow-sm"
+                                value="${escapeHtml(fiberName)}"
+                                disabled
+                            >
+
+                        </div>
+
+                        <div class="col-10 col-md-5">
+
+                            <div class="input-group">
+
+                                <input
+                                    type="number"
+                                    step="0.01"
+                                    name="fibers[${index}][optical_power]"
                                     class="form-control shadow-sm"
-                                    value="${escapeHtml(fiberName)}"
-                                    disabled>
+                                    value="${escapeHtml(opticalPower)}"
+                                    placeholder="Sinal"
+                                >
+
+                                <span class="input-group-text">
+                                    dBm
+                                </span>
+
                             </div>
 
-                            <div class="col-10 col-md-5">
-                                <div class="input-group">
-                                    <input type="number"
-                                        step="0.01"
-                                        name="fibers[${index}][optical_power]"
-                                        class="form-control shadow-sm"
-                                        value="${escapeHtml(opticalPower)}"
-                                        placeholder="Sinal">
+                        </div>
 
-                                    <span class="input-group-text">
-                                        dBm
-                                    </span>
-                                </div>
-                            </div>
+                        <div class="col-2 col-md-2 text-end">
 
-                            <div class="col-2 col-md-2 text-end">
-                                <button type="button"
-                                    class="btn btn-sm btn-outline-danger remove-fiber"
-                                    title="Remover fibra"
-                                    aria-label="Remover fibra">
+                            <button
+                                type="button"
+                                class="btn btn-sm btn-outline-danger remove-fiber"
+                                title="Remover fibra"
+                                aria-label="Remover fibra"
+                            >
+                                <i class="bi bi-dash-lg"></i>
+                            </button>
 
-                                    <i class="bi bi-dash-lg"></i>
-                                </button>
-                            </div>
-                        `;
+                        </div>
+                    `;
 
                         fibersContainer.appendChild(item);
                     }
@@ -1491,11 +1415,11 @@
                     if (!fibersContainer.children.length) {
 
                         fibersContainer.innerHTML = `
-                            <div class="alert alert-info mb-0">
-                                <i class="bi bi-info-circle me-1"></i>
-                                Todas as fibras deste cabo já estão cadastradas nesta caixa.
-                            </div>
-                        `;
+                        <div class="alert alert-info mb-0">
+                            <i class="bi bi-info-circle me-1"></i>
+                            Todas as fibras deste cabo já estão cadastradas nesta caixa.
+                        </div>
+                    `;
                     }
                 });
             }
@@ -1540,7 +1464,9 @@
 
                 const match = name.match(/(\d+)$/);
 
-                return match ? parseInt(match[1]) : null;
+                return match ?
+                    parseInt(match[1]) :
+                    null;
             }
 
             function isDarkColor(color) {
@@ -1580,9 +1506,13 @@
                 const background =
                     fiberColors[fiberNumber] || '#ffffff';
 
-                selectElement.style.backgroundColor = background;
+                selectElement.style.backgroundColor =
+                    background;
+
                 selectElement.style.color =
-                    isDarkColor(background) ? '#ffffff' : '#000000';
+                    isDarkColor(background) ?
+                    '#ffffff' :
+                    '#000000';
             }
 
             function updateDisabledFiberOptions() {
@@ -1591,16 +1521,25 @@
                     return;
                 }
 
-                const selectedFiber1 = fiber1Select.value;
-                const selectedFiber2 = fiber2Select.value;
+                const selectedFiber1 =
+                    fiber1Select.value;
 
-                Array.from(fiber2Select.options).forEach(function(option) {
+                const selectedFiber2 =
+                    fiber2Select.value;
+
+                Array.from(
+                    fiber2Select.options
+                ).forEach(function(option) {
+
                     option.disabled =
                         Boolean(selectedFiber1) &&
                         option.value === selectedFiber1;
                 });
 
-                Array.from(fiber1Select.options).forEach(function(option) {
+                Array.from(
+                    fiber1Select.options
+                ).forEach(function(option) {
+
                     option.disabled =
                         Boolean(selectedFiber2) &&
                         option.value === selectedFiber2;
@@ -1609,20 +1548,26 @@
 
             if (fiber1Select) {
 
-                fiber1Select.addEventListener('change', function() {
-                    updateDisabledFiberOptions();
-                    paintFiberSelect(this);
-                });
+                fiber1Select.addEventListener(
+                    'change',
+                    function() {
+                        updateDisabledFiberOptions();
+                        paintFiberSelect(this);
+                    }
+                );
 
                 paintFiberSelect(fiber1Select);
             }
 
             if (fiber2Select) {
 
-                fiber2Select.addEventListener('change', function() {
-                    updateDisabledFiberOptions();
-                    paintFiberSelect(this);
-                });
+                fiber2Select.addEventListener(
+                    'change',
+                    function() {
+                        updateDisabledFiberOptions();
+                        paintFiberSelect(this);
+                    }
+                );
 
                 paintFiberSelect(fiber2Select);
             }
@@ -1638,19 +1583,23 @@
             if (typeof bootstrap !== 'undefined') {
 
                 const tooltipElements =
-                    document.querySelectorAll('[data-bs-toggle="tooltip"]');
+                    document.querySelectorAll(
+                        '[data-bs-toggle="tooltip"]'
+                    );
 
                 tooltipElements.forEach(function(element) {
 
-                    new bootstrap.Tooltip(element, {
-                        boundary: 'window'
-                    });
+                    bootstrap.Tooltip.getOrCreateInstance(
+                        element, {
+                            boundary: 'window'
+                        }
+                    );
                 });
             }
 
             /*
             |--------------------------------------------------------------------------
-            | SELETOR DE COR DO CABO
+            | SELETOR DE COR DO NOVO CABO
             |--------------------------------------------------------------------------
             */
 
@@ -1662,21 +1611,390 @@
 
             if (colorPicker && colorHex) {
 
-                colorPicker.addEventListener('input', function() {
-                    colorHex.value = colorPicker.value;
-                });
+                colorPicker.addEventListener(
+                    'input',
+                    function() {
 
-                colorHex.addEventListener('input', function() {
-
-                    const validColor =
-                        /^#([0-9A-F]{3}){1,2}$/i.test(colorHex.value);
-
-                    if (validColor) {
-                        colorPicker.value = colorHex.value;
+                        colorHex.value =
+                            colorPicker.value.toUpperCase();
                     }
-                });
+                );
 
-                colorHex.value = colorPicker.value;
+                colorHex.addEventListener(
+                    'input',
+                    function() {
+
+                        let value = this.value
+                            .replace(/[^#0-9A-Fa-f]/g, '')
+                            .slice(0, 7);
+
+                        if (
+                            value !== '' &&
+                            !value.startsWith('#')
+                        ) {
+                            value = '#' + value;
+                        }
+
+                        this.value =
+                            value.toUpperCase();
+
+                        const validColor =
+                            /^#[0-9A-Fa-f]{6}$/.test(
+                                this.value
+                            );
+
+                        if (validColor) {
+                            colorPicker.value =
+                                this.value;
+                        }
+                    }
+                );
+
+                colorHex.value =
+                    colorPicker.value.toUpperCase();
+            }
+
+            /*
+            |--------------------------------------------------------------------------
+            | MODAL ÚNICO DE EDIÇÃO DO CABO
+            |--------------------------------------------------------------------------
+            */
+
+            const editCableModalElement =
+                document.getElementById('editCableModal');
+
+            if (
+                editCableModalElement &&
+                typeof bootstrap !== 'undefined'
+            ) {
+
+                const editCableModal =
+                    bootstrap.Modal.getOrCreateInstance(
+                        editCableModalElement
+                    );
+
+                const editCableForm =
+                    document.getElementById(
+                        'editCableForm'
+                    );
+
+                const editCableId =
+                    document.getElementById(
+                        'editCableId'
+                    );
+
+                const editCableInfo =
+                    document.getElementById(
+                        'editCableInfo'
+                    );
+
+                const editCableColorPicker =
+                    document.getElementById(
+                        'editCableColorPicker'
+                    );
+
+                const editCableColorHex =
+                    document.getElementById(
+                        'editCableColorHex'
+                    );
+
+                const editCablePreviewColor =
+                    document.getElementById(
+                        'editCablePreviewColor'
+                    );
+
+                const editCablePreviewName =
+                    document.getElementById(
+                        'editCablePreviewName'
+                    );
+
+                const editCableSubmitButton =
+                    editCableForm ?
+                    editCableForm.querySelector(
+                        'button[type="submit"]'
+                    ) :
+                    null;
+
+                function normalizeCableColor(value) {
+
+                    const color =
+                        String(value || '')
+                        .trim()
+                        .toUpperCase();
+
+                    return /^#[0-9A-F]{6}$/.test(color) ?
+                        color :
+                        '#000000';
+                }
+
+                function updateCablePreview() {
+
+                    if (
+                        !editCableInfo ||
+                        !editCableColorHex ||
+                        !editCableColorPicker
+                    ) {
+                        return;
+                    }
+
+                    const color =
+                        normalizeCableColor(
+                            editCableColorHex.value
+                        );
+
+                    editCableColorPicker.value =
+                        color;
+
+                    if (editCablePreviewColor) {
+                        editCablePreviewColor
+                            .style
+                            .backgroundColor = color;
+                    }
+
+                    if (editCablePreviewName) {
+                        editCablePreviewName.textContent =
+                            editCableInfo.value.trim() ||
+                            'Cabo sem descrição';
+                    }
+                }
+
+                document
+                    .querySelectorAll('.btn-edit-cable')
+                    .forEach(function(button) {
+
+                        button.addEventListener(
+                            'click',
+                            function() {
+
+                                const cableId =
+                                    this.dataset.id || '';
+
+                                const cableInfo =
+                                    this.dataset.info || '';
+
+                                const cableColor =
+                                    normalizeCableColor(
+                                        this.dataset.color
+                                    );
+
+                                const updateUrl =
+                                    this.dataset.updateUrl || '';
+
+                                if (editCableId) {
+                                    editCableId.value =
+                                        cableId;
+                                }
+
+                                if (editCableInfo) {
+                                    editCableInfo.value =
+                                        cableInfo;
+                                }
+
+                                if (editCableColorPicker) {
+                                    editCableColorPicker.value =
+                                        cableColor;
+                                }
+
+                                if (editCableColorHex) {
+                                    editCableColorHex.value =
+                                        cableColor;
+                                }
+
+                                if (editCableForm) {
+                                    editCableForm.action =
+                                        updateUrl;
+                                }
+
+                                updateCablePreview();
+
+                                editCableModal.show();
+                            }
+                        );
+                    });
+
+                if (
+                    editCableColorPicker &&
+                    editCableColorHex
+                ) {
+
+                    editCableColorPicker.addEventListener(
+                        'input',
+                        function() {
+
+                            editCableColorHex.value =
+                                this.value.toUpperCase();
+
+                            updateCablePreview();
+                        }
+                    );
+
+                    editCableColorHex.addEventListener(
+                        'input',
+                        function() {
+
+                            let value = this.value
+                                .replace(
+                                    /[^#0-9A-Fa-f]/g,
+                                    ''
+                                )
+                                .slice(0, 7);
+
+                            if (
+                                value !== '' &&
+                                !value.startsWith('#')
+                            ) {
+                                value =
+                                    '#' + value;
+                            }
+
+                            this.value =
+                                value.toUpperCase();
+
+                            if (
+                                /^#[0-9A-F]{6}$/.test(
+                                    this.value
+                                )
+                            ) {
+                                updateCablePreview();
+                            }
+                        }
+                    );
+                }
+
+                if (editCableInfo) {
+
+                    editCableInfo.addEventListener(
+                        'input',
+                        updateCablePreview
+                    );
+                }
+
+                if (editCableForm) {
+
+                    editCableForm.addEventListener(
+                        'submit',
+                        function(event) {
+
+                            const color =
+                                editCableColorHex ?
+                                editCableColorHex
+                                .value
+                                .trim()
+                                .toUpperCase() :
+                                '';
+
+                            if (
+                                !/^#[0-9A-F]{6}$/.test(color)
+                            ) {
+
+                                event.preventDefault();
+                                event.stopPropagation();
+
+                                if (editCableColorHex) {
+                                    editCableColorHex
+                                        .classList
+                                        .add('is-invalid');
+
+                                    editCableColorHex.focus();
+                                }
+
+                                if (
+                                    typeof toastr !==
+                                    'undefined'
+                                ) {
+                                    toastr.warning(
+                                        'Informe uma cor válida no formato #000000.'
+                                    );
+                                }
+
+                                return;
+                            }
+
+                            if (editCableColorHex) {
+                                editCableColorHex
+                                    .classList
+                                    .remove('is-invalid');
+
+                                editCableColorHex.value =
+                                    color;
+                            }
+
+                            if (editCableSubmitButton) {
+
+                                editCableSubmitButton.disabled =
+                                    true;
+
+                                editCableSubmitButton.innerHTML =
+                                    `
+                                <span
+                                    class="spinner-border spinner-border-sm me-2"
+                                    role="status"
+                                    aria-hidden="true">
+                                </span>
+
+                                Salvando...
+                                `;
+                            }
+                        }
+                    );
+                }
+
+                editCableModalElement.addEventListener(
+                    'hidden.bs.modal',
+                    function() {
+
+                        if (editCableForm) {
+                            editCableForm.action = '';
+                        }
+
+                        if (editCableId) {
+                            editCableId.value = '';
+                        }
+
+                        if (editCableInfo) {
+                            editCableInfo.value = '';
+                        }
+
+                        if (editCableColorPicker) {
+                            editCableColorPicker.value =
+                                '#000000';
+                        }
+
+                        if (editCableColorHex) {
+
+                            editCableColorHex.value =
+                                '#000000';
+
+                            editCableColorHex
+                                .classList
+                                .remove('is-invalid');
+                        }
+
+                        if (editCablePreviewColor) {
+                            editCablePreviewColor
+                                .style
+                                .backgroundColor =
+                                '#000000';
+                        }
+
+                        if (editCablePreviewName) {
+                            editCablePreviewName.textContent =
+                                'Cabo sem descrição';
+                        }
+
+                        if (editCableSubmitButton) {
+
+                            editCableSubmitButton.disabled =
+                                false;
+
+                            editCableSubmitButton.innerHTML =
+                                `
+                            <i class="bi bi-check-lg me-1"></i>
+                            Salvar alterações
+                            `;
+                        }
+                    }
+                );
             }
 
             /*
@@ -1686,7 +2004,9 @@
             */
 
             const editSignalModalElement =
-                document.getElementById('editSignalModal');
+                document.getElementById(
+                    'editSignalModal'
+                );
 
             if (
                 editSignalModalElement &&
@@ -1694,48 +2014,63 @@
             ) {
 
                 const editSignalModal =
-                    new bootstrap.Modal(editSignalModalElement);
+                    bootstrap.Modal.getOrCreateInstance(
+                        editSignalModalElement
+                    );
 
                 const fiberNameInput =
-                    document.getElementById('fiber_name');
+                    document.getElementById(
+                        'fiber_name'
+                    );
 
                 const oldSignalInput =
-                    document.getElementById('old_signal');
+                    document.getElementById(
+                        'old_signal'
+                    );
 
                 const editSignalForm =
-                    document.getElementById('formEditSignal');
+                    document.getElementById(
+                        'formEditSignal'
+                    );
 
                 document
-                    .querySelectorAll('.btn-edit-signal')
+                    .querySelectorAll(
+                        '.btn-edit-signal'
+                    )
                     .forEach(function(button) {
 
-                        button.addEventListener('click', function() {
+                        button.addEventListener(
+                            'click',
+                            function() {
 
-                            const fiberId =
-                                this.dataset.id;
+                                const fiberId =
+                                    this.dataset.id;
 
-                            const fiberName =
-                                this.dataset.fiber || '';
+                                const fiberName =
+                                    this.dataset.fiber || '';
 
-                            const fiberSignal =
-                                this.dataset.signal || '';
+                                const fiberSignal =
+                                    this.dataset.signal || '';
 
-                            if (fiberNameInput) {
-                                fiberNameInput.value = fiberName;
+                                if (fiberNameInput) {
+                                    fiberNameInput.value =
+                                        fiberName;
+                                }
+
+                                if (oldSignalInput) {
+                                    oldSignalInput.value =
+                                        fiberSignal;
+                                }
+
+                                if (editSignalForm) {
+                                    editSignalForm.action =
+                                        "{{ url('/ftth/fiber-box/updatesignal') }}/" +
+                                        fiberId;
+                                }
+
+                                editSignalModal.show();
                             }
-
-                            if (oldSignalInput) {
-                                oldSignalInput.value = fiberSignal;
-                            }
-
-                            if (editSignalForm) {
-                                editSignalForm.action =
-                                    "{{ url('/ftth/fiber-box/updatesignal') }}/" +
-                                    fiberId;
-                            }
-
-                            editSignalModal.show();
-                        });
+                        );
                     });
             }
 
@@ -1752,7 +2087,10 @@
             if (!navigator.clipboard) {
 
                 if (typeof toastr !== 'undefined') {
-                    toastr.warning('Seu navegador não permite copiar automaticamente.');
+
+                    toastr.warning(
+                        'Seu navegador não permite copiar automaticamente.'
+                    );
                 }
 
                 return;
@@ -1763,16 +2101,20 @@
                 .then(function() {
 
                     if (typeof toastr !== 'undefined') {
-                        toastr.success('Cor copiada: ' + color);
-                    }
 
+                        toastr.success(
+                            'Cor copiada: ' + color
+                        );
+                    }
                 })
                 .catch(function() {
 
                     if (typeof toastr !== 'undefined') {
-                        toastr.error('Não foi possível copiar a cor.');
-                    }
 
+                        toastr.error(
+                            'Não foi possível copiar a cor.'
+                        );
+                    }
                 });
         }
 
@@ -1796,25 +2138,33 @@
         |--------------------------------------------------------------------------
         | COMPATIBILIDADE COM O ANTIGO MODAL DE EDIÇÃO
         |--------------------------------------------------------------------------
-        |
-        | Mantido para não perder funcionalidade caso outro botão ainda utilize
-        | esta função em algum modal ou componente.
-        |
         */
 
-        function openEditFiberModal(id, name, power) {
+        function openEditFiberModal(
+            id,
+            name,
+            power
+        ) {
 
             const modalElement =
-                document.getElementById('modalEditFiber');
+                document.getElementById(
+                    'modalEditFiber'
+                );
 
             const fiberNameInput =
-                document.getElementById('editFiberName');
+                document.getElementById(
+                    'editFiberName'
+                );
 
             const fiberPowerInput =
-                document.getElementById('editFiberPower');
+                document.getElementById(
+                    'editFiberPower'
+                );
 
             const editForm =
-                document.getElementById('formEditFiber');
+                document.getElementById(
+                    'formEditFiber'
+                );
 
             if (
                 !modalElement ||
@@ -1825,11 +2175,13 @@
             }
 
             if (fiberNameInput) {
-                fiberNameInput.value = name ?? '';
+                fiberNameInput.value =
+                    name ?? '';
             }
 
             if (fiberPowerInput) {
-                fiberPowerInput.value = power ?? '';
+                fiberPowerInput.value =
+                    power ?? '';
             }
 
             let updateUrl =
@@ -1838,10 +2190,13 @@
             updateUrl =
                 updateUrl.replace(':id', id);
 
-            editForm.action = updateUrl;
+            editForm.action =
+                updateUrl;
 
             const modal =
-                new bootstrap.Modal(modalElement);
+                bootstrap.Modal.getOrCreateInstance(
+                    modalElement
+                );
 
             modal.show();
         }
