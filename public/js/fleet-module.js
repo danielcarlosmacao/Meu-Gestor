@@ -463,14 +463,18 @@
 
     /**
      * Inicia o Flatpickr nos campos de data.
+     *
+     * O valor inicial já chega do Blade em d/m/Y. Não usamos uma data ISO
+     * junto com dateFormat d/m/Y, porque essa combinação pode ser interpretada
+     * incorretamente pelo Flatpickr e resultar em 01/01 do ano informado.
      */
-    function initializeDatePickers() {
+    function initializeDatePickers(root = document) {
         if (typeof flatpickr === 'undefined') {
             return;
         }
 
-        document
-            .querySelectorAll('.datepicker')
+        root
+            .querySelectorAll('.datepicker, .maintenance-datepicker')
             .forEach(function (input) {
                 if (
                     input._flatpickr
@@ -479,14 +483,35 @@
                     return;
                 }
 
+                const initialDate =
+                    String(
+                        input.dataset.initialDate
+                        || input.value
+                        || ''
+                    ).trim();
+
                 input.dataset.datepickerInitialized = 'true';
 
                 flatpickr(input, {
                     dateFormat: 'd/m/Y',
+                    defaultDate: initialDate || null,
                     allowInput: true,
-                    disableMobile: false,
+                    disableMobile: true,
                     locale: {
                         firstDayOfWeek: 1
+                    },
+                    onReady: function (
+                        selectedDates,
+                        dateStr,
+                        instance
+                    ) {
+                        if (initialDate) {
+                            instance.setDate(
+                                initialDate,
+                                false,
+                                'd/m/Y'
+                            );
+                        }
                     }
                 });
             });
@@ -601,7 +626,9 @@
      */
     function updateMileageHint(form, vehicleId) {
         const mileageInput =
-            form.querySelector('input[name="mileage"]');
+            form.querySelector(
+                'input[name="mileage"]'
+            );
 
         if (!mileageInput) {
             return;
@@ -609,7 +636,17 @@
 
         const mileageLabel =
             form.querySelector(
-                '[data-mileage-label], #mileage-label'
+                '[data-mileage-label]'
+            );
+
+        const mileageHelp =
+            form.querySelector(
+                '[data-mileage-help]'
+            );
+
+        const allowLowerMileage =
+            form.querySelector(
+                '.allow-lower-mileage'
             );
 
         const maxMileages =
@@ -618,13 +655,19 @@
         const currentMileage =
             maxMileages[vehicleId];
 
+        const lowerMileageAllowed =
+            Boolean(allowLowerMileage?.checked);
+
         if (
             currentMileage !== undefined
             && currentMileage !== null
             && currentMileage !== ''
         ) {
+            const numericMileage =
+                Number(currentMileage);
+
             const formattedMileage =
-                Number(currentMileage).toLocaleString(
+                numericMileage.toLocaleString(
                     'pt-BR'
                 );
 
@@ -636,19 +679,50 @@
                     `Quilometragem — última: ${formattedMileage} km`;
             }
 
-            mileageInput.min =
-                Number(currentMileage);
+            if (lowerMileageAllowed) {
+                mileageInput.removeAttribute('min');
+
+                if (mileageHelp) {
+                    mileageHelp.textContent =
+                        'Exceção ativada: será permitido informar uma quilometragem menor.';
+
+                    mileageHelp.classList.add(
+                        'text-warning'
+                    );
+                }
+            } else {
+                mileageInput.min =
+                    String(numericMileage);
+
+                if (mileageHelp) {
+                    mileageHelp.textContent =
+                        `Informe ${formattedMileage} km ou mais, ou marque a opção de exceção.`;
+
+                    mileageHelp.classList.remove(
+                        'text-warning'
+                    );
+                }
+            }
 
             return;
         }
 
         mileageInput.placeholder = '';
+        mileageInput.removeAttribute('min');
 
         if (mileageLabel) {
-            mileageLabel.textContent = 'Quilometragem';
+            mileageLabel.textContent =
+                'Quilometragem';
         }
 
-        mileageInput.removeAttribute('min');
+        if (mileageHelp) {
+            mileageHelp.textContent =
+                'Ainda não há quilometragem anterior registrada para este veículo.';
+
+            mileageHelp.classList.remove(
+                'text-warning'
+            );
+        }
     }
 
     /**
@@ -709,12 +783,28 @@
                     }
                 );
 
+                const allowLowerMileage =
+                    form.querySelector(
+                        '.allow-lower-mileage'
+                    );
+
+                allowLowerMileage?.addEventListener(
+                    'change',
+                    function () {
+                        updateMileageHint(
+                            form,
+                            vehicleSelect.value
+                        );
+                    }
+                );
+
                 const modal =
                     form.closest('.modal');
 
                 modal?.addEventListener(
                     'shown.bs.modal',
                     function () {
+                        initializeDatePickers(modal);
                         updateMaintenanceForm(form);
                     }
                 );
