@@ -474,7 +474,7 @@
         }
 
         root
-            .querySelectorAll('.datepicker, .maintenance-datepicker')
+            .querySelectorAll('.datepicker:not([type="date"]), .maintenance-datepicker:not([type="date"])')
             .forEach(function (input) {
                 if (
                     input._flatpickr
@@ -511,6 +511,32 @@
                                 false,
                                 'd/m/Y'
                             );
+                        }
+                    }
+                });
+            });
+    }
+
+    /**
+     * Abre o calendário nativo ao clicar em qualquer área
+     * do campo de data da manutenção.
+     */
+    function initializeNativeDatePickers(root = document) {
+        root
+            .querySelectorAll('input[name="maintenance_date"][type="date"]')
+            .forEach(function (input) {
+                if (input.dataset.nativePickerInitialized === 'true') {
+                    return;
+                }
+
+                input.dataset.nativePickerInitialized = 'true';
+
+                input.addEventListener('click', function () {
+                    if (typeof this.showPicker === 'function') {
+                        try {
+                            this.showPicker();
+                        } catch (error) {
+                            // Mantém o comportamento padrão do navegador.
                         }
                     }
                 });
@@ -738,7 +764,7 @@
 
         const selectedOption =
             vehicleSelect.options[
-                vehicleSelect.selectedIndex
+            vehicleSelect.selectedIndex
             ];
 
         const vehicleType =
@@ -768,7 +794,7 @@
                 if (
                     !vehicleSelect
                     || vehicleSelect.dataset.fleetMaintenanceInitialized
-                        === 'true'
+                    === 'true'
                 ) {
                     return;
                 }
@@ -805,6 +831,7 @@
                     'shown.bs.modal',
                     function () {
                         initializeDatePickers(modal);
+                        initializeNativeDatePickers(modal);
                         updateMaintenanceForm(form);
                     }
                 );
@@ -919,7 +946,7 @@
 
                             const direction =
                                 header.dataset.sortDirection
-                                === 'asc'
+                                    === 'asc'
                                     ? 'desc'
                                     : 'asc';
 
@@ -1015,6 +1042,7 @@
         initializeLicensePlates();
         initializeColorPreview();
         initializeDatePickers();
+        initializeNativeDatePickers();
         initializeMaintenanceForms();
         initializeErrorModals();
         initializeModalAutofocus();

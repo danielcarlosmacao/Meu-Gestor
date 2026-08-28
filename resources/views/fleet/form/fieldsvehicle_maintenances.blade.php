@@ -13,11 +13,12 @@
     | DATA DA MANUTENÇÃO
     |--------------------------------------------------------------------------
     |
-    | Na edição, usa o valor bruto salvo no banco para evitar que accessor,
-    | cast ou formatação do model transforme a data incorretamente.
+    | O input type="date" usa o formato Y-m-d internamente.
+    | Na criação, o dia atual já vem selecionado automaticamente.
+    | Na edição, mantém a data salva no registro.
     |
     */
-    $maintenanceDateValue = '';
+    $maintenanceDateValue = now()->format('Y-m-d');
 
     if ($isEdit) {
         $rawMaintenanceDate = method_exists($maintenance, 'getRawOriginal')
@@ -26,23 +27,21 @@
 
         if (!empty($rawMaintenanceDate)) {
             try {
-                $maintenanceDateValue = \Carbon\Carbon::parse($rawMaintenanceDate)->format('d/m/Y');
+                $maintenanceDateValue = \Carbon\Carbon::parse($rawMaintenanceDate)->format('Y-m-d');
             } catch (\Throwable $exception) {
                 $maintenanceDateValue = '';
             }
+        } else {
+            $maintenanceDateValue = '';
         }
     } else {
         $oldMaintenanceDate = old('maintenance_date');
 
         if (!empty($oldMaintenanceDate)) {
             try {
-                $maintenanceDateValue = \Carbon\Carbon::createFromFormat('d/m/Y', $oldMaintenanceDate)->format('d/m/Y');
+                $maintenanceDateValue = \Carbon\Carbon::parse($oldMaintenanceDate)->format('Y-m-d');
             } catch (\Throwable $exception) {
-                try {
-                    $maintenanceDateValue = \Carbon\Carbon::parse($oldMaintenanceDate)->format('d/m/Y');
-                } catch (\Throwable $exception) {
-                    $maintenanceDateValue = '';
-                }
+                $maintenanceDateValue = now()->format('Y-m-d');
             }
         }
     }
@@ -110,9 +109,15 @@
         Data
     </label>
 
-    <input type="text" id="maintenance_date_{{ $fieldSuffix }}" name="maintenance_date"
-        class="form-control rounded-pill maintenance-datepicker" value="{{ $maintenanceDateValue }}"
-        data-initial-date="{{ $maintenanceDateValue }}" placeholder="dd/mm/aaaa" autocomplete="off" required>
+    <input type="date" id="maintenance_date_{{ $fieldSuffix }}" name="maintenance_date"
+        class="form-control rounded-pill @error('maintenance_date') is-invalid @enderror"
+        value="{{ $maintenanceDateValue }}" required>
+
+    @error('maintenance_date')
+        <div class="invalid-feedback">
+            {{ $message }}
+        </div>
+    @enderror
 </div>
 
 {{-- TIPO --}}
