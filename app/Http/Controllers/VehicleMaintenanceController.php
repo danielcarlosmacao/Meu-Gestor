@@ -8,8 +8,11 @@ use App\Models\VehicleMaintenance;
 use App\Models\VehicleService;
 use App\Models\Workshop;
 use App\Services\SettingService;
+use App\Models\VehicleMaintenanceFile;
 use Illuminate\Support\Facades\DB;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class VehicleMaintenanceController extends Controller
 {
@@ -751,14 +754,148 @@ class VehicleMaintenanceController extends Controller
             );
         }
 
-        /*
-        |--------------------------------------------------------------------------
-        | VISUALIZAÇÃO
-        |--------------------------------------------------------------------------
-        */
 
         return $pdf->stream(
             "relatorio_manutencoes_{$startDate}_a_{$endDate}.pdf"
+        );
+    }
+
+
+    public function getFiles()
+    {
+        $files = VehicleMaintenanceFile::with([
+            'maintenance.vehicle',
+        ])
+            ->latest()
+            ->paginate(30);
+
+        return view(
+            'fleet.vehicles.vehicle_maintenance_files',
+            compact('files')
+        );
+    }
+
+
+    public function uploadFiles(Request $request)
+    {
+        $data = $request->validate([
+            'vehicle_maintenance_id' => [
+                'required',
+                'exists:vehicle_maintenances,id',
+            ],
+
+            'files' => [
+                'required',
+                'array',
+                'min:1',
+            ],
+
+            'files.*' => [
+                'required',
+                'file',
+                'mimes:pdf,jpg,jpeg,png,webp',
+                'max:20480',
+            ],
+        ], [
+            'vehicle_maintenance_id.required' =>
+            'Selecione uma manutenção.',
+
+            'vehicle_maintenance_id.exists' =>
+            'A manutenção selecionada não existe.',
+
+            'files.required' =>
+            'Selecione pelo menos um arquivo.',
+
+            'files.array' =>
+            'Os arquivos enviados são inválidos.',
+
+            'files.min' =>
+            'Selecione pelo menos um arquivo.',
+
+            'files.*.file' =>
+            'Um dos arquivos enviados é inválido.',
+
+            'files.*.mimes' =>
+            'Os arquivos devem ser PDF, JPG, JPEG, PNG ou WEBP.',
+
+            'files.*.max' =>
+            'Cada arquivo pode ter no máximo 20 MB.',
+        ]);
+
+        $maintenance = VehicleMaintenance::findOrFail(
+            $data['vehicle_maintenance_id']
+        );
+
+        foreach ($request->file('files', []) as $file) {
+
+            $originalName = $file->getClientOriginalName();
+
+            $extension = strtolower(
+                $file->getClientOriginalExtension()
+            );
+
+            $fileName = Str::uuid()
+                . '.' . $extension;
+
+            $path = $file->storeAs(
+                'vehicle-maintenance-files',
+                $fileName,
+                'public'
+            );
+
+            VehicleMaintenanceFile::create([
+                'vehicle_maintenance_id' => $maintenance->id,
+                'original_name' => $originalName,
+                'file_name' => $fileName,
+                'path' => $path,
+                'mime_type' => $file->getMimeType(),
+                'size' => $file->getSize(),
+            ]);
+        }
+
+        return redirect()
+            ->back()
+            ->with(
+                'success',
+                'Arquivo(s) enviado(s) com sucesso!'
+            );
+    }
+
+
+    public function viewFile(string $token)
+    {
+        $file = VehicleMaintenanceFile::with([
+            'maintenance.vehicle',
+        ])
+            ->where('token', $token)
+            ->firstOrFail();
+
+        if (!Storage::disk('public')->exists($file->path)) {
+            abort(404, 'Arquivo não encontrado.');
+        }
+
+        return view(
+            'fleet.vehicles.vehicle_maintenance_file_view',
+            compact('file')
+        );
+    }
+
+    public function deleteFile(string $token)
+    {
+        $file = VehicleMaintenanceFile::where('token', $token)
+            ->firstOrFail();
+
+        if (
+            $file->path &&
+            Storage::disk('public')->exists($file->path)
+        ) {
+            Storage::disk('public')->delete($file->path);
+        }
+
+        $file->delete();
+
+        return response()->view(
+            'fleet.vehicles.vehicle_maintenance_file_deleted'
         );
     }
 }

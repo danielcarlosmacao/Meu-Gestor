@@ -18,9 +18,7 @@ Route::middleware(['auth', 'permission:fleets.view'])->group(function () {
     Route::get('/vehicle-maintenance/report/form', function () {
         return view('fleet.vehicles.vehicle_maintenances_report');
     })->name('vehicle-maintenance.report.form');
-
-    Route::get('/vehicle-maintenance/report/pdf', [VehicleMaintenanceController::class, 'handlePdfReport'])
-        ->name('vehicle-maintenance.report.pdf');
+    Route::get('/vehicle-maintenance/report/pdf', [VehicleMaintenanceController::class, 'handlePdfReport'])->name('vehicle-maintenance.report.pdf');
 });
 //fleets.create
 Route::middleware(['auth', 'permission:fleets.create'])->group(function () {
@@ -43,3 +41,24 @@ Route::middleware(['auth', 'permission:fleets.delete'])->group(function () {
     Route::delete('/fleet/vehicle_services/{vehicleService}', [VehicleServiceController::class, 'destroy'])->name('fleet.vehicle_services.destroy');
     Route::delete('/fleet/vehicle_workshop/{id}', [WorkshopController::class, 'destroy'])->name('fleet.vehicle_workshop.destroy');
 });
+
+
+Route::get(
+    '/fleet/vehicle_maintenances/files',
+    [VehicleMaintenanceController::class, 'getFiles']
+)->name('fleet.vehicle_maintenances.getFiles');
+
+Route::post(
+    '/fleet/vehicle_maintenances/files',
+    [VehicleMaintenanceController::class, 'uploadFiles']
+)->name('fleet.vehicle_maintenances.files.upload');
+
+Route::get(
+    '/fleet/vehicle_maintenances/files/{token}',
+    [VehicleMaintenanceController::class, 'viewFile']
+)->name('fleet.vehicle_maintenances.files.view');
+
+Route::delete(
+    '/fleet/vehicle_maintenances/files/{token}',
+    [VehicleMaintenanceController::class, 'deleteFile']
+)->name('fleet.vehicle_maintenances.files.delete');

@@ -48,9 +48,16 @@
                     </div>
 
                     @can('fleets.create')
+                        {{-- Botão adicionar arquivo --}}
+                        <button type="button" class="btn dcm-btn-primary" data-bs-toggle="modal"
+                            data-bs-target="#uploadMaintenanceFileModal" title="Adicionar arquivo">
+                            <i class="bi bi-paperclip"></i>
+                            Arquivo
+                        </button>
+
+                        {{-- Botão nova manutenção --}}
                         <button type="button" class="btn dcm-btn-primary" data-bs-toggle="modal"
                             data-bs-target="#addMaintenanceModal">
-
                             <i class="bi bi-plus-lg"></i>
                             Nova manutenção
                         </button>
@@ -59,6 +66,7 @@
                 </div>
 
             </div>
+
 
             {{-- ============================================================
             RESUMO
@@ -86,6 +94,7 @@
 
                 </div>
 
+
                 <div class="fleet-summary-card">
 
                     <div class="fleet-summary-icon">
@@ -106,6 +115,7 @@
 
                 </div>
 
+
                 <div class="fleet-summary-card">
 
                     <div class="fleet-summary-icon">
@@ -125,6 +135,7 @@
                     </div>
 
                 </div>
+
 
                 <div class="fleet-summary-card">
 
@@ -147,6 +158,7 @@
                 </div>
 
             </div>
+
 
             {{-- ============================================================
             LISTAGEM
@@ -177,6 +189,7 @@
                     </span>
 
                 </div>
+
 
                 <div class="fleet-card-body-flush">
 
@@ -230,6 +243,11 @@
                                             Informações
                                         </th>
 
+                                        {{-- NOVA COLUNA --}}
+                                        <th style="width: 110px;">
+                                            Arquivos
+                                        </th>
+
                                         <th class="text-end">
                                             Ações
                                         </th>
@@ -238,36 +256,53 @@
 
                                 </thead>
 
+
                                 <tbody>
 
                                     @foreach ($maintenances as $maintenance)
                                         @php
+
                                             $fullInfo = $maintenance->parts_used ?? '';
+
                                             $shortInfo = \Illuminate\Support\Str::limit($fullInfo, 35, '...');
 
                                             $status = strtolower($maintenance->status ?? '');
+
                                             $type = strtolower($maintenance->type ?? '');
+
+                                            /*
+                                             * Os arquivos já devem vir carregados
+                                             * pelo VehicleMaintenance::with('files')
+                                             */
+                                            $maintenanceFiles = $maintenance->files ?? collect();
+
                                         @endphp
+
 
                                         <tr>
 
-                                            {{-- Cor do veículo --}}
+                                            {{-- =====================================================
+                                            COR DO VEÍCULO
+                                            ====================================================== --}}
+
                                             <td>
 
                                                 <div style="
-                                                    width:22px;
-                                                    height:22px;
-                                                    border-radius:6px;
-                                                    background:{{ $maintenance->vehicle->color ?? '#DDD' }};
-                                                    border:1px solid #bdbdbd;
-                                                    margin:auto;
-                                                "
-                                                    title="{{ $maintenance->vehicle->color }}">
-                                                </div>
+                                                        width:22px;
+                                                        height:22px;
+                                                        border-radius:6px;
+                                                        background:{{ $maintenance->vehicle->color ?? '#DDD' }};
+                                                        border:1px solid #bdbdbd;
+                                                        margin:auto;
+                                                    "
+                                                    title="{{ $maintenance->vehicle->color ?? '' }}"></div>
 
                                             </td>
 
-                                            {{-- Veículo --}}
+
+                                            {{-- =====================================================
+                                            VEÍCULO
+                                            ====================================================== --}}
 
                                             <td>
 
@@ -276,15 +311,20 @@
                                                         class="text-decoration-none">
 
                                                         <strong class="d-block text-body">
+
                                                             {{ $maintenance->vehicle->model ?? 'Sem modelo' }}
+
                                                             {{ $maintenance->vehicle->year ?? '' }}
+
                                                         </strong>
 
                                                         <small class="text-secondary">
 
                                                             @if ($maintenance->vehicle->license_plate)
                                                                 <span class="fleet-plate-badge">
+
                                                                     {{ strtoupper($maintenance->vehicle->license_plate) }}
+
                                                                 </span>
                                                             @else
                                                                 Placa não informada
@@ -301,13 +341,18 @@
 
                                             </td>
 
-                                            {{-- Data --}}
+
+                                            {{-- =====================================================
+                                            DATA
+                                            ====================================================== --}}
 
                                             <td data-sort-value="{{ $maintenance->maintenance_date }}">
 
                                                 @if ($maintenance->maintenance_date)
                                                     <span class="d-block fw-semibold">
+
                                                         {{ \Carbon\Carbon::parse($maintenance->maintenance_date)->format('d/m/Y') }}
+
                                                     </span>
                                                 @else
                                                     <span class="text-secondary">
@@ -317,40 +362,57 @@
 
                                             </td>
 
-                                            {{-- Tipo --}}
+
+                                            {{-- =====================================================
+                                            TIPO
+                                            ====================================================== --}}
 
                                             <td data-sort-value="{{ $type }}">
 
                                                 @switch($type)
                                                     @case('preventive')
                                                         <span class="fleet-badge fleet-badge-info">
+
                                                             <i class="bi bi-shield-check"></i>
+
                                                             {{ __('typemaintenances.' . $maintenance->type) }}
+
                                                         </span>
                                                     @break
 
                                                     @case('corrective')
                                                         <span class="fleet-badge fleet-badge-danger">
+
                                                             <i class="bi bi-wrench-adjustable"></i>
+
                                                             {{ __('typemaintenances.' . $maintenance->type) }}
+
                                                         </span>
                                                     @break
 
                                                     @default
                                                         <span class="fleet-badge fleet-badge-secondary">
+
                                                             <i class="bi bi-tools"></i>
+
                                                             {{ __('typemaintenances.' . $maintenance->type) }}
+
                                                         </span>
                                                 @endswitch
 
                                             </td>
 
-                                            {{-- Quilometragem --}}
+
+                                            {{-- =====================================================
+                                            QUILOMETRAGEM
+                                            ====================================================== --}}
 
                                             <td data-sort-value="{{ $maintenance->mileage ?? 0 }}">
 
                                                 <span class="fw-semibold">
+
                                                     {{ number_format($maintenance->mileage ?? 0, 0, ',', '.') }}
+
                                                 </span>
 
                                                 <small class="text-secondary">
@@ -359,17 +421,26 @@
 
                                             </td>
 
-                                            {{-- Valor --}}
+
+                                            {{-- =====================================================
+                                            VALOR
+                                            ====================================================== --}}
 
                                             <td data-sort-value="{{ $maintenance->cost ?? 0 }}">
 
                                                 <strong>
-                                                    R$ {{ number_format($maintenance->cost ?? 0, 2, ',', '.') }}
+
+                                                    R$
+                                                    {{ number_format($maintenance->cost ?? 0, 2, ',', '.') }}
+
                                                 </strong>
 
                                             </td>
 
-                                            {{-- Status --}}
+
+                                            {{-- =====================================================
+                                            STATUS
+                                            ====================================================== --}}
 
                                             <td data-sort-value="{{ $status }}">
 
@@ -379,36 +450,50 @@
 
                                                     @case('finished')
                                                         <span class="fleet-badge fleet-badge-success">
+
                                                             <i class="bi bi-check-circle"></i>
+
                                                             {{ __('status.' . $maintenance->status) }}
+
                                                         </span>
                                                     @break
 
                                                     @case('pending')
                                                     @case('scheduled')
                                                         <span class="fleet-badge fleet-badge-warning">
+
                                                             <i class="bi bi-clock"></i>
+
                                                             {{ __('status.' . $maintenance->status) }}
+
                                                         </span>
                                                     @break
 
                                                     @case('canceled')
                                                     @case('cancelled')
                                                         <span class="fleet-badge fleet-badge-danger">
+
                                                             <i class="bi bi-x-circle"></i>
+
                                                             {{ __('status.' . $maintenance->status) }}
+
                                                         </span>
                                                     @break
 
                                                     @default
                                                         <span class="fleet-badge fleet-badge-secondary">
+
                                                             {{ __('status.' . $maintenance->status) }}
+
                                                         </span>
                                                 @endswitch
 
                                             </td>
 
-                                            {{-- Oficina --}}
+
+                                            {{-- =====================================================
+                                            OFICINA
+                                            ====================================================== --}}
 
                                             <td>
 
@@ -418,7 +503,9 @@
                                                         <i class="bi bi-building-gear text-secondary"></i>
 
                                                         <span>
+
                                                             {{ is_object($maintenance->workshop) ? $maintenance->workshop->name : $maintenance->workshop }}
+
                                                         </span>
 
                                                     </div>
@@ -430,7 +517,10 @@
 
                                             </td>
 
-                                            {{-- Serviços --}}
+
+                                            {{-- =====================================================
+                                            SERVIÇOS
+                                            ====================================================== --}}
 
                                             <td>
 
@@ -452,7 +542,10 @@
 
                                             </td>
 
-                                            {{-- Informações --}}
+
+                                            {{-- =====================================================
+                                            INFORMAÇÕES
+                                            ====================================================== --}}
 
                                             <td style="min-width: 210px;">
 
@@ -464,14 +557,12 @@
                                                         </span>
 
                                                         <span data-text-full class="d-none">
-
                                                             {{ $fullInfo }}
                                                         </span>
 
                                                         @if (mb_strlen($fullInfo) > 35)
                                                             <button type="button" class="btn btn-link btn-sm p-0 ms-1"
                                                                 data-text-toggle>
-
                                                                 Mais
                                                             </button>
                                                         @endif
@@ -485,7 +576,41 @@
 
                                             </td>
 
-                                            {{-- Ações --}}
+
+                                            {{-- =====================================================
+                                            ARQUIVOS
+                                            ====================================================== --}}
+
+                                            <td>
+
+                                                @if ($maintenanceFiles->count())
+                                                    <div class="d-flex flex-wrap gap-1">
+
+                                                        @foreach ($maintenanceFiles as $file)
+                                                            <a href="{{ route('fleet.vehicle_maintenances.files.view', $file->token) }}"
+                                                                target="_blank"
+                                                                class="btn btn-sm btn-outline-primary rounded-circle d-inline-flex align-items-center justify-content-center"
+                                                                style="width:34px;height:34px;"
+                                                                title="{{ $file->original_name }}">
+
+                                                                <i class="bi bi-eye"></i>
+
+                                                            </a>
+                                                        @endforeach
+
+                                                    </div>
+                                                @else
+                                                    <span class="text-secondary" title="Nenhum arquivo">
+                                                        —
+                                                    </span>
+                                                @endif
+
+                                            </td>
+
+
+                                            {{-- =====================================================
+                                            AÇÕES
+                                            ====================================================== --}}
 
                                             <td>
 
@@ -498,6 +623,7 @@
                                                             title="Editar manutenção">
 
                                                             <i class="bi bi-pencil-square"></i>
+
                                                         </button>
                                                     @endcan
 
@@ -535,7 +661,9 @@
                                         data-bs-target="#addMaintenanceModal">
 
                                         <i class="bi bi-plus-lg"></i>
+
                                         Cadastrar manutenção
+
                                     </button>
                                 @endcan
 
@@ -549,13 +677,16 @@
 
             </div>
 
+
             {{-- ============================================================
             PAGINAÇÃO
         ============================================================= --}}
 
             @if ($maintenances->hasPages())
                 <div class="fleet-pagination">
+
                     {{ $maintenances->withQueryString()->links() }}
+
                 </div>
             @endif
 
@@ -563,9 +694,10 @@
 
     </div>
 
+
     {{-- ================================================================
     MODAIS DE MANUTENÇÃO
-================================================================= --}}
+    ================================================================= --}}
 
     @include('fleet.form.vehicle_maintenances', [
         'vehicles' => $vehicles,
@@ -574,39 +706,357 @@
         'maintenances' => $maintenances,
     ])
 
+
+    {{-- ================================================================
+    MODAL - ADICIONAR ARQUIVO
+    ================================================================= --}}
+
+    <div class="modal fade" id="uploadMaintenanceFileModal" tabindex="-1"
+        aria-labelledby="uploadMaintenanceFileModalLabel" aria-hidden="true">
+
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+
+            <div class="modal-content border-0 rounded-4 shadow-lg">
+
+                <form
+                    action="{{ route('fleet.vehicle_maintenances.files.upload') }}"
+                    method="POST" enctype="multipart/form-data">
+
+                    @csrf
+
+                    <div class="modal-header border-0">
+
+                        <div>
+
+                            <h5 class="modal-title fw-bold" id="uploadMaintenanceFileModalLabel">
+
+                                <i class="bi bi-paperclip me-2"></i>
+
+                                Adicionar arquivos
+
+                            </h5>
+
+                            <small class="text-secondary">
+
+                                Anexe documentos ou imagens à manutenção.
+
+                            </small>
+
+                        </div>
+
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+
+                    </div>
+
+
+                    <div class="modal-body">
+
+                        {{-- =================================================
+                        MANUTENÇÃO
+                        ================================================== --}}
+
+                        <div class="mb-4">
+
+                            <label for="vehicle_maintenance_id" class="form-label fw-semibold">
+                                Manutenção
+                            </label>
+
+                            <select id="vehicle_maintenance_id" name="vehicle_maintenance_id"
+                                class="form-select rounded-pill" required>
+
+                                <option value="">
+                                    Selecione a manutenção
+                                </option>
+
+                                @foreach ($maintenances as $maintenance)
+                                    <option value="{{ $maintenance->id }}">
+
+                                        {{ $maintenance->vehicle->license_plate ?? 'Sem placa' }}
+
+                                        -
+
+                                        {{ $maintenance->vehicle->model ?? 'Sem modelo' }}
+
+                                        @if ($maintenance->maintenance_date)
+                                            |
+
+                                            {{ \Carbon\Carbon::parse($maintenance->maintenance_date)->format('d/m/Y') }}
+                                        @endif
+
+                                        -
+
+                                        {{ $maintenance->type ? __('typemaintenances.' . $maintenance->type) : 'Manutenção' }}
+
+                                    </option>
+                                @endforeach
+
+                            </select>
+
+                            <div class="form-text">
+
+                                Selecione a manutenção à qual os arquivos pertencem.
+
+                            </div>
+
+                        </div>
+
+
+                        {{-- =================================================
+                        ARQUIVOS
+                        ================================================== --}}
+
+                        <div>
+
+                            <label for="maintenance_files" class="form-label fw-semibold">
+                                Arquivos
+                            </label>
+
+                            <input type="file" id="maintenance_files" name="files[]" class="form-control rounded-3"
+                                accept=".pdf,.jpg,.jpeg,.png,.webp" multiple required>
+
+                            <div class="form-text">
+
+                                Você pode selecionar um ou vários arquivos.
+
+                                <br>
+
+                                Formatos permitidos:
+                                PDF, JPG, JPEG, PNG e WEBP.
+
+                                <br>
+
+                                Tamanho máximo:
+                                20 MB por arquivo.
+
+                            </div>
+
+                        </div>
+
+
+                        {{-- =================================================
+                        PREVIEW DOS NOMES
+                        ================================================== --}}
+
+                        <div id="maintenanceFilesPreview" class="mt-3 d-none">
+
+                            <div class="small fw-semibold mb-2">
+                                Arquivos selecionados:
+                            </div>
+
+                            <div id="maintenanceFilesPreviewList" class="d-flex flex-column gap-1"></div>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="modal-footer border-0">
+
+                        <button type="button" class="btn btn-outline-secondary rounded-pill" data-bs-dismiss="modal">
+                            Cancelar
+                        </button>
+
+                        <button type="submit" class="btn dcm-btn-primary rounded-pill">
+
+                            <i class="bi bi-cloud-upload me-1"></i>
+
+                            Enviar arquivos
+
+                        </button>
+
+                    </div>
+
+                </form>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    {{-- ================================================================
+    SCRIPT
+    ================================================================= --}}
+
     <script>
         window.maxMileages = @json($maxMileages ?? []);
     </script>
 
     <script src="{{ asset('js/fleet-module.js') }}"></script>
 
+
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const expandableTexts = document.querySelectorAll('[data-expandable-text]');
+
+            /*
+             * ============================================================
+             * TEXTO EXPANSÍVEL
+             * ============================================================
+             */
+
+            const expandableTexts = document.querySelectorAll(
+                '[data-expandable-text]'
+            );
 
             expandableTexts.forEach(function(container) {
-                const shortText = container.querySelector('[data-text-short]');
-                const fullText = container.querySelector('[data-text-full]');
-                const toggleButton = container.querySelector('[data-text-toggle]');
+
+                const shortText = container.querySelector(
+                    '[data-text-short]'
+                );
+
+                const fullText = container.querySelector(
+                    '[data-text-full]'
+                );
+
+                const toggleButton = container.querySelector(
+                    '[data-text-toggle]'
+                );
 
                 if (!shortText || !fullText || !toggleButton) {
                     return;
                 }
 
                 toggleButton.addEventListener('click', function() {
+
                     const isExpanded = !fullText.classList.contains('d-none');
 
                     if (isExpanded) {
+
                         fullText.classList.add('d-none');
+
                         shortText.classList.remove('d-none');
+
                         toggleButton.textContent = 'Mais';
+
                     } else {
+
                         shortText.classList.add('d-none');
+
                         fullText.classList.remove('d-none');
+
                         toggleButton.textContent = 'Menos';
+
                     }
+
                 });
+
             });
+
+
+            /*
+             * ============================================================
+             * PREVIEW DOS ARQUIVOS SELECIONADOS
+             * ============================================================
+             */
+
+            const filesInput = document.getElementById(
+                'maintenance_files'
+            );
+
+            const filesPreview = document.getElementById(
+                'maintenanceFilesPreview'
+            );
+
+            const filesPreviewList = document.getElementById(
+                'maintenanceFilesPreviewList'
+            );
+
+            if (filesInput && filesPreview && filesPreviewList) {
+
+                filesInput.addEventListener('change', function() {
+
+                    filesPreviewList.innerHTML = '';
+
+                    if (!this.files.length) {
+
+                        filesPreview.classList.add('d-none');
+
+                        return;
+
+                    }
+
+                    filesPreview.classList.remove('d-none');
+
+                    Array.from(this.files).forEach(function(file) {
+
+                        const item = document.createElement('div');
+
+                        item.className =
+                            'd-flex align-items-center gap-2 small border rounded-3 px-3 py-2 bg-light';
+
+                        let icon = 'bi-file-earmark';
+
+                        if (
+                            file.type === 'application/pdf'
+                        ) {
+
+                            icon = 'bi-file-earmark-pdf text-danger';
+
+                        } else if (
+                            file.type.startsWith('image/')
+                        ) {
+
+                            icon = 'bi-file-earmark-image text-primary';
+
+                        }
+
+                        item.innerHTML = `
+                            <i class="bi ${icon}"></i>
+                            <span class="text-truncate">
+                                ${file.name}
+                            </span>
+                            <span class="text-secondary ms-auto">
+                                ${(file.size / 1024 / 1024).toFixed(2)} MB
+                            </span>
+                        `;
+
+                        filesPreviewList.appendChild(item);
+
+                    });
+
+                });
+
+            }
+
+
+            /*
+             * ============================================================
+             * LIMPA O MODAL AO FECHAR
+             * ============================================================
+             */
+
+            const uploadModal =
+                document.getElementById(
+                    'uploadMaintenanceFileModal'
+                );
+
+            if (uploadModal) {
+
+                uploadModal.addEventListener(
+                    'hidden.bs.modal',
+                    function() {
+
+                        const form =
+                            uploadModal.querySelector('form');
+
+                        if (form) {
+                            form.reset();
+                        }
+
+                        if (filesPreview) {
+                            filesPreview.classList.add('d-none');
+                        }
+
+                        if (filesPreviewList) {
+                            filesPreviewList.innerHTML = '';
+                        }
+
+                    }
+                );
+
+            }
+
         });
     </script>
 
