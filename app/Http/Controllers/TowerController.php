@@ -383,7 +383,7 @@ class TowerController extends Controller
     {
         $request->validate([
             'tower_id' => 'required|exists:towers,id',
-            'images.*' => 'required|file|max:2048'
+            'images.*' => 'required|file|max:30720' // 30MB
         ]);
 
         if ($request->hasFile('images')) {
