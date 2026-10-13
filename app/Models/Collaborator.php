@@ -11,7 +11,11 @@ class Collaborator extends Model
 
     protected $fillable = [
         'name',
+        'contact',
         'admission_date',
+        'user_id',
+        'job_title_id',
+        'work_scale',
         'color',
         'status',
     ];
@@ -26,4 +30,17 @@ public function courses()
 }
 
 
+    public function jobTitle()
+    {
+        return $this->belongsTo(CollaboratorJobTitle::class, 'job_title_id');
+    }
+
+    public function workSchedules()
+    {
+        return $this->hasMany(WorkSchedule::class);
+    }
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 }

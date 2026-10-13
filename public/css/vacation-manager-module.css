@@ -99,7 +99,7 @@
 
 .vm-btn-add:hover,
 .vm-btn-add:focus {
-    color: #fff;
+    color: var(--color-hover);
     filter: brightness(0.95);
     transform: translateY(-1px);
     box-shadow: 0 9px 20px color-mix(in srgb, var(--vm-primary) 28%, transparent);

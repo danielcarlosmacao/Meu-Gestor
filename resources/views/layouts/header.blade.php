@@ -567,6 +567,21 @@
                                                 </a>
                                             @endcan
 
+                                            @can('collaborators.workschedule.view')
+                                                <a class="app-menu-link"
+                                                    href="{{ route('vacation_manager.work_schedules.releases') }}">
+
+                                                    <span class="app-menu-link-icon">
+                                                        <i class="bi bi-person-vcard"></i>
+                                                    </span>
+
+                                                    <span>
+                                                        <strong>Lançamentos</strong>
+                                                        <small>Gerenciamento de lançamentos extras (afastamentos e folgas)</small>
+                                                    </span>
+                                                </a>
+                                            @endcan
+
                                             @can('collaborators.courses.view')
                                                 <a class="app-menu-link"
                                                     href="{{ route('vacation_manager.collaborator.courses.index') }}">
@@ -587,8 +602,23 @@
                                         <div class="col-12 col-md-6">
 
                                             <div class="app-menu-group-title">
-                                                Férias
+                                                Lançamentos
                                             </div>
+
+                                            @can('collaborators.workschedule.view')
+                                                <a class="app-menu-link"
+                                                    href="{{ route('vacation_manager.work_schedules.index', ['date' => now()->format('m-y')]) }}">
+
+                                                    <span class="app-menu-link-icon">
+                                                        <i class="bi bi-person-vcard"></i>
+                                                    </span>
+
+                                                    <span>
+                                                        <strong>Escalas</strong>
+                                                        <small>Gerenciamento de escalas</small>
+                                                    </span>
+                                                </a>
+                                            @endcan
 
                                             @can('vacations.edit')
                                                 <a class="app-menu-link"
@@ -613,7 +643,7 @@
                                                     </span>
 
                                                     <span>
-                                                        <strong>Calendário</strong>
+                                                        <strong>Calendário de ferias</strong>
                                                         <small>Visualizar períodos</small>
                                                     </span>
                                                 </a>
@@ -1117,7 +1147,7 @@
 
     {{-- Toast --}}
     @include('layouts.toast')
-    
+
     <script>
         let deferredInstallPrompt = null;
 

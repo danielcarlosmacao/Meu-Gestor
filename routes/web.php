@@ -6,7 +6,7 @@ use Spatie\Permission\Middleware\PermissionMiddleware;
 use Spatie\Permission\Middleware\RoleMiddleware;
 use Spatie\Permission\Middleware\RoleOrPermissionMiddleware;
 
-
+use App\Http\Controllers\WelcomeController;
 use App\Http\Controllers\PostitController;
 use App\Http\Controllers\Admin\RecipientController;
 use App\Http\Controllers\Admin\NotificationController;
@@ -43,10 +43,11 @@ require __DIR__ . '/web/vpn.php';
 require __DIR__ . '/web/ftth.php';
 
 //---------------------------------------
+
 Route::middleware(['auth'])->group(function () {
-    Route::get('/', [TaskController::class, 'index'])->name('welcome');
-    Route::get('/welcome', [TaskController::class, 'index'])->name('welcome');
-    Route::get('/dashboard', [TaskController::class, 'index'])->name('dashboard');
+    Route::get('/', WelcomeController::class)->name('welcome');
+    Route::get('/welcome', WelcomeController::class);
+    Route::get('/dashboard', WelcomeController::class)->name('dashboard');
 });
 /* -----------------------------------------Desativando postit -------------------
 Route::get('/dashboard', function () {

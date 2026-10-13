@@ -5,6 +5,8 @@ namespace App\Http\Controllers\VacationManager;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Collaborator;
+use App\Models\CollaboratorJobtitle;
+use App\Models\User;
 use App\Services\SettingService;
 
 class CollaboratorController extends Controller
@@ -14,7 +16,9 @@ class CollaboratorController extends Controller
     {
         $perPage = $settingService->getPerPage();
         $collaborators = Collaborator::orderBy('status', 'asc')->orderBy('name', 'asc')->paginate($perPage);
-        return view('vacation_manager.collaborators.index', compact('collaborators'));
+        $users = User::where('active', 1)->orderBy('name', 'asc')->get();
+        $jobTitles = CollaboratorJobtitle::orderBy('name', 'asc')->where('status', 'active')->get();
+        return view('vacation_manager.collaborators.index', compact('collaborators', 'jobTitles', 'users'));
     }
 
    public function store(Request $request)
@@ -22,6 +26,9 @@ class CollaboratorController extends Controller
     $data = $request->validate([
         'name'           => 'required|string',
         'admission_date' => 'required|date',
+        'user_id'        => 'nullable|exists:users,id',
+        'job_title_id'   => 'nullable|exists:collaborator_jobtitles,id',
+        'work_scale'     => 'nullable|string',
         'color'          => 'required|string',
         'status'         => 'required|in:active,inactive',
     ]);
@@ -47,6 +54,9 @@ public function update(Request $request, $id)
     $data = $request->validate([
         'name'           => 'required|string',
         'admission_date' => 'required|date',
+        'user_id'        => 'nullable|exists:users,id',
+        'job_title_id'   => 'nullable|exists:collaborator_jobtitles,id',
+        'work_scale'     => 'nullable|string',
         'color'          => 'required|string',
         'status'         => 'required|in:active,inactive',
     ]);

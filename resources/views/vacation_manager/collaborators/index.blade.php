@@ -32,18 +32,27 @@
                     </div>
 
                 </div>
+                <div class="vm-actions">
+                    @can('collaborators.create')
+                        <a href="{{ route('vacation_manager.collaborators.jobtitles.index') }}" class="btn vm-btn-add" <i
+                            class="bi bi-plus-lg"></i>
+                            <span class="vm-btn-text">
+                                Cargos
+                            </span>
+                        </a>
+                    @endcan
 
-                @can('collaborators.create')
-                    <button type="button" class="btn vm-btn-add" data-bs-toggle="modal" data-bs-target="#addCollaboratorModal"
-                        title="Adicionar colaborador">
-                        <i class="bi bi-plus-lg"></i>
+                    @can('collaborators.create')
+                        <button type="button" class="btn vm-btn-add" data-bs-toggle="modal"
+                            data-bs-target="#addCollaboratorModal" title="Adicionar colaborador">
+                            <i class="bi bi-plus-lg"></i>
 
-                        <span class="vm-btn-text">
-                            Novo colaborador
-                        </span>
-                    </button>
-                @endcan
-
+                            <span class="vm-btn-text">
+                                Novo colaborador
+                            </span>
+                        </button>
+                    @endcan
+                </div>
             </div>
 
             {{-- Tabela --}}
@@ -81,7 +90,8 @@
                                             </div>
 
                                             <small class="text-muted">
-                                                Código #{{ $collaborator->id }}
+                                                {{ $collaborator->jobTitle->name ?? '' }}
+                                                {{ $collaborator->work_scale ?? '' }}
                                             </small>
                                         </div>
 

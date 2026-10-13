@@ -12,8 +12,113 @@ document.addEventListener('DOMContentLoaded', () => {
     initModalAutoFocus();
     initSubmitLock();
     initVacationForms();
+    initWorkScheduleToggle(); // <-- ADICIONADO AQUI
 });
 
+/**
+ * ===========================================================
+ * Controle de Escalas de Trabalho (Alternar Folga / Trabalho)
+ * ===========================================================
+ */
+function initWorkScheduleToggle() {
+
+
+    // Seletor de mês/ano
+    const picker = document.getElementById('monthYearPicker');
+    if (picker && !picker.dataset.listenerAttached) {
+        picker.dataset.listenerAttached = 'true';
+        picker.addEventListener('change', function () {
+            const value = this.value;
+            if (!value) return;
+            const [yearFull, month] = value.split('-');
+            const yearShort = yearFull.slice(-2);
+            window.location.href = `/vacation_manager/work_schedules/month/${month}-${yearShort}`;
+        });
+    }
+
+    // Delegação de evento global para as células da grade
+    if (!document.body.dataset.scheduleListener) {
+        document.body.dataset.scheduleListener = 'true';
+
+        document.addEventListener('click', function (event) {
+            // SE O USUÁRIO NÃO TIVER PERMISSÃO, NÃO FAZ NADA AO CLICAR
+            if (window.canEditSchedule === false) {
+                return;
+            }
+
+            const cell = event.target.closest('.schedule-day-cell[data-collaborator]');
+            if (!cell) return;
+
+            const collaboratorId = cell.dataset.collaborator;
+            const date = cell.dataset.date;
+            const badge = cell.querySelector('.schedule-badge');
+
+            if (!badge) return;
+
+            // Identifica o tipo atual baseado nas classes do badge
+            let currentType = 'work';
+            if (badge.classList.contains('badge-day_off')) currentType = 'day_off';
+            else if (badge.classList.contains('badge-medical_leave')) currentType = 'medical_leave';
+            else if (badge.classList.contains('badge-vacation')) currentType = 'vacation';
+            else if (badge.classList.contains('badge-holiday')) currentType = 'holiday';
+
+            // SE FOR LICENÇA, FÉRIAS OU FERIADO, NÃO FAZ NADA AO CLICAR
+            if (['medical_leave', 'vacation', 'holiday'].includes(currentType)) {
+                return;
+            }
+
+            if (cell.dataset.loading === 'true') return;
+            cell.dataset.loading = 'true';
+
+            // Alterna apenas entre 'work' e 'day_off'
+            const targetType = currentType === 'day_off' ? 'work' : 'day_off';
+
+            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+
+            fetch("/vacation_manager/work_schedules/toggle", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken || ''
+                },
+                body: JSON.stringify({
+                    collaborator_id: collaboratorId,
+                    date: date,
+                    type: targetType
+                })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    cell.dataset.loading = 'false';
+                    if (data.success) {
+                        badge.className = `badge badge-${data.type} w-100 py-1 schedule-badge`;
+                        badge.textContent = data.label;
+                        badge.title = data.type;
+                    }
+                })
+                .catch(error => {
+                    cell.dataset.loading = 'false';
+                    console.error('Erro ao atualizar escala:', error);
+                });
+        });
+    }
+
+
+    // Botão Atualizar jornada (Abre o Modal com segurança)
+    const btnUpdate = document.getElementById('btnUpdateSchedule');
+    if (btnUpdate && !btnUpdate.dataset.listenerAttached) {
+        btnUpdate.dataset.listenerAttached = 'true';
+        btnUpdate.addEventListener('click', function (event) {
+            event.preventDefault(); // <-- EVITA QUE DISPARUE OUTRO FORMULÁRIO NA PÁGINA
+
+            const modalElement = document.getElementById('updateScheduleModal');
+            if (modalElement && typeof bootstrap !== 'undefined') {
+                const modal = bootstrap.Modal.getOrCreateInstance(modalElement);
+                modal.show();
+            }
+        });
+    }
+}
 /**
  * ===========================================================
  * Modal de edição dos cursos
@@ -65,9 +170,6 @@ function initCourseEditModal() {
 /**
  * ===========================================================
  * Confirma exclusão
- *
- * Exemplo:
- * data-confirm="Deseja excluir este registro?"
  * ===========================================================
  */
 function initDeleteConfirmations() {
@@ -89,9 +191,6 @@ function initDeleteConfirmations() {
 /**
  * ===========================================================
  * Exibe o nome do arquivo selecionado
- *
- * Exemplo:
- * data-file-preview="#nomeDoElemento"
  * ===========================================================
  */
 function initFileNamePreview() {
@@ -149,9 +248,6 @@ function initModalAutoFocus() {
 /**
  * ===========================================================
  * Impede envio duplo do formulário
- *
- * Formulário:
- * data-submit-lock
  * ===========================================================
  */
 function initSubmitLock() {
@@ -159,10 +255,6 @@ function initSubmitLock() {
         .querySelectorAll('form[data-submit-lock]')
         .forEach((form) => {
             form.addEventListener('submit', function (event) {
-                /*
-                 * Caso o formulário esteja inválido, não bloqueia
-                 * o botão porque o navegador não enviará os dados.
-                 */
                 if (!form.checkValidity()) {
                     return;
                 }
@@ -199,11 +291,6 @@ function initSubmitLock() {
 /**
  * ===========================================================
  * Formulários de férias
- *
- * - Atualiza a data final pela quantidade de dias
- * - Atualiza a quantidade de dias pela data final
- * - Funciona no cadastro e na edição
- * - Alerta início em quinta, sexta ou sábado
  * ===========================================================
  */
 function initVacationForms() {
@@ -241,9 +328,6 @@ function initVacationForms() {
         });
 }
 
-/**
- * Inicializa um formulário específico de férias.
- */
 function initializeVacationForm(
     form,
     vacationToast,
@@ -271,14 +355,6 @@ function initializeVacationForm(
 
     let lastWarnedDate = null;
 
-    /**
-     * Atualiza a data final.
-     *
-     * Exemplo:
-     * início: 01/08
-     * dias: 30
-     * término: 30/08
-     */
     function calculateEndDate() {
         const numberOfDays = Number.parseInt(
             daysInput.value,
@@ -299,10 +375,6 @@ function initializeVacationForm(
 
         const endDate = new Date(startDate);
 
-        /*
-         * Subtrai 1 porque o dia inicial
-         * também faz parte do período.
-         */
         endDate.setDate(
             endDate.getDate() + numberOfDays - 1
         );
@@ -313,10 +385,6 @@ function initializeVacationForm(
         endDateInput.setCustomValidity('');
     }
 
-    /**
-     * Atualiza a quantidade de dias quando a
-     * data inicial ou final é alterada manualmente.
-     */
     function calculateVacationDays() {
         const startDate = parseLocalDate(
             startDateInput.value
@@ -357,9 +425,6 @@ function initializeVacationForm(
         daysInput.value = numberOfDays;
     }
 
-    /**
-     * Verifica o dia da semana da data inicial.
-     */
     function validateStartDate() {
         const startDate = parseLocalDate(
             startDateInput.value
@@ -375,11 +440,6 @@ function initializeVacationForm(
         const weekday =
             startDate.getDay();
 
-        /*
-         * 4 = quinta-feira
-         * 5 = sexta-feira
-         * 6 = sábado
-         */
         const warningDays = [4, 5, 6];
 
         if (
@@ -397,9 +457,6 @@ function initializeVacationForm(
         }
     }
 
-    /**
-     * Alteração na quantidade de dias.
-     */
     daysInput.addEventListener(
         'input',
         calculateEndDate
@@ -410,9 +467,6 @@ function initializeVacationForm(
         calculateEndDate
     );
 
-    /**
-     * Alteração na data inicial.
-     */
     startDateInput.addEventListener(
         'change',
         function () {
@@ -426,18 +480,11 @@ function initializeVacationForm(
         }
     );
 
-    /**
-     * Alteração manual na data final.
-     */
     endDateInput.addEventListener(
         'change',
         calculateVacationDays
     );
 
-    /**
-     * Ao abrir o modal, garante que a quantidade
-     * de dias esteja preenchida corretamente.
-     */
     const modal = form.closest('.vacation-modal');
 
     if (modal) {
@@ -454,10 +501,6 @@ function initializeVacationForm(
         );
     }
 
-    /**
-     * Também calcula imediatamente caso o formulário
-     * de edição já tenha datas preenchidas.
-     */
     if (
         startDateInput.value &&
         endDateInput.value
@@ -466,14 +509,6 @@ function initializeVacationForm(
     }
 }
 
-/**
- * ===========================================================
- * Converte YYYY-MM-DD para uma data local
- *
- * Evita problema de fuso horário causado por:
- * new Date('2026-07-31')
- * ===========================================================
- */
 function parseLocalDate(value) {
     if (!value) {
         return null;
@@ -485,39 +520,16 @@ function parseLocalDate(value) {
         return null;
     }
 
-    const year = Number.parseInt(
-        parts[0],
-        10
-    );
+    const year = Number.parseInt(parts[0], 10);
+    const month = Number.parseInt(parts[1], 10);
+    const day = Number.parseInt(parts[2], 10);
 
-    const month = Number.parseInt(
-        parts[1],
-        10
-    );
-
-    const day = Number.parseInt(
-        parts[2],
-        10
-    );
-
-    if (
-        Number.isNaN(year) ||
-        Number.isNaN(month) ||
-        Number.isNaN(day)
-    ) {
+    if (Number.isNaN(year) || Number.isNaN(month) || Number.isNaN(day)) {
         return null;
     }
 
-    const date = new Date(
-        year,
-        month - 1,
-        day
-    );
+    const date = new Date(year, month - 1, day);
 
-    /*
-     * Confirma se a data construída corresponde
-     * exatamente aos valores informados.
-     */
     if (
         date.getFullYear() !== year ||
         date.getMonth() !== month - 1 ||
@@ -529,11 +541,6 @@ function parseLocalDate(value) {
     return date;
 }
 
-/**
- * ===========================================================
- * Converte uma data local para YYYY-MM-DD
- * ===========================================================
- */
 function formatLocalDate(date) {
     if (
         !(date instanceof Date) ||
@@ -542,41 +549,21 @@ function formatLocalDate(date) {
         return '';
     }
 
-    const year =
-        date.getFullYear();
-
-    const month = String(
-        date.getMonth() + 1
-    ).padStart(2, '0');
-
-    const day = String(
-        date.getDate()
-    ).padStart(2, '0');
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
 
     return `${year}-${month}-${day}`;
 }
 
-/**
- * ===========================================================
- * Define o valor de um campo pelo ID
- * ===========================================================
- */
 function setFieldValue(id, value) {
-    const field =
-        document.getElementById(id);
-
+    const field = document.getElementById(id);
     if (!field) {
         return;
     }
-
     field.value = value;
 }
 
-/**
- * ===========================================================
- * Escapa texto antes de inserir com innerHTML
- * ===========================================================
- */
 function escapeHtml(value) {
     return String(value)
         .replaceAll('&', '&amp;')

@@ -59,67 +59,114 @@
                             value="{{ $collaborator->admission_date ?? '' }}" required>
 
                     </div>
+                    <div class=mb-3>
+
+                        <label class="form-label">
+                            Usuário
+                        </label>
+
+                        <select name="user_id" class="form-select">
+
+                            <option value="">Selecione um usuário</option>
+
+                            @foreach ($users as $user)
+                                <option value="{{ $user->id }}" @selected(($collaborator->user_id ?? '') == $user->id)>
+                                    {{ $user->name }}
+                                </option>
+                            @endforeach
+
+                        </select>
 
                     <div class="mb-3">
 
                         <label class="form-label">
-                            Cor do colaborador
+                            Cargo
                         </label>
 
-                        <div class="d-flex align-items-center gap-3">
+                        <select name="job_title_id" class="form-select">
 
-                            <input type="color" name="color" class="form-control form-control-color"
-                                value="{{ $collaborator->color ?? '#24b153' }}" title="Escolha uma cor" required>
+                            <option value="">Selecione um cargo</option>
 
-                            <small class="text-muted">
-                                Esta cor será utilizada em listas e calendários.
-                            </small>
+                            @foreach ($jobTitles as $jobTitle)
+                                <option value="{{ $jobTitle->id }}" @selected(($collaborator->job_title_id ?? '') == $jobTitle->id)>
+                                    {{ $jobTitle->name }}
+                                </option>
+                            @endforeach
+
+                        </select>
+
+                        <div class="mb-3">
+                            <label class="form-label">
+                                Escala de trabalho
+                            </label>
+                            <select name="work_scale" class="form-select">
+                                <option value="">Selecione uma escala de trabalho</option>
+                                <option value="no_scale" @selected(($collaborator->work_scale ?? '') == 'no_scale')>Sem escala</option>
+                                <option value="5x2" @selected(($collaborator->work_scale ?? '') == '5x2')>5x2</option>
+                            </select>
+                        </div>
+
+
+                        <div class="mb-3">
+
+                            <label class="form-label">
+                                Cor do colaborador
+                            </label>
+
+                            <div class="d-flex align-items-center gap-3">
+
+                                <input type="color" name="color" class="form-control form-control-color"
+                                    value="{{ $collaborator->color ?? '#24b153' }}" title="Escolha uma cor" required>
+
+                                <small class="text-muted">
+                                    Esta cor será utilizada em listas e calendários.
+                                </small>
+
+                            </div>
+
+                        </div>
+
+                        <div class="mb-3">
+
+                            <label class="form-label">
+                                Status
+                            </label>
+
+                            <select name="status" class="form-select" required>
+
+                                <option value="active" @selected(($collaborator->status ?? 'active') == 'active')>
+                                    Ativo
+                                </option>
+
+                                <option value="inactive" @selected(($collaborator->status ?? '') == 'inactive')>
+                                    Inativo
+                                </option>
+
+                            </select>
 
                         </div>
 
                     </div>
 
-                    <div class="mb-3">
+                    <div class="modal-footer">
 
-                        <label class="form-label">
-                            Status
-                        </label>
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                            <i class="bi bi-x-circle me-1"></i>
 
-                        <select name="status" class="form-select" required>
+                            Cancelar
+                        </button>
 
-                            <option value="active" @selected(($collaborator->status ?? 'active') == 'active')>
-                                Ativo
-                            </option>
+                        <button type="submit" class="btn dcm-btn-primary">
 
-                            <option value="inactive" @selected(($collaborator->status ?? '') == 'inactive')>
-                                Inativo
-                            </option>
+                            <i class="bi bi-check-lg me-1"></i>
 
-                        </select>
+                            {{ $isEdit ? 'Salvar alterações' : 'Cadastrar colaborador' }}
+
+                        </button>
 
                     </div>
 
                 </div>
-
-                <div class="modal-footer">
-
-                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
-                        <i class="bi bi-x-circle me-1"></i>
-
-                        Cancelar
-                    </button>
-
-                    <button type="submit" class="btn dcm-btn-primary">
-
-                        <i class="bi bi-check-lg me-1"></i>
-
-                        {{ $isEdit ? 'Salvar alterações' : 'Cadastrar colaborador' }}
-
-                    </button>
-
-                </div>
-
-            </div>
 
         </form>
 

@@ -18,6 +18,10 @@ class SystemUpdateHook
 
             $newPermissions = [
                 // 'reports.export',
+                'collaborators.workschedule.view',
+                'collaborators.workschedule.edit',
+                'collaborators.medical_leave.edit',
+                'collaborators.lack.edit',
             ];
 
             if (!empty($newPermissions)) {
@@ -36,9 +40,6 @@ class SystemUpdateHook
             } else {
                 Log::info('[SystemUpdateHook] Nenhuma nova permissão a ser criada.');
             }
-
-
-
         } catch (\Throwable $e) {
             Log::error('[SystemUpdateHook] Erro ao executar hook', [
                 'erro' => $e->getMessage(),

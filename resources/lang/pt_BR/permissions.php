@@ -47,5 +47,8 @@
     'ftth.view'   => 'Visualizar Gestor Ftth',
     'ftth.create'  => 'Adicionar Modulo Ftth',
     'ftth.delete'  => 'Deletar Modulo Ftth',
-
+    'collaborators.workschedule.view'=> 'Visualizar Escalas de Trabalho',
+    'collaborators.workschedule.edit'=> 'Editar Escalas de Trabalho',
+    'collaborators.medical_leave.edit'=> 'Permicao adicionar Licenças Médicas',
+    'collaborators.lack.edit'=> 'Permicao adicionar Faltas',
 ];

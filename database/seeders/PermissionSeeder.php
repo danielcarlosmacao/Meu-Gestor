@@ -89,6 +89,12 @@ class PermissionSeeder extends Seeder
             'ftth.view',
             'ftth.create',
             'ftth.delete',
+
+            //collaborators.workschedule
+            'collaborators.workschedule.view',
+            'collaborators.workschedule.edit',
+            'collaborators.medical_leave.edit',
+            'collaborators.lack.edit',
         ];
 
         // Criar permissões (se não existirem)
